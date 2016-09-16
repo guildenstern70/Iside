@@ -1,47 +1,31 @@
-﻿/**
-    Iside - .NET WPF Version 
-    Copyright (C) LittleLite Software
-    Author Alessio Saltarin
-**/
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Text;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using IsideLogic;
 using LLCryptoLib.Utils;
 
 namespace Iside
 {
-
     /// <summary>
-    /// Interaction logic for KeyedHash.xaml
+    ///     Interaction logic for KeyedHash.xaml
     /// </summary>
     public partial class KeyedHash : Window
     {
-        private HexEnum style;
-        private string strBytes;
         private Cursor enterCursor;
+        private string strBytes;
+        private readonly HexEnum style;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="KeyedHash" /> class.
+        ///     Initializes a new instance of the <see cref="KeyedHash" /> class.
         /// </summary>
         public KeyedHash()
         {
-            InitializeComponent();
+            this.InitializeComponent();
             this.style = HexEnum.SPACE; // TO DO PERSIST WITH SETTINGS
         }
 
         /// <summary>
-        /// Gets the key.
+        ///     Gets the key.
         /// </summary>
         /// <returns></returns>
         /// <exception cref="IsideException"></exception>
@@ -49,25 +33,22 @@ namespace Iside
         {
             byte[] bytes = null;
 
-            if (strBytes == null)
+            if (this.strBytes == null)
             {
                 throw new IsideException("Null input string!");
             }
-            else
+            if (this.strBytes.Length == 0)
             {
-                if (strBytes.Length == 0)
-                {
-                    throw new IsideException("Zero input string!");
-                }
+                throw new IsideException("Zero input string!");
             }
 
             if (this.radHex.IsChecked.Value)
             {
-                bytes = Hexer.Hex2Bytes(strBytes);
+                bytes = Hexer.Hex2Bytes(this.strBytes);
             }
             else
             {
-                bytes = Hexer.Text2Bytes(strBytes);
+                bytes = Hexer.Text2Bytes(this.strBytes);
             }
 
             if (bytes != null)
@@ -97,14 +78,16 @@ namespace Iside
                         StringBuilder sb = new StringBuilder("ff0012ac4a");
                         HexStyler hs = new HexStyler(this.style);
                         string exampleString = hs.Format(sb.ToString());
-                        MessageBox.Show(this, "Input text seems not to be hexadecimal (ie: \"" + exampleString + "\")", IsideLogic.Config.APPNAME, MessageBoxButton.OK, MessageBoxImage.Warning);
+                        MessageBox.Show(this, "Input text seems not to be hexadecimal (ie: \"" + exampleString + "\")",
+                            Config.APPNAME, MessageBoxButton.OK, MessageBoxImage.Warning);
                         textOk = false;
                     }
                 }
             }
             else
             {
-                MessageBox.Show(this, "Enter a key in text or hexadecimal format", IsideLogic.Config.APPNAME, MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(this, "Enter a key in text or hexadecimal format", Config.APPNAME, MessageBoxButton.OK,
+                    MessageBoxImage.Error);
                 textOk = false;
             }
 

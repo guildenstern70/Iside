@@ -2,13 +2,11 @@
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
 namespace Iside
 {
-
     public class DriveItem
     {
         public ImageSource DriveImage { get; set; }
@@ -17,22 +15,22 @@ namespace Iside
     }
 
     /// <summary>
-    /// Interaction logic for SelectCDROM.xaml
+    ///     Interaction logic for SelectCDROM.xaml
     /// </summary>
     public partial class SelectCDROM : Window
     {
-        public ObservableCollection<DriveItem> Drives { get; private set; } 
-        
         public SelectCDROM()
         {
-            InitializeComponent();
+            this.InitializeComponent();
             this.DataContext = this;
             this.Drives = new ObservableCollection<DriveItem>();
             this.InitializeDrives();
         }
 
+        public ObservableCollection<DriveItem> Drives { get; }
+
         /// <summary>
-        /// Return selected drive
+        ///     Return selected drive
         /// </summary>
         public DirectoryInfo SelectedDrive
         {

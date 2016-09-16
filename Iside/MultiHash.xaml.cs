@@ -1,11 +1,4 @@
-﻿/**
-    Iside - .NET WPF Version 
-    Copyright (C) LittleLite Software
-    Author Alessio Saltarin
-**/
-
-
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.IO;
 using System.Threading;
@@ -22,53 +15,53 @@ using WPFUtils;
 namespace Iside
 {
     /// <summary>
-    /// Interaction logic for MultiHash.xaml
+    ///     Interaction logic for MultiHash.xaml
     /// </summary>
     public partial class MultiHash : Window
     {
-        private DirectoryInfo cdromDirectory;
         private BackgroundWorker backgroundWorker;
+        private readonly DirectoryInfo cdromDirectory;
         private AutoResetEvent reset;
 
         public MultiHash()
         {
-            InitializeComponent();
+            this.InitializeComponent();
             this.Init();
         }
 
-        		/// <summary>
-		/// MultiHashForm for CDROM
-		/// </summary>
-		/// <param name="di">Path to CDROM file system</param>
+        /// <summary>
+        ///     MultiHashForm for CDROM
+        /// </summary>
+        /// <param name="di">Path to CDROM file system</param>
         public MultiHash(DirectoryInfo di)
-		{
-			InitializeComponent();
+        {
+            this.InitializeComponent();
             this.Init();
 
-			this.Title = "DVD/CD-ROM Hash Computer";
-            this.btnAddFiles.Visibility = System.Windows.Visibility.Hidden;
-            this.btnAddDir.Visibility = System.Windows.Visibility.Hidden;
-			this.lstFiles.Items.Add("Reading DVD/CDROM files list...");
-			this.cdromDirectory = di;
-		}
+            this.Title = "DVD/CD-ROM Hash Computer";
+            this.btnAddFiles.Visibility = Visibility.Hidden;
+            this.btnAddDir.Visibility = Visibility.Hidden;
+            this.lstFiles.Items.Add("Reading DVD/CDROM files list...");
+            this.cdromDirectory = di;
+        }
 
         private void Init()
         {
             this.reset = new AutoResetEvent(false);
-            this.lstFiles.ContextMenuOpening += lstFiles_ContextMenuOpening;
+            this.lstFiles.ContextMenuOpening += this.lstFiles_ContextMenuOpening;
             this.RefreshStatusBar();
 
             this.backgroundWorker = new BackgroundWorker();
             this.backgroundWorker.WorkerReportsProgress = true;
             this.backgroundWorker.WorkerSupportsCancellation = true;
-            this.backgroundWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker_DoWork);
-            this.backgroundWorker.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.backgroundWorker_ProgressChanged);
-            this.backgroundWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.backgroundWorker_RunWorkerCompleted);
+            this.backgroundWorker.DoWork += this.backgroundWorker_DoWork;
+            this.backgroundWorker.ProgressChanged += this.backgroundWorker_ProgressChanged;
+            this.backgroundWorker.RunWorkerCompleted += this.backgroundWorker_RunWorkerCompleted;
         }
 
-        void lstFiles_ContextMenuOpening(object sender, ContextMenuEventArgs e)
+        private void lstFiles_ContextMenuOpening(object sender, ContextMenuEventArgs e)
         {
-            string selItem = (string)this.lstFiles.SelectedItem;
+            string selItem = (string) this.lstFiles.SelectedItem;
             if (selItem != null)
             {
                 if (selItem.Length > 0)
@@ -116,7 +109,7 @@ namespace Iside
         private void Reset()
         {
             this.progressBar.Value = this.progressBar.Minimum;
-            this.txtHash.Text = String.Empty;
+            this.txtHash.Text = string.Empty;
         }
 
         private void AddFiles()
@@ -150,10 +143,12 @@ namespace Iside
         }
 
         /// <summary>
-        /// Set the value of the progress bar.
+        ///     Set the value of the progress bar.
         /// </summary>
-        /// <param name="i">Value of the progress bar. If negative, set the maximum value
-        /// of the progress bar to -i</param>
+        /// <param name="i">
+        ///     Value of the progress bar. If negative, set the maximum value
+        ///     of the progress bar to -i
+        /// </param>
         private void SetProgressBar(int i)
         {
             this.backgroundWorker.ReportProgress(i);
@@ -165,12 +160,11 @@ namespace Iside
 
             if (nr > 0)
             {
-
                 // Get files list
                 FileInfo[] files = new FileInfo[nr];
                 for (int j = 0; j < nr; j++)
                 {
-                    files[j] = new FileInfo((string)this.lstFiles.Items[j]);
+                    files[j] = new FileInfo((string) this.lstFiles.Items[j]);
                 }
 
                 this.Reset();
@@ -178,13 +172,13 @@ namespace Iside
                 // Get hash algorithm
                 Hash hash = new Hash();
                 GUI.SetCursorWait(true);
-                string algo = ((ComboBoxItem)this.cboHash.SelectedItem).Content as string;
+                string algo = ((ComboBoxItem) this.cboHash.SelectedItem).Content as string;
                 SupportedHashAlgo hashAlgo = SupportedHashAlgoFactory.FromName(algo);
                 hash.SetAlgorithm(hashAlgo.Id);
                 this.progressBar.Maximum = nr;
 
                 // Set callback delegate
-                CallbackEntry cbe = new CallbackEntry(this.SetProgressBar);
+                CallbackEntry cbe = this.SetProgressBar;
 
                 // Get hash style
                 HexEnum hs = Settings.Default.HashStyle;
@@ -201,7 +195,7 @@ namespace Iside
             int totalFiles = this.lstFiles.Items.Count;
             if (totalFiles > 0)
             {
-                this.statusBar.Content = totalFiles.ToString() + " files to hash.";
+                this.statusBar.Content = totalFiles + " files to hash.";
             }
             else
             {
@@ -233,8 +227,9 @@ namespace Iside
             catch (AxsException)
             {
                 GUI.SetCursorWait(false);
-                MessageTaskDialog.Show(this, IsideLogic.Config.APPNAME, "The list contain access denied or protected files. Operation aborted.",
-                                IsideLogic.Config.APPNAME, TaskDialogType.ERROR);
+                MessageTaskDialog.Show(this, IsideLogic.Config.APPNAME,
+                    "The list contain access denied or protected files. Operation aborted.",
+                    IsideLogic.Config.APPNAME, TaskDialogType.ERROR);
             }
             finally
             {
@@ -300,12 +295,14 @@ namespace Iside
             if (e.Cancelled)
             {
                 // The user canceled the operation.
-                MessageTaskDialog.Show(this, IsideLogic.Config.APPNAME, "Process was canceled by user", "Operation aborted", TaskDialogType.INFO);
+                MessageTaskDialog.Show(this, IsideLogic.Config.APPNAME, "Process was canceled by user",
+                    "Operation aborted", TaskDialogType.INFO);
             }
             else if (e.Error != null) // this will print Exceptions thrown in the DoWork phase
             {
                 // There was an error during the operation.
-                MessageTaskDialog.Show(this, IsideLogic.Config.APPNAME, e.Error.Message, "Hash error", TaskDialogType.ERROR);
+                MessageTaskDialog.Show(this, IsideLogic.Config.APPNAME, e.Error.Message, "Hash error",
+                    TaskDialogType.ERROR);
             }
             else
             {
@@ -322,7 +319,7 @@ namespace Iside
 
         private void Ctx_Remove_Click(object sender, RoutedEventArgs e)
         {
-            this.lstFiles.Items.Remove((string)this.lstFiles.SelectedItem);
+            this.lstFiles.Items.Remove((string) this.lstFiles.SelectedItem);
         }
 
         private void Ctx_Clear_Click(object sender, RoutedEventArgs e)
@@ -337,7 +334,7 @@ namespace Iside
                 this.BuildFileList(this.cdromDirectory);
             }
 
-            this.Activated -= new System.EventHandler(this.Window_Activated_1);
+            this.Activated -= this.Window_Activated_1;
         }
     }
 }

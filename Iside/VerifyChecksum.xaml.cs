@@ -1,17 +1,10 @@
-﻿/**
-    Iside - .NET WPF Version 
-    Copyright (C) LittleLite Software
-    Author Alessio Saltarin
-**/
-
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using AxsUtils;
-using Iside.Logic;
 using IsideLogic;
 using LLCryptoLib;
 using LLCryptoLib.Hash;
@@ -20,7 +13,7 @@ using WPFUtils;
 namespace Iside
 {
     /// <summary>
-    /// Verification Parameters
+    ///     Verification Parameters
     /// </summary>
     internal sealed class VerifyChecksumParams
     {
@@ -33,38 +26,37 @@ namespace Iside
     }
 
     /// <summary>
-    /// Interaction logic for VerifyChecksum.xaml
+    ///     Interaction logic for VerifyChecksum.xaml
     /// </summary>
     public partial class VerifyChecksum : Window
     {
-        private bool isStandalone;
-        private ChecksumGenerator gen;
-        private Microsoft.Win32.OpenFileDialog openFileDialog;
         private BackgroundWorker bwGenerator;
+        private ChecksumGenerator gen;
+        private readonly bool isStandalone;
+        private Microsoft.Win32.OpenFileDialog openFileDialog;
 
         #region Constructors
 
         public VerifyChecksum(ChecksumType type, bool isAlone)
         {
-            InitializeComponent();
+            this.InitializeComponent();
             this.isStandalone = isAlone;
             this.Init(type);
         }
 
         /// <summary>
-        /// Constructor with folderPath already indicated
+        ///     Constructor with folderPath already indicated
         /// </summary>
         /// <param name="folderPath"></param>
         public VerifyChecksum(ChecksumType type, string folderPath, bool isAlone)
         {
-
             if (folderPath == null)
             {
                 throw new ArgumentNullException("folderPath");
             }
 
             this.isStandalone = isAlone;
-            InitializeComponent();
+            this.InitializeComponent();
             if (folderPath.EndsWith(".md5"))
             {
                 if (File.Exists(folderPath))
@@ -72,11 +64,12 @@ namespace Iside
                     this.txtMD5file.Text = folderPath;
                     this.txtMD5file.Width = 272;
                     this.txtMD5file.IsReadOnly = true;
-                    this.btnLoadMd5Sum.Visibility = System.Windows.Visibility.Hidden;
+                    this.btnLoadMd5Sum.Visibility = Visibility.Hidden;
                 }
                 else
                 {
-                    MessageTaskDialog.Show(this, IsideLogic.Config.APPNAME, "File " + folderPath + " does not exist", IsideLogic.Config.APPNAME, TaskDialogType.WARNING);
+                    MessageTaskDialog.Show(this, Config.APPNAME, "File " + folderPath + " does not exist",
+                        Config.APPNAME, TaskDialogType.WARNING);
                 }
             }
             else
@@ -85,11 +78,12 @@ namespace Iside
                 {
                     this.txtVerificationDir.Text = folderPath;
                     this.txtVerificationDir.IsReadOnly = true;
-                    this.btnVerify.Visibility = System.Windows.Visibility.Hidden;
+                    this.btnVerify.Visibility = Visibility.Hidden;
                 }
                 else
                 {
-                    MessageTaskDialog.Show(this, IsideLogic.Config.APPNAME, "File " + folderPath + " does not exist", IsideLogic.Config.APPNAME, TaskDialogType.WARNING);
+                    MessageTaskDialog.Show(this, Config.APPNAME, "File " + folderPath + " does not exist",
+                        Config.APPNAME, TaskDialogType.WARNING);
                 }
             }
             this.Init(type);
@@ -104,9 +98,9 @@ namespace Iside
             this.bwGenerator = new BackgroundWorker();
             this.bwGenerator.WorkerReportsProgress = true;
             this.bwGenerator.WorkerSupportsCancellation = true;
-            this.bwGenerator.DoWork += new DoWorkEventHandler(bwGenerator_DoWork);
-            this.bwGenerator.RunWorkerCompleted += new RunWorkerCompletedEventHandler(bwGenerator_RunWorkerCompleted);
-            this.bwGenerator.ProgressChanged += new ProgressChangedEventHandler(bwGenerator_ProgressChanged);
+            this.bwGenerator.DoWork += this.bwGenerator_DoWork;
+            this.bwGenerator.RunWorkerCompleted += this.bwGenerator_RunWorkerCompleted;
+            this.bwGenerator.ProgressChanged += this.bwGenerator_ProgressChanged;
         }
 
         private void SelectHash(string hashName)
@@ -126,7 +120,6 @@ namespace Iside
 
         private void Init(ChecksumType type)
         {
-
             GUI.ComboBoxItemsAdd(this.cboHash, SupportedHashAlgorithms.GetHashAlgorithms());
             this.btnView.IsEnabled = this.isStandalone;
             this.openFileDialog = new Microsoft.Win32.OpenFileDialog();
@@ -154,7 +147,6 @@ namespace Iside
                     this.gen = new SFVGenerator();
                     break;
             }
-
         }
 
         private void Reset()
@@ -165,8 +157,8 @@ namespace Iside
 
         private bool ValidateMD5Sum(DirectoryElements de, VerifyChecksumParams parms)
         {
-            gen.Initialize(de, parms.Algorithm);
-            return gen.VerifySum(parms.Md5SumFilePath, parms.Feedback);
+            this.gen.Initialize(de, parms.Algorithm);
+            return this.gen.VerifySum(parms.Md5SumFilePath, parms.Feedback);
         }
 
         private void SetProgressBar(int i)
@@ -217,30 +209,31 @@ namespace Iside
 
         private void bwGenerator_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-
             this.progressBar.Value = this.progressBar.Maximum;
 
             Mouse.OverrideCursor = null;
 
-            if ((e.Cancelled == true))
+            if (e.Cancelled)
             {
-                MessageBox.Show(this, "Verification Halted", IsideLogic.Config.APPNAME,
-                                MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show(this, "Verification Halted", Config.APPNAME,
+                    MessageBoxButton.OK, MessageBoxImage.Information);
             }
             else if (!(e.Error == null))
             {
-                MessageBox.Show(this, "Error: " + e.Error.Message, IsideLogic.Config.APPNAME,
-                                MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(this, "Error: " + e.Error.Message, Config.APPNAME,
+                    MessageBoxButton.OK, MessageBoxImage.Error);
             }
             else
             {
-                if ((bool)e.Result == true)
+                if ((bool) e.Result)
                 {
-                    MessageTaskDialog.Show(this, IsideLogic.Config.APPNAME, "Verification successful", IsideLogic.Config.APPNAME, TaskDialogType.INFO);
+                    MessageTaskDialog.Show(this, Config.APPNAME, "Verification successful", Config.APPNAME,
+                        TaskDialogType.INFO);
                 }
                 else
                 {
-                    MessageTaskDialog.Show(this, IsideLogic.Config.APPNAME, "Verification failed", IsideLogic.Config.APPNAME, TaskDialogType.INFO);
+                    MessageTaskDialog.Show(this, Config.APPNAME, "Verification failed", Config.APPNAME,
+                        TaskDialogType.INFO);
                 }
             }
 
@@ -256,12 +249,12 @@ namespace Iside
         {
             if (this.progressBar.Value != this.progressBar.Minimum)
             {
-                this.txtMD5file.Text = String.Empty;
+                this.txtMD5file.Text = string.Empty;
                 this.btnView.IsEnabled = false;
                 this.Reset();
             }
 
-            Nullable<bool> result = this.openFileDialog.ShowDialog();
+            bool? result = this.openFileDialog.ShowDialog();
             if (result == true)
             {
                 this.txtMD5file.Text = this.openFileDialog.FileName;
@@ -273,13 +266,13 @@ namespace Iside
         {
             if (this.progressBar.Value != this.progressBar.Minimum)
             {
-                this.txtVerificationDir.Text = String.Empty;
+                this.txtVerificationDir.Text = string.Empty;
                 this.Reset();
             }
 
             string selectedPath = GUI.SelectFolderPath(this, false);
 
-            if (!String.IsNullOrEmpty(selectedPath))
+            if (!string.IsNullOrEmpty(selectedPath))
             {
                 this.txtVerificationDir.Text = selectedPath;
                 if (this.txtMD5file.Text.Length > 0)
@@ -305,26 +298,30 @@ namespace Iside
                             VerifyChecksumParams verifyParms = new VerifyChecksumParams();
                             verifyParms.Md5SumFilePath = md5Path;
                             verifyParms.IgnoreMd5File = this.chkIgnoreMd5sum.IsChecked.GetValueOrDefault(true);
-                            verifyParms.SubCheck =  this.chkIncludeSubDirs.IsChecked.GetValueOrDefault(true);
+                            verifyParms.SubCheck = this.chkIncludeSubDirs.IsChecked.GetValueOrDefault(true);
                             verifyParms.ValidationPath = new DirectoryInfo(this.txtVerificationDir.Text);
-                            verifyParms.Feedback = new CallbackEntry(this.SetProgressBar);
-                            verifyParms.Algorithm = SupportedHashAlgoFactory.FromName((string)selHash.Content);
+                            verifyParms.Feedback = this.SetProgressBar;
+                            verifyParms.Algorithm = SupportedHashAlgoFactory.FromName((string) selHash.Content);
                             Mouse.OverrideCursor = Cursors.Wait;
                             this.bwGenerator.RunWorkerAsync(verifyParms);
                         }
                         else
                         {
-                            MessageTaskDialog.Show(this, IsideLogic.Config.APPNAME, "Verification path " + md5Path + " does not exist.", IsideLogic.Config.APPNAME, TaskDialogType.WARNING);
+                            MessageTaskDialog.Show(this, Config.APPNAME,
+                                "Verification path " + md5Path + " does not exist.", Config.APPNAME,
+                                TaskDialogType.WARNING);
                         }
                     }
                     else
                     {
-                        MessageTaskDialog.Show(this, IsideLogic.Config.APPNAME, "Specify a verification path.", IsideLogic.Config.APPNAME, TaskDialogType.WARNING);
+                        MessageTaskDialog.Show(this, Config.APPNAME, "Specify a verification path.", Config.APPNAME,
+                            TaskDialogType.WARNING);
                     }
                 }
                 else
                 {
-                    MessageTaskDialog.Show(this, IsideLogic.Config.APPNAME, "MD5Sum file " + md5Path + " does not exist.", IsideLogic.Config.APPNAME, TaskDialogType.WARNING);
+                    MessageTaskDialog.Show(this, Config.APPNAME, "MD5Sum file " + md5Path + " does not exist.",
+                        Config.APPNAME, TaskDialogType.WARNING);
                 }
             }
         }
@@ -345,7 +342,8 @@ namespace Iside
                 }
                 catch
                 {
-                    MessageTaskDialog.Show(this, IsideLogic.Config.APPNAME, "Cannot show " + this.txtMD5file.Text, IsideLogic.Config.APPNAME, TaskDialogType.WARNING);
+                    MessageTaskDialog.Show(this, Config.APPNAME, "Cannot show " + this.txtMD5file.Text, Config.APPNAME,
+                        TaskDialogType.WARNING);
                 }
             }
         }
@@ -369,6 +367,5 @@ namespace Iside
         }
 
         #endregion
-
     }
 }

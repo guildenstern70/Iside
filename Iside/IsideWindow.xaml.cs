@@ -1,17 +1,4 @@
-﻿/**
-    Iside - .NET WPF Version 
-    Copyright (C) LittleLite Software
-    Author Alessio Saltarin
-**/
-
-using ColorFont;
-using Iside.Logic;
-using Iside.Properties;
-using IsideLogic;
-using LLCryptoLib.Hash;
-using LLCryptoLib.Utils;
-using Microsoft.Win32;
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
@@ -23,29 +10,36 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Xps;
 using System.Windows.Xps.Packaging;
+using ColorFont;
+using Iside.Logic;
+using Iside.Properties;
+using IsideLogic;
+using LLCryptoLib.Hash;
+using LLCryptoLib.Utils;
+using Microsoft.Win32;
 using WPFUtils;
 
 namespace Iside
 {
     /// <summary>
-    /// Iside Window code behind
+    ///     Iside Window code behind
     /// </summary>
     public partial class IsideWindow : Window
     {
+        private SupportedHashAlgo altHash;
+        internal bool canCompareNow;
+        internal FileProperties[] fileProperties = {new FileProperties(), new FileProperties()};
+        internal FormWidth guiWidth;
+        private HexEnum hexRegistry;
+        private HashLogic logic;
         // Keep them private: must be accessed from accessors
         private SupportedHashAlgo prHash;
-        private SupportedHashAlgo altHash;
-        private HexEnum hexRegistry;
         private string[] reportToPrint;
-        private HashLogic logic;
+        internal AutoResetEvent reset;
         private SaveFileDialog saveFileDialog;
 
         // Accessed directly from IsideLogic
-        internal bool[] skipHashComputing = { false, false };
-        internal FormWidth guiWidth;
-        internal FileProperties[] fileProperties = { new FileProperties(), new FileProperties() };
-        internal AutoResetEvent reset;
-        internal bool canCompareNow;
+        internal bool[] skipHashComputing = {false, false};
 
         #region Constructors
 
@@ -60,7 +54,7 @@ namespace Iside
         }
 
         /// <summary>
-        ///  Iside computing hash code for file1 with registry saved hash algo
+        ///     Iside computing hash code for file1 with registry saved hash algo
         /// </summary>
         /// <param name="file1">The file1.</param>
         public IsideWindow(string file1, bool isRegistered)
@@ -70,7 +64,7 @@ namespace Iside
         }
 
         /// <summary>
-        /// Iside computing hash code for file1 with algo by user
+        ///     Iside computing hash code for file1 with algo by user
         /// </summary>
         /// <param name="file1"></param>
         public IsideWindow(string file1, AvailableHash hash, bool isRegistered)
@@ -81,7 +75,7 @@ namespace Iside
         }
 
         /// <summary>
-        /// Iside computing hash code for file1 and file2 with registry saved hash algo
+        ///     Iside computing hash code for file1 and file2 with registry saved hash algo
         /// </summary>
         /// <param name="file1"></param>
         /// <param name="file2"></param>
@@ -99,15 +93,13 @@ namespace Iside
         #endregion
 
         #region Public Properties
+
         /// <summary>
-        /// File 1 to compare
+        ///     File 1 to compare
         /// </summary>
         public string LeftFile
         {
-            get
-            {
-                return this.fileProperties[0].FileName;
-            }
+            get { return this.fileProperties[0].FileName; }
             set
             {
                 this.fileProperties[0].FileName = value;
@@ -116,23 +108,22 @@ namespace Iside
         }
 
         /// <summary>
-        /// File 2 to compare
+        ///     File 2 to compare
         /// </summary>
         public string RightFile
         {
-            get
-            {
-                return this.fileProperties[1].FileName;
-            }
+            get { return this.fileProperties[1].FileName; }
             set
             {
                 this.fileProperties[1].FileName = value;
                 this.skipHashComputing[1] = false;
             }
         }
+
         #endregion
 
         #region Internal Properties
+
         internal SupportedHashAlgo PrimaryHash
         {
             get
@@ -170,10 +161,11 @@ namespace Iside
         #endregion
 
         #region Menu StatusBar Helper
+
         private void MenuHelper_StatusBar(object sender, MouseEventArgs e)
         {
-            MenuItem sendM = (MenuItem)sender;
-            RoutedUICommand cmd = (RoutedUICommand)sendM.Command;
+            MenuItem sendM = (MenuItem) sender;
+            RoutedUICommand cmd = (RoutedUICommand) sendM.Command;
             this.statusBar.Content = cmd.Text;
         }
 
@@ -196,7 +188,6 @@ namespace Iside
         {
             if (this.logic == null) return;
             this.logic.SetSize(FormWidth.SINGLE);
-            
         }
 
         private void NewHashCanExecute(object sender, CanExecuteRoutedEventArgs e)
@@ -327,12 +318,12 @@ namespace Iside
             try
             {
                 string isideExePath = "IsideFolder.exe";
-                string startupPath = WPFUtils.Core.StartupPath;
+                string startupPath = Core.StartupPath;
 
 #if (DEBUG)
                 startupPath = @"D:\Codice\VisualStudio\Iside\IsideFolder\bin\Debug";
 #endif
-                String folderPath = Path.Combine(startupPath, isideExePath);
+                string folderPath = Path.Combine(startupPath, isideExePath);
 
                 if (File.Exists(folderPath))
                 {
@@ -340,10 +331,12 @@ namespace Iside
                 }
                 else
                 {
-                    System.Diagnostics.Debug.WriteLine("Cannot find " + folderPath);
+                    Debug.WriteLine("Cannot find " + folderPath);
                 }
             }
-            catch (System.ComponentModel.Win32Exception) { }
+            catch (System.ComponentModel.Win32Exception)
+            {
+            }
         }
 
         private void MultiFileCanExecute(object sender, CanExecuteRoutedEventArgs e)
@@ -390,7 +383,8 @@ namespace Iside
                 }
                 else
                 {
-                    MessageTaskDialog.Show(this, IsideLogic.Config.APPNAME, "No CDROM/DVD found in drive.", "CDROM Error", TaskDialogType.ERROR);
+                    MessageTaskDialog.Show(this, Config.APPNAME, "No CDROM/DVD found in drive.", "CDROM Error",
+                        TaskDialogType.ERROR);
                 }
             }
         }
@@ -455,7 +449,9 @@ namespace Iside
                 string currentPath = Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName);
                 System.Windows.Forms.Help.ShowHelp(null, currentPath + @"\help\Iside.chm");
             }
-            catch (IOException) { }
+            catch (IOException)
+            {
+            }
         }
 
         private void ChekForUpdatesCanExecute(object sender, CanExecuteRoutedEventArgs e)
@@ -465,7 +461,7 @@ namespace Iside
 
         private void ChekForUpdatesExecuted(object sender, ExecutedRoutedEventArgs e)
         {
-            CheckForUpdatesWPF.Updates.Check(this, IsideLogic.Config.AppInfo);
+            CheckForUpdatesWPF.Updates.Check(this, Config.AppInfo);
         }
 
         private void IsideWebCanExecute(object sender, CanExecuteRoutedEventArgs e)
@@ -477,18 +473,22 @@ namespace Iside
         {
             try
             {
-                Process.Start(IsideLogic.Config.APPURL);
+                Process.Start(Config.APPURL);
             }
-            catch (System.ComponentModel.Win32Exception) { }
+            catch (System.ComponentModel.Win32Exception)
+            {
+            }
         }
 
         private void OrderingInfoExecuted(object sender, ExecutedRoutedEventArgs e)
         {
             try
             {
-                Process.Start(IsideLogic.Config.APPBUY);
+                Process.Start(Config.APPBUY);
             }
-            catch (System.ComponentModel.Win32Exception) { }
+            catch (System.ComponentModel.Win32Exception)
+            {
+            }
         }
 
         private void OrderingInfoCanExecute(object sender, CanExecuteRoutedEventArgs e)
@@ -498,7 +498,6 @@ namespace Iside
 
         private void BuyNowExecuted(object sender, ExecutedRoutedEventArgs e)
         {
-            
         }
 
         private void BuyNowCanExecute(object sender, CanExecuteRoutedEventArgs e)
@@ -526,7 +525,9 @@ namespace Iside
             {
                 Process.Start("http://www.littlelite.net/");
             }
-            catch (System.ComponentModel.Win32Exception) { }
+            catch (System.ComponentModel.Win32Exception)
+            {
+            }
         }
 
         private void AboutCanExecute(object sender, CanExecuteRoutedEventArgs e)
@@ -541,10 +542,10 @@ namespace Iside
             aboutForm.ShowDialog();
         }
 
-
         #endregion
 
         #region Private Methods
+
         private void New()
         {
             this.fileProperties[0] = new FileProperties();
@@ -554,50 +555,50 @@ namespace Iside
 
         private void Reset()
         {
-            System.Diagnostics.Debug.WriteLine("Iside Window Reset");
+            Debug.WriteLine("Iside Window Reset");
 
             SolidColorBrush background = new SolidColorBrush(Colors.White);
 
-            this.txtHash1Left.Text = String.Empty;
+            this.txtHash1Left.Text = string.Empty;
             this.txtHash1Left.Background = background;
 
-            this.txtHash1Right.Text = String.Empty;
+            this.txtHash1Right.Text = string.Empty;
             this.txtHash1Right.Background = background;
 
-            this.txtHash2Left.Text = String.Empty;
+            this.txtHash2Left.Text = string.Empty;
             this.txtHash2Left.Background = background;
 
-            this.txtHash2Right.Text = String.Empty;
+            this.txtHash2Right.Text = string.Empty;
             this.txtHash2Right.Background = background;
 
-            this.txtCreationDate.Text = String.Empty;
+            this.txtCreationDate.Text = string.Empty;
             this.txtCreationDate.Background = background;
 
-            this.txtCreationDateVS.Text = String.Empty;
+            this.txtCreationDateVS.Text = string.Empty;
             this.txtCreationDateVS.Background = background;
 
-            this.txtFileName.Text = String.Empty;
+            this.txtFileName.Text = string.Empty;
             this.txtFileName.Background = background;
 
-            this.txtFileNameVS.Text = String.Empty;
+            this.txtFileNameVS.Text = string.Empty;
             this.txtFileNameVS.Background = background;
 
-            this.txtFileSize.Text = String.Empty;
+            this.txtFileSize.Text = string.Empty;
             this.txtFileSize.Background = background;
 
-            this.txtFileSizeVS.Text = String.Empty;
+            this.txtFileSizeVS.Text = string.Empty;
             this.txtFileSizeVS.Background = background;
 
-            this.txtLastAccess.Text = String.Empty;
+            this.txtLastAccess.Text = string.Empty;
             this.txtLastAccess.Background = background;
 
-            this.txtLastAccessVS.Text = String.Empty;
+            this.txtLastAccessVS.Text = string.Empty;
             this.txtLastAccessVS.Background = background;
 
-            this.txtLastModified.Text = String.Empty;
+            this.txtLastModified.Text = string.Empty;
             this.txtLastModified.Background = background;
 
-            this.txtLastModifiedVS.Text = String.Empty;
+            this.txtLastModifiedVS.Text = string.Empty;
             this.txtLastModifiedVS.Background = background;
 
             this.statusBar.Content = "Ready";
@@ -610,12 +611,12 @@ namespace Iside
 
         private void HashNow()
         {
-            if (!String.IsNullOrEmpty(this.txtFileName.Text))
+            if (!string.IsNullOrEmpty(this.txtFileName.Text))
             {
                 this.StartHashProcess(Quadrant.UPPER_LEFT, this.txtFileName.Text);
             }
 
-            if (!String.IsNullOrEmpty(this.txtFileNameVS.Text))
+            if (!string.IsNullOrEmpty(this.txtFileNameVS.Text))
             {
                 this.StartHashProcess(Quadrant.UPPER_RIGHT, this.txtFileNameVS.Text);
             }
@@ -625,7 +626,9 @@ namespace Iside
         {
             if (!File.Exists(fileName))
             {
-                System.Windows.Forms.DialogResult dr = MessageTaskDialog.Show(this, IsideLogic.Config.APPNAME, "File does not exist. \nDo you want to compute the hash of the inserted string?", "File Save Error", TaskDialogType.QUESTION);
+                System.Windows.Forms.DialogResult dr = MessageTaskDialog.Show(this, Config.APPNAME,
+                    "File does not exist. \nDo you want to compute the hash of the inserted string?", "File Save Error",
+                    TaskDialogType.QUESTION);
                 if (dr == System.Windows.Forms.DialogResult.Yes)
                 {
                     this.logic.TextHashCompute(fileName, q);
@@ -644,15 +647,16 @@ namespace Iside
             if ((this.txtHash1Left.Text.Length > 0) || (this.txtHash1Right.Text.Length > 0))
             {
                 this.saveFileDialog = new SaveFileDialog();
-                saveFileDialog.Filter = "Text files (*.txt)|*.txt|All files (*.*)|*.*";
-                saveFileDialog.FilterIndex = 2;
-                saveFileDialog.RestoreDirectory = true;
+                this.saveFileDialog.Filter = "Text files (*.txt)|*.txt|All files (*.*)|*.*";
+                this.saveFileDialog.FilterIndex = 2;
+                this.saveFileDialog.RestoreDirectory = true;
 
-                if (saveFileDialog.ShowDialog() == true) 
+                if (this.saveFileDialog.ShowDialog() == true)
                 {
-                    if (this.logic.SaveHashes(saveFileDialog.FileName))
+                    if (this.logic.SaveHashes(this.saveFileDialog.FileName))
                     {
-                        MessageTaskDialog.Show(this, IsideLogic.Config.APPNAME, "Hash codes saved to " + saveFileDialog.FileName, "File saved", TaskDialogType.INFO);
+                        MessageTaskDialog.Show(this, Config.APPNAME,
+                            "Hash codes saved to " + this.saveFileDialog.FileName, "File saved", TaskDialogType.INFO);
                     }
                 }
             }
@@ -683,7 +687,6 @@ namespace Iside
 
         private void RefreshHash(Quadrant quadran)
         {
-
             try
             {
                 ComboBox thisHashCombo = null;
@@ -700,7 +703,7 @@ namespace Iside
                         currentTab = this.tabControl1;
                         fileItem = this.txtFileName.Text;
                         this.skipHashComputing[0] = false;
-                        selected = ((ComboBoxItem)thisHashCombo.SelectedItem).Content as string;
+                        selected = ((ComboBoxItem) thisHashCombo.SelectedItem).Content as string;
                         this.prHash = SupportedHashAlgoFactory.FromName(selected);
                         HashLogic.SyncHashCombo(this.prHash.Id, twinHashCombo);
                         break;
@@ -711,7 +714,7 @@ namespace Iside
                         currentTab = this.tabControl2;
                         fileItem = this.txtFileNameVS.Text;
                         this.skipHashComputing[1] = false;
-                        selected = ((ComboBoxItem)thisHashCombo.SelectedItem).Content as string;
+                        selected = ((ComboBoxItem) thisHashCombo.SelectedItem).Content as string;
                         this.prHash = SupportedHashAlgoFactory.FromName(selected);
                         HashLogic.SyncHashCombo(this.prHash.Id, thisHashCombo);
                         break;
@@ -722,7 +725,7 @@ namespace Iside
                         currentTab = this.tabControl1;
                         fileItem = this.txtFileName.Text;
                         this.skipHashComputing[0] = false;
-                        selected = ((ComboBoxItem)thisHashCombo.SelectedItem).Content as string;
+                        selected = ((ComboBoxItem) thisHashCombo.SelectedItem).Content as string;
                         this.altHash = SupportedHashAlgoFactory.FromName(selected);
                         HashLogic.SyncHashCombo(this.altHash.Id, twinHashCombo);
                         break;
@@ -733,7 +736,7 @@ namespace Iside
                         currentTab = this.tabControl2;
                         fileItem = this.txtFileNameVS.Text;
                         this.skipHashComputing[1] = false;
-                        selected = ((ComboBoxItem)thisHashCombo.SelectedItem).Content as string;
+                        selected = ((ComboBoxItem) thisHashCombo.SelectedItem).Content as string;
                         this.altHash = SupportedHashAlgoFactory.FromName(selected);
                         HashLogic.SyncHashCombo(this.altHash.Id, thisHashCombo);
                         break;
@@ -754,19 +757,17 @@ namespace Iside
             }
             catch (IsideException isex)
             {
-                MessageTaskDialog.Show(this, IsideLogic.Config.APPNAME, isex.Message, "Iside Exception", TaskDialogType.WARNING);
+                MessageTaskDialog.Show(this, Config.APPNAME, isex.Message, "Iside Exception", TaskDialogType.WARNING);
             }
-
         }
 
         private void SetLayout()
         {
             FontInfo hashFont = null;
-            string fontFile = Path.Combine(Core.AppDataPath, IsideLogic.Config.FONTFILE);
+            string fontFile = Path.Combine(Core.AppDataPath, Config.FONTFILE);
 
             try
             {
-
                 if (File.Exists(fontFile))
                 {
                     hashFont = FontInfo.Deserialize(fontFile);
@@ -782,17 +783,16 @@ namespace Iside
             }
             catch (IOException ioex)
             {
-                System.Diagnostics.Debug.WriteLine("Error in deserializing font: " + ioex.Message);
+                Debug.WriteLine("Error in deserializing font: " + ioex.Message);
             }
         }
 
         private void ShowRegisteredControls(bool registered)
         {
-
-            System.Windows.Visibility visible = System.Windows.Visibility.Visible;
+            Visibility visible = Visibility.Visible;
             if (registered)
             {
-                visible = System.Windows.Visibility.Collapsed;
+                visible = Visibility.Collapsed;
             }
 
             this.sepOrders.Visibility = visible;
@@ -841,13 +841,13 @@ namespace Iside
         {
             try
             {
-                InitializeComponent();
+                this.InitializeComponent();
                 this.Init();
                 this.ShowRegisteredControls(isRegistered);
             }
             catch (InvalidOperationException ioe)
             {
-                System.Diagnostics.Debug.WriteLine(ioe.Message);
+                Debug.WriteLine(ioe.Message);
             }
         }
 
@@ -875,7 +875,7 @@ namespace Iside
 
                 bool isThereAFileToHash = false;
 
-                if (!String.IsNullOrEmpty(this.txtFileName.Text))
+                if (!string.IsNullOrEmpty(this.txtFileName.Text))
                 {
                     isThereAFileToHash = true;
                 }
@@ -888,7 +888,6 @@ namespace Iside
         {
             get
             {
-
                 if (this.txtFileName == null)
                     return false;
 
@@ -896,7 +895,7 @@ namespace Iside
 
                 if (this.IsThereSomethingToHash)
                 {
-                    if (!String.IsNullOrEmpty(this.txtFileNameVS.Text))
+                    if (!string.IsNullOrEmpty(this.txtFileNameVS.Text))
                     {
                         if (this.txtHash1Right.Text.Length > 0)
                         {
@@ -906,14 +905,13 @@ namespace Iside
                 }
 
                 return isCompare;
-               
             }
         }
 
         private void PreviewPrint()
         {
             string _previewWindowXaml =
-                        @"<Window
+                @"<Window
                             xmlns                 ='http://schemas.microsoft.com/netfx/2007/xaml/presentation'
                             xmlns:x               ='http://schemas.microsoft.com/winfx/2006/xaml'
                             Title                 ='Iside Hash Print Preview'
@@ -923,7 +921,7 @@ namespace Iside
                             <DocumentViewer Name='dv1'/>
                          </Window>";
 
-            string previewFilePath = Path.Combine(Core.AppDataPath, System.IO.Path.GetRandomFileName());
+            string previewFilePath = Path.Combine(Core.AppDataPath, Path.GetRandomFileName());
             //FlowDocumentScrollViewer visual = (FlowDocumentScrollViewer)(_parent.FindName("fdsv1"));
 
             this.PrepareReport();
@@ -936,7 +934,7 @@ namespace Iside
                 using (XpsDocument doc = new XpsDocument(previewFilePath, FileAccess.ReadWrite))
                 {
                     XpsDocumentWriter writer = XpsDocument.CreateXpsDocumentWriter(doc);
-                    DocumentPaginator dp = ((IDocumentPaginatorSource)documentToPrint).DocumentPaginator;
+                    DocumentPaginator dp = ((IDocumentPaginatorSource) documentToPrint).DocumentPaginator;
                     writer.Write(dp);
                 }
 
@@ -955,7 +953,7 @@ namespace Iside
                         dv1.ApplyTemplate();
                         ContentControl cc = dv1.Template.FindName("PART_FindToolBarHost", dv1) as ContentControl;
                         cc.Visibility = Visibility.Collapsed;
-                        dv1.Document = fds as IDocumentPaginatorSource;
+                        dv1.Document = fds;
 
                         preview.ShowDialog();
                     }
@@ -974,12 +972,10 @@ namespace Iside
                     }
                 }
             }
-
         }
 
         private void PrepareReport()
         {
-
             string[] filenames = new string[2];
             SupportedHashAlgo[] algosLeft = new SupportedHashAlgo[2];
             string[] hashesLeft = new string[2];
@@ -987,7 +983,7 @@ namespace Iside
             string[] hashesRight = new string[2];
 
             filenames[0] = this.txtFileName.Text;
-            if (String.IsNullOrEmpty(this.txtFileNameVS.Text))
+            if (string.IsNullOrEmpty(this.txtFileNameVS.Text))
             {
                 filenames[1] = null;
             }
@@ -1005,7 +1001,11 @@ namespace Iside
             hashesRight[0] = this.txtHash1Right.Text;
             hashesRight[1] = this.txtHash2Right.Text;
 
-            HashReport[] reports = { new HashReport(filenames[0], algosLeft, hashesLeft), new HashReport(filenames[1], algosRight, hashesRight) };
+            HashReport[] reports =
+            {
+                new HashReport(filenames[0], algosLeft, hashesLeft),
+                new HashReport(filenames[1], algosRight, hashesRight)
+            };
             TextReport tr = new TextReport(reports);
             this.reportToPrint = tr.GetReport();
         }
@@ -1019,12 +1019,12 @@ namespace Iside
                 document = new FlowDocument();
                 try
                 {
-                    document.FontFamily = new System.Windows.Media.FontFamily("Courier New");
+                    document.FontFamily = new FontFamily("Courier New");
                     document.FontSize = 11.0;
                 }
                 catch (Exception exc)
                 {
-                    System.Diagnostics.Debug.WriteLine(exc.Message);
+                    Debug.WriteLine(exc.Message);
                 }
 
                 foreach (string s in this.reportToPrint)
@@ -1036,7 +1036,7 @@ namespace Iside
             }
             else
             {
-                System.Diagnostics.Debug.WriteLine(">>> Error: reportToPrint is NULL");
+                Debug.WriteLine(">>> Error: reportToPrint is NULL");
             }
 
             return document;
@@ -1047,20 +1047,20 @@ namespace Iside
             this.PrepareReport();
             if (this.PrintReport(this.ComposeReportToPrint()))
             {
-                MessageTaskDialog.Show(this, IsideLogic.Config.APPNAME, "Report sent to printer", "Report Printed", TaskDialogType.INFO);
+                MessageTaskDialog.Show(this, Config.APPNAME, "Report sent to printer", "Report Printed",
+                    TaskDialogType.INFO);
             }
         }
 
-        private bool PrintReport(System.Windows.Documents.FlowDocument document)
+        private bool PrintReport(FlowDocument document)
         {
-
             bool printedOk = true;
 
             // Clone the source document's content into a new FlowDocument.
             // This is because the pagination for the printer needs to be
             // done differently than the pagination for the displayed page.
             // We print the copy, rather that the original FlowDocument.
-            System.IO.MemoryStream s = new System.IO.MemoryStream();
+            MemoryStream s = new MemoryStream();
             TextRange source = new TextRange(document.ContentStart, document.ContentEnd);
             source.Save(s, DataFormats.Xaml);
             FlowDocument copy = new FlowDocument();
@@ -1072,21 +1072,21 @@ namespace Iside
 
             // get information about the dimensions of the seleted printer+media.
             System.Printing.PrintDocumentImageableArea ia = null;
-            System.Windows.Xps.XpsDocumentWriter docWriter = 
+            XpsDocumentWriter docWriter =
                 System.Printing.PrintQueue.CreateXpsDocumentWriter(ref ia);
 
-            if (docWriter != null && ia != null)
+            if ((docWriter != null) && (ia != null))
             {
-                DocumentPaginator paginator = ((IDocumentPaginatorSource)copy).DocumentPaginator;
+                DocumentPaginator paginator = ((IDocumentPaginatorSource) copy).DocumentPaginator;
 
                 // Change the PageSize and PagePadding for the document to match the CanvasSize for the printer device.
-                paginator.PageSize = new System.Windows.Size(ia.MediaSizeWidth, ia.MediaSizeHeight);
-                Thickness t = new Thickness(72);  // copy.PagePadding;
+                paginator.PageSize = new Size(ia.MediaSizeWidth, ia.MediaSizeHeight);
+                Thickness t = new Thickness(72); // copy.PagePadding;
                 copy.PagePadding = new Thickness(
-                                 Math.Max(ia.OriginWidth, t.Left),
-                                   Math.Max(ia.OriginHeight, t.Top),
-                                   Math.Max(ia.MediaSizeWidth - (ia.OriginWidth + ia.ExtentWidth), t.Right),
-                                   Math.Max(ia.MediaSizeHeight - (ia.OriginHeight + ia.ExtentHeight), t.Bottom));
+                    Math.Max(ia.OriginWidth, t.Left),
+                    Math.Max(ia.OriginHeight, t.Top),
+                    Math.Max(ia.MediaSizeWidth - (ia.OriginWidth + ia.ExtentWidth), t.Right),
+                    Math.Max(ia.MediaSizeHeight - (ia.OriginHeight + ia.ExtentHeight), t.Bottom));
 
                 copy.ColumnWidth = double.PositiveInfinity;
                 //copy.PageWidth = 528; // allow the page to be the natural with of the output device
@@ -1100,7 +1100,6 @@ namespace Iside
             }
 
             return printedOk;
-
         }
 
         private void InitializeUIFirstTime()
@@ -1112,7 +1111,7 @@ namespace Iside
             }
             else
             {
-                this.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterScreen;
+                this.WindowStartupLocation = WindowStartupLocation.CenterScreen;
             }
 
             this.SetLayout();
@@ -1123,7 +1122,6 @@ namespace Iside
                 this.expSize.IsExpanded = false;
             }
             this.hexRegistry = Settings.Default.HashStyle;
-
         }
 
         private void ExportReport()
@@ -1144,21 +1142,23 @@ namespace Iside
                 string path = this.saveFileDialog.FileName;
                 if (fm.SaveFile(path, sb.ToString()))
                 {
-                    MessageTaskDialog.Show(this, IsideLogic.Config.APPNAME, "Report saved to " + path, "File Saved", TaskDialogType.INFO);
+                    MessageTaskDialog.Show(this, Config.APPNAME, "Report saved to " + path, "File Saved",
+                        TaskDialogType.INFO);
                 }
                 else
                 {
-                    MessageTaskDialog.Show(this, IsideLogic.Config.APPNAME, fm.ErrorMessage, "File error", TaskDialogType.ERROR);
+                    MessageTaskDialog.Show(this, Config.APPNAME, fm.ErrorMessage, "File error", TaskDialogType.ERROR);
                 }
             }
         }
+
         #endregion
 
         #region Window Event Handlers
 
         private void Iside_Loaded(object sender, RoutedEventArgs e)
         {
-            System.Diagnostics.Debug.WriteLine("Iside Windows Loaded");
+            Debug.WriteLine("Iside Windows Loaded");
             this.InitializeUIFirstTime();
         }
 
@@ -1177,8 +1177,8 @@ namespace Iside
 
         private void Iside_Activated(object sender, EventArgs e)
         {
-            System.Diagnostics.Debug.WriteLine("Iside Window activated");
-            this.Activated -= new EventHandler(this.Iside_Activated);
+            Debug.WriteLine("Iside Window activated");
+            this.Activated -= this.Iside_Activated;
             this.logic.PropertiesRefresh();
         }
 
@@ -1188,25 +1188,25 @@ namespace Iside
 
         private void cboSelHashLeft1_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            System.Diagnostics.Debug.WriteLine("Refreshing UPPER-LEFT");
+            Debug.WriteLine("Refreshing UPPER-LEFT");
             this.RefreshHash(Quadrant.UPPER_LEFT);
         }
 
         private void cboSelHashLeft2_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            System.Diagnostics.Debug.WriteLine("Refreshing LOWER-LEFT");
+            Debug.WriteLine("Refreshing LOWER-LEFT");
             this.RefreshHash(Quadrant.LOWER_LEFT);
         }
 
         private void cboSelHashRight1_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            System.Diagnostics.Debug.WriteLine("Refreshing UPPER_RIGHT");
+            Debug.WriteLine("Refreshing UPPER_RIGHT");
             this.RefreshHash(Quadrant.UPPER_RIGHT);
         }
 
         private void cboSelHashRight2_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            System.Diagnostics.Debug.WriteLine("Refreshing LOWER_RIGHT");
+            Debug.WriteLine("Refreshing LOWER_RIGHT");
             this.RefreshHash(Quadrant.LOWER_RIGHT);
         }
 
@@ -1228,6 +1228,7 @@ namespace Iside
         #endregion
 
         #region Drag&Drop Handling & Events
+
         private void DoLeftDragAndDrop(object sender, DragEventArgs e)
         {
             try
@@ -1235,7 +1236,7 @@ namespace Iside
                 // Data dropped is a file?
                 if (e.Data.GetDataPresent(DataFormats.FileDrop))
                 {
-                    Array a = (Array)e.Data.GetData(DataFormats.FileDrop);
+                    Array a = (Array) e.Data.GetData(DataFormats.FileDrop);
                     this.skipHashComputing[0] = false;
                     this.skipHashComputing[1] = true;
                     if (a.Length == 1)
@@ -1262,7 +1263,9 @@ namespace Iside
                     }
                 }
             }
-            catch (Exception) { }
+            catch (Exception)
+            {
+            }
         }
 
         private void DoRightDragAndDrop(object sender, DragEventArgs e)
@@ -1272,7 +1275,7 @@ namespace Iside
                 // Data dropped is a file?
                 if (e.Data.GetDataPresent(DataFormats.FileDrop))
                 {
-                    Array a = (Array)e.Data.GetData(DataFormats.FileDrop);
+                    Array a = (Array) e.Data.GetData(DataFormats.FileDrop);
                     this.skipHashComputing[0] = true;
                     this.skipHashComputing[1] = false;
                     if (a.Length == 1)
@@ -1296,11 +1299,10 @@ namespace Iside
                     }
                 }
             }
-            catch (Exception exc) 
+            catch (Exception exc)
             {
-                System.Diagnostics.Debug.WriteLine(exc.Message);
+                Debug.WriteLine(exc.Message);
             }
-
         }
 
         private void DoDragEnter(object sender, DragEventArgs e)
@@ -1315,7 +1317,6 @@ namespace Iside
             {
                 e.Effects = DragDropEffects.None;
             }
-            
         }
 
         private void txtFileName_Drop(object sender, DragEventArgs e)
@@ -1339,8 +1340,5 @@ namespace Iside
         }
 
         #endregion
-
-
-
     }
 }

@@ -1,12 +1,5 @@
-﻿/**
-    Iside - .NET WPF Version 
-    Copyright (C) LittleLite Software
-    Author Alessio Saltarin
-**/
-
-using System;
+﻿using System;
 using System.Text;
-using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using Iside.Properties;
@@ -19,11 +12,11 @@ namespace Iside.Logic
 {
     public class HashLogic
     {
-        private IsideWindow parent;
-        private HashWorks hashOperations;
+        private readonly HashWorks hashOperations;
+        private readonly IsideWindow parent;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="T:IsideShowLogic"/> class.
+        ///     Initializes a new instance of the <see cref="T:IsideShowLogic" /> class.
         /// </summary>
         /// <param name="main">The main form.</param>
         public HashLogic(IsideWindow main)
@@ -33,20 +26,20 @@ namespace Iside.Logic
         }
 
         /// <summary>
-        /// Propertieses the refresh.
+        ///     Propertieses the refresh.
         /// </summary>
         internal void PropertiesRefresh()
         {
             this.SetSize(this.parent.guiWidth);
 
-            if (!String.IsNullOrEmpty(parent.fileProperties[0].FileName))
+            if (!string.IsNullOrEmpty(this.parent.fileProperties[0].FileName))
             {
                 this.hashOperations.HashKickOff();
             }
         }
 
         /// <summary>
-        /// Refreshes a single hash.
+        ///     Refreshes a single hash.
         /// </summary>
         /// <param name="upper">if set to <c>true</c> will refresh the UPPER hash, else the BOTTOM</param>
         internal void RefreshSingleHash(Quadrant q)
@@ -60,8 +53,8 @@ namespace Iside.Logic
 
             if (hq.IsUpper)
             {
-                toRefreshUpperLeft = parent.txtHash1Left;
-                toRefreshUpperRight = parent.txtHash1Right;
+                toRefreshUpperLeft = this.parent.txtHash1Left;
+                toRefreshUpperRight = this.parent.txtHash1Right;
                 toRefreshLowerLeft = null;
                 toRefreshLowerRight = null;
             }
@@ -69,13 +62,12 @@ namespace Iside.Logic
             {
                 toRefreshUpperLeft = null;
                 toRefreshUpperRight = null;
-                toRefreshLowerLeft = parent.txtHash2Left;
-                toRefreshLowerRight = parent.txtHash2Right;
+                toRefreshLowerLeft = this.parent.txtHash2Left;
+                toRefreshLowerRight = this.parent.txtHash2Right;
             }
 
-            this.hashOperations.HashKickOff(toRefreshUpperLeft, toRefreshUpperRight, 
-                                            toRefreshLowerLeft, toRefreshLowerRight);
-
+            this.hashOperations.HashKickOff(toRefreshUpperLeft, toRefreshUpperRight,
+                toRefreshLowerLeft, toRefreshLowerRight);
         }
 
         internal void SetSize(FormWidth width)
@@ -91,13 +83,13 @@ namespace Iside.Logic
 
             if (this.parent.guiWidth != width)
             {
-                System.Diagnostics.Debug.WriteLine("Setting size to " + width.ToString());
+                System.Diagnostics.Debug.WriteLine("Setting size to " + width);
                 this.parent.guiWidth = width;
             }
         }
 
         /// <summary>
-        /// Compares the now.
+        ///     Compares the now.
         /// </summary>
         internal void CompareNow()
         {
@@ -105,10 +97,10 @@ namespace Iside.Logic
             string message;
             TaskDialogType dialogType = TaskDialogType.INFO;
 
-            string hash1a = parent.txtHash1Left.Text;
-            string hash1b = parent.txtHash2Left.Text;
-            string hash2a = parent.txtHash1Right.Text;
-            string hash2b = parent.txtHash2Right.Text;
+            string hash1a = this.parent.txtHash1Left.Text;
+            string hash1b = this.parent.txtHash2Left.Text;
+            string hash2a = this.parent.txtHash1Right.Text;
+            string hash2b = this.parent.txtHash2Right.Text;
 
             if (hash1a.Equals(hash2a))
             {
@@ -128,63 +120,62 @@ namespace Iside.Logic
                 dialogType = TaskDialogType.WARNING;
             }
 
-            MessageTaskDialog.Show(parent, IsideLogic.Config.APPNAME, message, "Iside File Comparison", dialogType);
-
+            MessageTaskDialog.Show(this.parent, Config.APPNAME, message, "Iside File Comparison", dialogType);
         }
 
         /// <summary>
-        /// Restores the textboxes background colors.
+        ///     Restores the textboxes background colors.
         /// </summary>
         internal void RestoreColors()
         {
             SolidColorBrush highlight = new SolidColorBrush(Colors.White);
-            parent.txtFileSize.Background = highlight;
-            parent.txtFileSizeVS.Background = highlight;
-            parent.txtCreationDate.Background = highlight;
-            parent.txtCreationDateVS.Background = highlight;
-            parent.txtLastAccess.Background = highlight;
-            parent.txtLastAccessVS.Background = highlight;
-            parent.txtLastModified.Background = highlight;
-            parent.txtLastModifiedVS.Background = highlight;
-            parent.txtHash1Left.Background = highlight;
-            parent.txtHash1Right.Background = highlight;
-            parent.txtHash2Left.Background = highlight;
-            parent.txtHash2Right.Background = highlight;
+            this.parent.txtFileSize.Background = highlight;
+            this.parent.txtFileSizeVS.Background = highlight;
+            this.parent.txtCreationDate.Background = highlight;
+            this.parent.txtCreationDateVS.Background = highlight;
+            this.parent.txtLastAccess.Background = highlight;
+            this.parent.txtLastAccessVS.Background = highlight;
+            this.parent.txtLastModified.Background = highlight;
+            this.parent.txtLastModifiedVS.Background = highlight;
+            this.parent.txtHash1Left.Background = highlight;
+            this.parent.txtHash1Right.Background = highlight;
+            this.parent.txtHash2Left.Background = highlight;
+            this.parent.txtHash2Right.Background = highlight;
         }
 
         /// <summary>
-        /// Opens the left file for hashing.
+        ///     Opens the left file for hashing.
         /// </summary>
         internal void OpenLeftFile()
         {
-            parent.statusBar.Content = "Opening File";
-            parent.skipHashComputing[0] = false;
+            this.parent.statusBar.Content = "Opening File";
+            this.parent.skipHashComputing[0] = false;
 
             Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
             dlg.Filter = "All documents (*.*)|*.*"; // Filter files by extension 
-            Nullable<bool> result = dlg.ShowDialog();
+            bool? result = dlg.ShowDialog();
 
             if (result == true)
             {
                 this.RestoreColors();
-                parent.fileProperties[0].FileName = dlg.FileName;
+                this.parent.fileProperties[0].FileName = dlg.FileName;
                 this.PropertiesRefresh();
             }
 
-            parent.statusBar.Content = "Ready";
+            this.parent.statusBar.Content = "Ready";
         }
 
         /// <summary>
-        /// Opens the right file for hasing.
+        ///     Opens the right file for hasing.
         /// </summary>
         internal void OpenRightFile()
         {
-            parent.statusBar.Content = "Opening File";
-            parent.skipHashComputing[1] = false;
+            this.parent.statusBar.Content = "Opening File";
+            this.parent.skipHashComputing[1] = false;
 
             Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
             dlg.Filter = "All documents (.*)|*.*"; // Filter files by extension 
-            Nullable<bool> result = dlg.ShowDialog();
+            bool? result = dlg.ShowDialog();
 
             if (result == true)
             {
@@ -193,15 +184,15 @@ namespace Iside.Logic
                 {
                     this.SetSize(FormWidth.DOUBLE);
                 }
-                parent.fileProperties[1].FileName = dlg.FileName;
+                this.parent.fileProperties[1].FileName = dlg.FileName;
                 this.PropertiesRefresh();
             }
 
-            parent.statusBar.Content = "Ready";
+            this.parent.statusBar.Content = "Ready";
         }
 
         /// <summary>
-        /// Computes hash for a text string
+        ///     Computes hash for a text string
         /// </summary>
         /// <param name="textToHash">The text to hash.</param>
         internal void TextHashCompute(string textToHash, Quadrant q)
@@ -223,27 +214,26 @@ namespace Iside.Logic
             }
 
             Hash h = new Hash();
-            h.SetAlgorithmAlgo(parent.PrimaryHash);
+            h.SetAlgorithmAlgo(this.parent.PrimaryHash);
             HexEnum style = Settings.Default.HashStyle;
             t1.Text = h.ComputeHashStyle(textToHash, style, Encoding.ASCII);
-            h.SetAlgorithmAlgo(parent.AlternativeHash);
+            h.SetAlgorithmAlgo(this.parent.AlternativeHash);
             t2.Text = h.ComputeHashStyle(textToHash, style, Encoding.ASCII);
         }
 
         internal void ManuallySetFile(Quadrant q, string path)
         {
-
             HashQuadrant hq = new HashQuadrant(q);
 
             if (hq.IsLeft)
             {
-                parent.skipHashComputing[0] = false;
-                parent.LeftFile = path;
+                this.parent.skipHashComputing[0] = false;
+                this.parent.LeftFile = path;
             }
             else
             {
-                parent.skipHashComputing[1] = false;
-                parent.RightFile = path;
+                this.parent.skipHashComputing[1] = false;
+                this.parent.RightFile = path;
             }
 
             this.PropertiesRefresh();
@@ -254,9 +244,9 @@ namespace Iside.Logic
         {
         }
 
-        
+
         /// <summary>
-        /// Saves the hashes.
+        ///     Saves the hashes.
         /// </summary>
         /// <param name="fileName">Name of the file.</param>
         /// <returns></returns>
@@ -268,9 +258,9 @@ namespace Iside.Logic
 
             // Header
             sb.Append("# Hash codes generated with ");
-            sb.Append(IsideLogic.Config.AppNameAndVersion);
+            sb.Append(Config.AppNameAndVersion);
             sb.Append(" (");
-            sb.Append(IsideLogic.Config.APPURL);
+            sb.Append(Config.APPURL);
             sb.Append(")");
             sb.Append(Environment.NewLine);
             sb.Append("# Operating System: " + AxsUtils.Win32.OS.OperatingSystem);
@@ -308,7 +298,8 @@ namespace Iside.Logic
 
             if (!fm.SaveFile(fileName, sb.ToString(), false))
             {
-                MessageTaskDialog.Show(parent, IsideLogic.Config.APPNAME, "Cannot save " + fileName + ": " + fm.ErrorMessage, "File Save Error", TaskDialogType.ERROR);
+                MessageTaskDialog.Show(this.parent, Config.APPNAME, "Cannot save " + fileName + ": " + fm.ErrorMessage,
+                    "File Save Error", TaskDialogType.ERROR);
                 okSaved = false;
             }
 
@@ -318,13 +309,12 @@ namespace Iside.Logic
         #region STATIC MEMBERS
 
         /// <summary>
-        /// Set selected index for an hash combo box as the given hash
+        ///     Set selected index for an hash combo box as the given hash
         /// </summary>
         /// <param name="hash"></param>
         /// <param name="cbo"></param>
         internal static void SyncHashCombo(AvailableHash hashAlgo, ComboBox cbo)
         {
-
             // Do not process if combo has not been initialized
             if (cbo.Items.Count == 0)
             {
@@ -339,7 +329,7 @@ namespace Iside.Logic
             {
                 cboItem = cbo.Items[j] as ComboBoxItem;
                 string cboItemString = cboItem.Content as string;
-                if (hashName == cboItemString) 
+                if (hashName == cboItemString)
                 {
                     cbo.SelectedIndex = j;
                     break;
@@ -350,11 +340,8 @@ namespace Iside.Logic
             {
                 cbo.SelectedIndex = 0;
             }
-
         }
 
-
         #endregion
-
     }
 }

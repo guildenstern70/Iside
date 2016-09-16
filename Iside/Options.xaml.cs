@@ -1,21 +1,6 @@
-﻿/**
-    Iside - .NET WPF Version 
-    Copyright (C) LittleLite Software
-    Author Alessio Saltarin
-**/
-
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
+﻿using System.IO;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using ColorFont;
 using Iside.Logic;
 using Iside.Properties;
@@ -26,38 +11,38 @@ using LLCryptoLib.Utils;
 namespace Iside
 {
     /// <summary>
-    /// Interaction logic for Options.xaml
+    ///     Interaction logic for Options.xaml
     /// </summary>
     public partial class Options : Window
     {
         private static string[] comboOptionsShell;
         private static string[] comboOptions1;
         private static string[] comboOptions2;
+        private AvailableHash hash1;
+        private AvailableHash hash2;
 
         // Options
         private RegistryOptions optionsInRegistry;
         private ShellIntegrationOption shellInt;
-        private AvailableHash hash1;
-        private AvailableHash hash2;
         private HexEnum style;
 
         public Options()
         {
-            InitializeComponent();
+            this.InitializeComponent();
             this.Init();
         }
 
         private void Init()
         {
             this.optionsInRegistry = new RegistryOptions();
-            
-            Options.comboOptionsShell = SupportedHashAlgorithms.GetFastHashAlgorithms();
-            Options.comboOptions1 = SupportedHashAlgorithms.GetHashAlgorithms();
-            Options.comboOptions2 = SupportedHashAlgorithms.GetHashAlgorithmsWithNone();
 
-            WPFUtils.GUI.ComboBoxItemsAdd(this.cboHash1, Options.comboOptions1);
-            WPFUtils.GUI.ComboBoxItemsAdd(this.cboHash2, Options.comboOptions2);
-            WPFUtils.GUI.ComboBoxItemsAdd(this.cboHashShell, Options.comboOptions1);
+            comboOptionsShell = SupportedHashAlgorithms.GetFastHashAlgorithms();
+            comboOptions1 = SupportedHashAlgorithms.GetHashAlgorithms();
+            comboOptions2 = SupportedHashAlgorithms.GetHashAlgorithmsWithNone();
+
+            WPFUtils.GUI.ComboBoxItemsAdd(this.cboHash1, comboOptions1);
+            WPFUtils.GUI.ComboBoxItemsAdd(this.cboHash2, comboOptions2);
+            WPFUtils.GUI.ComboBoxItemsAdd(this.cboHashShell, comboOptions1);
             this.txtHashStyle.IsReadOnly = true;
 
             this.hash1 = Settings.Default.PrimaryHash;
@@ -83,12 +68,12 @@ namespace Iside
             }
 
             // Secondary Hash
-            HashLogic.SyncHashCombo(hash2, this.cboHash2);
+            HashLogic.SyncHashCombo(this.hash2, this.cboHash2);
             // Primary Hash
-            HashLogic.SyncHashCombo(hash1, this.cboHash1);
+            HashLogic.SyncHashCombo(this.hash1, this.cboHash1);
 
             // Shell Integration
-            AvailableHash hashShell = (AvailableHash)this.optionsInRegistry.DefaultHash.RegistryValue;
+            AvailableHash hashShell = (AvailableHash) this.optionsInRegistry.DefaultHash.RegistryValue;
             HashLogic.SyncHashCombo(hashShell, this.cboHashShell);
 
             // Style
@@ -122,10 +107,10 @@ namespace Iside
             }
 
             // Fonts, colors and layout
-            if (File.Exists(IsideLogic.Config.FONTFILE))
+            if (File.Exists(Config.FONTFILE))
             {
                 System.Diagnostics.Debug.WriteLine("FontInfo serialization found. Deserializing.");
-                FontInfo selectedFont = FontInfo.Deserialize(IsideLogic.Config.FONTFILE);
+                FontInfo selectedFont = FontInfo.Deserialize(Config.FONTFILE);
                 FontInfo.ApplyFont(this.txtHashStyle, selectedFont);
             }
 
@@ -133,13 +118,12 @@ namespace Iside
             this.chkEnableFileIntegration.IsChecked = this.shellInt.FileIntegration;
             this.chkEnableMd5Association.IsChecked = this.shellInt.Md5FileAssociation;
             this.chkEnableFolderIntegration.IsChecked = this.shellInt.FolderShellIntegration;
-
         }
 
         private void SaveOptions()
         {
-            this.hash1 = Options.GetHashFromCombo(this.cboHash1);
-            this.hash2 = Options.GetHashFromCombo(this.cboHash2);
+            this.hash1 = GetHashFromCombo(this.cboHash1);
+            this.hash2 = GetHashFromCombo(this.cboHash2);
 
             Settings.Default.PrimaryHash = this.hash1;
             Settings.Default.AlternativeHash = this.hash2;
@@ -176,13 +160,13 @@ namespace Iside
             Settings.Default.HashStyle = this.style;
 
             // Fonts, colors and layout
-            string fontPath = Path.Combine(WPFUtils.Core.AppDataPath, IsideLogic.Config.FONTFILE);
+            string fontPath = Path.Combine(WPFUtils.Core.AppDataPath, Config.FONTFILE);
             FontInfo selectedFont = FontInfo.GetControlFont(this.txtHashStyle);
             selectedFont.Serialize(fontPath);
             System.Diagnostics.Debug.WriteLine("Font serialized to " + fontPath);
 
             // Shell Integration
-            AvailableHash hashShell = Options.GetHashFromCombo(this.cboHashShell);
+            AvailableHash hashShell = GetHashFromCombo(this.cboHashShell);
             this.optionsInRegistry.DefaultHash.RegistryValue = hashShell;
             this.shellInt.FileIntegration = this.chkEnableFileIntegration.IsChecked.GetValueOrDefault();
             this.shellInt.Md5FileAssociation = this.chkEnableMd5Association.IsChecked.GetValueOrDefault();
@@ -190,13 +174,12 @@ namespace Iside
             this.shellInt.WriteOptionsToRegistry();
 
             Settings.Default.Save();
-
         }
 
         private static AvailableHash GetHashFromCombo(ComboBox cbo)
         {
             ComboBoxItem cbi = cbo.SelectedItem as ComboBoxItem;
-            return Options.GetSelectedHashCode(cbi.Content.ToString());
+            return GetSelectedHashCode(cbi.Content.ToString());
         }
 
         private static AvailableHash GetSelectedHashCode(string selected)
@@ -207,12 +190,12 @@ namespace Iside
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
-            ColorFont.ColorFontDialog fontDlg = new ColorFont.ColorFontDialog();
+            ColorFontDialog fontDlg = new ColorFontDialog();
             fontDlg.Owner = this;
-            fontDlg.Font = ColorFont.FontInfo.GetControlFont(this.txtHashStyle);
+            fontDlg.Font = FontInfo.GetControlFont(this.txtHashStyle);
             if (fontDlg.ShowDialog() == true)
             {
-                ColorFont.FontInfo.ApplyFont(this.txtHashStyle, fontDlg.Font);
+                FontInfo.ApplyFont(this.txtHashStyle, fontDlg.Font);
             }
         }
 

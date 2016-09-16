@@ -1,53 +1,44 @@
-﻿/**
-    Iside - .NET WPF Version 
-    Copyright (C) LittleLite Software
-    Author Alessio Saltarin
-**/
-
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Windows;
 using System.Windows.Input;
-using System.Windows.Interop;
-using AxsUtils;
-using Iside.Logic;
 using IsideLogic;
 using LLCryptoLib;
 using LLCryptoLib.Hash;
-using LLCryptoLib.Utils;
 using Microsoft.Win32;
 using WPFUtils;
 
 namespace Iside
 {
     /// <summary>
-    /// The type of checksum requested
+    ///     The type of checksum requested
     /// </summary>
     public enum ChecksumType
     {
         /// <summary>
-        /// Md5Sum checksum type
+        ///     Md5Sum checksum type
         /// </summary>
         MD5SUM,
+
         /// <summary>
-        /// SFV Checksum type
+        ///     SFV Checksum type
         /// </summary>
         SFV
     }
 
     /// <summary>
-    /// Interaction logic for Checksum.xaml
+    ///     Interaction logic for Checksum.xaml
     /// </summary>
     public partial class Checksum : Window
     {
+        private BackgroundWorker bwGenerator;
         private string checksumName;
         private ChecksumGenerator chksumGen;
-        private SaveFileDialog saveFileDialog;
-        private BackgroundWorker bwGenerator;
         private bool isStandalone;
+        private SaveFileDialog saveFileDialog;
 
         public Checksum(ChecksumType type, bool standalone)
         {
@@ -61,11 +52,11 @@ namespace Iside
 
         private void Initialize(ChecksumType type, bool standalone, string folder)
         {
-            InitializeComponent();
+            this.InitializeComponent();
             this.InitType(type);
             this.InitializeBackgroundWorker();
             this.isStandalone = standalone;
-            
+
             if (folder != null)
             {
                 if (Directory.Exists(folder))
@@ -115,16 +106,16 @@ namespace Iside
             this.bwGenerator = new BackgroundWorker();
             this.bwGenerator.WorkerReportsProgress = true;
             this.bwGenerator.WorkerSupportsCancellation = true;
-            this.bwGenerator.DoWork += new DoWorkEventHandler(bwGenerator_DoWork);
-            this.bwGenerator.RunWorkerCompleted += new RunWorkerCompletedEventHandler(bwGenerator_RunWorkerCompleted);
-            this.bwGenerator.ProgressChanged += new ProgressChangedEventHandler(bwGenerator_ProgressChanged);
+            this.bwGenerator.DoWork += this.bwGenerator_DoWork;
+            this.bwGenerator.RunWorkerCompleted += this.bwGenerator_RunWorkerCompleted;
+            this.bwGenerator.ProgressChanged += this.bwGenerator_ProgressChanged;
         }
 
         private string AskForFilename()
         {
             string md5SumFile = null;
             if (this.saveFileDialog.ShowDialog(this) == true)
-			{
+            {
                 md5SumFile = this.saveFileDialog.FileName;
             }
             return md5SumFile;
@@ -143,20 +134,20 @@ namespace Iside
 
                 if (savedOk)
                 {
-                    MessageBox.Show(this, this.checksumName + " file saved", IsideLogic.Config.APPNAME,
+                    MessageBox.Show(this, this.checksumName + " file saved", Config.APPNAME,
                         MessageBoxButton.OK, MessageBoxImage.Information);
                 }
                 else
                 {
-                    MessageBox.Show(this, "Cannot save "+ this.checksumName +" as " + this.saveFileDialog.FileName,
-                        IsideLogic.Config.APPNAME, MessageBoxButton.OK, MessageBoxImage.Information);
+                    MessageBox.Show(this, "Cannot save " + this.checksumName + " as " + this.saveFileDialog.FileName,
+                        Config.APPNAME, MessageBoxButton.OK, MessageBoxImage.Information);
                 }
             }
         }
 
         private void PrepareForGeneration()
         {
-            if (String.IsNullOrEmpty(this.txtFolder.Text))
+            if (string.IsNullOrEmpty(this.txtFolder.Text))
             {
                 return;
             }
@@ -166,15 +157,15 @@ namespace Iside
             if (!di.Exists)
             {
                 MessageBox.Show(this, "The folder does not exist.",
-                                IsideLogic.Config.APPNAME, MessageBoxButton.OK, MessageBoxImage.Error);
+                    Config.APPNAME, MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
 
-            SupportedHashAlgo hashAlgo = SupportedHashAlgoFactory.FromName((string)this.cboHash.SelectedItem);
+            SupportedHashAlgo hashAlgo = SupportedHashAlgoFactory.FromName((string) this.cboHash.SelectedItem);
 
             if (hashAlgo.IsKeyed)
             {
-                KeyedHashAlgorithm khash = (KeyedHashAlgorithm)hashAlgo.Algorithm;
+                KeyedHashAlgorithm khash = (KeyedHashAlgorithm) hashAlgo.Algorithm;
                 // Ask for key only if it was not just entered
                 KeyedHash khf = new KeyedHash();
                 khf.Owner = this;
@@ -186,12 +177,12 @@ namespace Iside
 
             if (!this.bwGenerator.IsBusy)
             {
-                if (AskForFilename() != null)
+                if (this.AskForFilename() != null)
                 {
                     Mouse.OverrideCursor = Cursors.Wait;
                     this.btnGenerate.IsEnabled = false;
 
-                    LLCryptoLib.CallbackEntry cbe = new LLCryptoLib.CallbackEntry(UpdateProgressBar);
+                    CallbackEntry cbe = this.UpdateProgressBar;
                     ChecksumParameters parms = new ChecksumParameters();
                     parms.Callback = cbe;
                     parms.SumDir = di;
@@ -201,7 +192,6 @@ namespace Iside
                     this.bwGenerator.RunWorkerAsync(parms);
                 }
             }
-
         }
 
         private string Generate(ChecksumParameters parms, AxsUtils.DirectoryElements de)
@@ -227,7 +217,24 @@ namespace Iside
             this.PrepareForGeneration();
         }
 
+        private void Window_Loaded_1(object sender, RoutedEventArgs e)
+        {
+            if (this.isStandalone)
+            {
+                this.btnCancel.Content = "Exit";
+            }
+        }
+
+        private void btnCancel_Click(object sender, RoutedEventArgs e)
+        {
+            if (this.isStandalone)
+            {
+                Application.Current.Shutdown();
+            }
+        }
+
         #region Event Handlers
+
         private void bwGenerator_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             int progress = e.ProgressPercentage;
@@ -246,21 +253,21 @@ namespace Iside
         private void bwGenerator_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             Mouse.OverrideCursor = null;
-            
-            if ((e.Cancelled == true))
+
+            if (e.Cancelled)
             {
-                MessageBox.Show(this, "Checksum Halted", IsideLogic.Config.APPNAME,
-                                MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show(this, "Checksum Halted", Config.APPNAME,
+                    MessageBoxButton.OK, MessageBoxImage.Information);
             }
             else if (!(e.Error == null))
             {
-                MessageBox.Show(this, "Error: " + e.Error.Message, IsideLogic.Config.APPNAME,
-                                MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(this, "Error: " + e.Error.Message, Config.APPNAME,
+                    MessageBoxButton.OK, MessageBoxImage.Error);
             }
             else
             {
                 this.SaveMd5SumFile(this.saveFileDialog.FileName, e.Result as string);
-                this.btnGenerate.Visibility = System.Windows.Visibility.Hidden;
+                this.btnGenerate.Visibility = Visibility.Hidden;
                 this.btnCancel.Content = "Exit";
             }
 
@@ -282,33 +289,18 @@ namespace Iside
 
         private void btnSelectFolder_Click(object sender, RoutedEventArgs e)
         {
-            this.txtFolder.Text = GUI.SelectFolderPath(this, Environment.GetFolderPath(Environment.SpecialFolder.Personal), false);
+            this.txtFolder.Text = GUI.SelectFolderPath(this,
+                Environment.GetFolderPath(Environment.SpecialFolder.Personal), false);
         }
+
         #endregion
-
-        private void Window_Loaded_1(object sender, RoutedEventArgs e)
-        {
-            if (this.isStandalone)
-            {
-                this.btnCancel.Content = "Exit";
-            }
-        }
-
-        private void btnCancel_Click(object sender, RoutedEventArgs e)
-        {
-            if (this.isStandalone)
-            {
-                Application.Current.Shutdown();
-            }
-        }
     }
 
-    sealed class ChecksumParameters
+    internal sealed class ChecksumParameters
     {
         public DirectoryInfo SumDir { get; set; }
-        public LLCryptoLib.CallbackEntry Callback { get; set; }
+        public CallbackEntry Callback { get; set; }
         public SupportedHashAlgo Hash { get; set; }
         public bool CheckSubdirs { get; set; }
     }
-
 }

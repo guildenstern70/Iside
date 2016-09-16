@@ -1,10 +1,4 @@
-﻿/**
-    Iside - .NET WPF Version 
-    Copyright (C) LittleLite Software
-    Author Alessio Saltarin
-**/
-
-using System;
+﻿using System;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
@@ -26,6 +20,5 @@ namespace Iside.Logic
         }
 
         #endregion
-    } 
-
+    }
 }

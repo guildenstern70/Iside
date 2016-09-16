@@ -1,56 +1,48 @@
-﻿/**
-    Iside - .NET WPF Version 
-    Copyright (C) LittleLite Software
-    Author Alessio Saltarin
-**/
-
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Windows;
+using System.Windows.Threading;
 using AxsUtils;
-using Iside.Logic;
 using IsideLogic;
 using LiteErrorReportWPF;
 using LLCryptoLib.Hash;
 using WPFUtils;
-using System.Windows.Threading;
 
 namespace Iside
 {
     /// <summary>
-    /// Interaction logic for App.xaml
+    ///     Interaction logic for App.xaml
     /// </summary>
     public partial class App : Application
     {
         private static readonly string MODULE = "Iside.App";
 
         public App()
-            : base()
         {
-            System.Diagnostics.Debug.WriteLine("Welcome to Iside", MODULE);
-            Application.Current.ShutdownMode = ShutdownMode.OnExplicitShutdown;
+            Debug.WriteLine("Welcome to Iside", MODULE);
+            Current.ShutdownMode = ShutdownMode.OnExplicitShutdown;
         }
 
-        private void Application_Startup(object sender, StartupEventArgs e) 
+        private void Application_Startup(object sender, StartupEventArgs e)
         {
-            System.Diagnostics.Debug.WriteLine("Application_Startup", MODULE);
+            Debug.WriteLine("Application_Startup", MODULE);
 
-            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+            AppDomain.CurrentDomain.UnhandledException += this.CurrentDomain_UnhandledException;
             Window main = null;
 
             try
             {
-                bool registered = App.IsRegistered();
+                bool registered = IsRegistered();
 
                 if (e != null)
                 {
-                    main = App.ArgumentParser(e.Args, registered);
+                    main = ArgumentParser(e.Args, registered);
                 }
                 else
                 {
-                    main = App.ArgumentParser(null, registered);
+                    main = ArgumentParser(null, registered);
                 }
             }
             catch (NullReferenceException)
@@ -64,7 +56,7 @@ namespace Iside
             }
         }
 
-        void App_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
+        private void App_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
         {
             this.HandleException(e.Exception);
             e.Handled = true;
@@ -77,29 +69,30 @@ namespace Iside
 
         private static Window ArgumentParser(string[] args, bool isRegistered)
         {
-            System.Diagnostics.Debug.WriteLine("ArgumentParser. Registered = " + isRegistered, MODULE);
+            Debug.WriteLine("ArgumentParser. Registered = " + isRegistered, MODULE);
             if (args != null)
             {
-                System.Diagnostics.Debug.WriteLine("Args > ", MODULE);
+                Debug.WriteLine("Args > ", MODULE);
                 foreach (string arg in args)
                 {
-                    System.Diagnostics.Debug.WriteLine(" -> " + arg, MODULE);
+                    Debug.WriteLine(" -> " + arg, MODULE);
                 }
             }
             else
             {
-                System.Diagnostics.Debug.WriteLine("No Args", MODULE);
+                Debug.WriteLine("No Args", MODULE);
             }
 
             Window mf = null;
 
-            if ((args == null)||(args.Length == 0))
+            if ((args == null) || (args.Length == 0))
             {
                 mf = new IsideWindow(isRegistered);
             }
             if (args.Length == 1)
             {
                 #region 1_Argument
+
                 if (args[0].EndsWith("-md5"))
                 {
                     mf = new VerifyChecksum(ChecksumType.MD5SUM, true); // Iside launch in MD5sum mode
@@ -119,12 +112,12 @@ namespace Iside
 #if (DEBUG)
                 else if (args[0].Equals("-test"))
                 {
-                    IsideLogic.ShellIntegrationOption.Test();
+                    ShellIntegrationOption.Test();
                 }
 #endif
                 if (args[0].StartsWith("-file"))
                 {
-                    System.Diagnostics.Debug.WriteLine("Received " + args[0]);
+                    Debug.WriteLine("Received " + args[0]);
                     string filePath = args[0].Substring(5);
                     filePath = filePath.Replace('?', ' ');
                     mf = new IsideWindow(filePath, isRegistered); // Iside launch with one file
@@ -144,11 +137,13 @@ namespace Iside
                         mf = new IsideWindow(isRegistered);
                     }
                 }
+
                 #endregion
             }
             else if (args.Length == 2)
             {
                 #region 2_Arguments
+
                 if (args[0].Equals("-md5"))
                 {
                     mf = new VerifyChecksum(ChecksumType.MD5SUM, args[1], true);
@@ -183,37 +178,36 @@ namespace Iside
                 }
                 else if (args[0].StartsWith("-file"))
                 {
-                    System.Diagnostics.Debug.WriteLine("Received " + args[0] + " " + args[1]);
+                    Debug.WriteLine("Received " + args[0] + " " + args[1]);
                     string filePath1 = args[0].Substring(5);
                     filePath1 = filePath1.Replace('?', ' ');
                     string filePath2 = args[1].Substring(5);
                     filePath2 = filePath2.Replace('?', ' ');
                     mf = new IsideWindow(filePath1, filePath2, isRegistered); // Iside launch with two files
                 }
+
                 #endregion
             }
 
             return mf;
-
         }
 
         private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
-            this.HandleException((Exception)e.ExceptionObject);
+            this.HandleException((Exception) e.ExceptionObject);
         }
 
         private void HandleException(Exception exc)
         {
             try
             {
-
                 string errorNumber = ErrorReportLib.ErrorCodeNumber(exc.Message);
 
                 // Preparing report
                 StringBuilder sb = new StringBuilder("ISIDE Critical error.");
                 sb.AppendLine("<br />");
                 sb.AppendLine("Version: " + Config.AppVersionWithBuild);
-                sb.AppendLine("Date: " + DateTime.Now.ToString());
+                sb.AppendLine("Date: " + DateTime.Now);
                 sb.Append("<br />");
                 sb.AppendLine("OS: " + AxsUtils.Win32.OS.OperatingSystem);
                 sb.Append("<br />");
@@ -240,22 +234,19 @@ namespace Iside
 
                 // Saving log
                 FileManager fm = FileManager.Reference;
-                string errorPath = Path.Combine(WPFUtils.Core.AppDataPath, "critical_error.log");
+                string errorPath = Path.Combine(Core.AppDataPath, "critical_error.log");
                 fm.SaveFile(errorPath, report, true);
 
                 // Send to LittleLite
                 CriticalError ceForm = new CriticalError(Config.APPNAME,
-                                                         Config.APPKEY,
-                                                         report, errorNumber);
+                    Config.APPKEY,
+                    report, errorNumber);
                 ceForm.ShowDialog();
-
             }
             finally
             {
-                Application.Current.Shutdown();
+                Current.Shutdown();
             }
         }
-
-
     }
 }

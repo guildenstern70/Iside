@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Iside.Logic
+﻿namespace Iside.Logic
 {
     public class HashInfo
     {

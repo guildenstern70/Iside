@@ -17,12 +17,9 @@
         <ListBox x:Name="lstFiles" Grid.Row="1" Margin="5">
             <ListBox.ContextMenu>
                 <ContextMenu x:Name="ctxMenu">
-                    <MenuItem Header="Add more files.." Click="Ctx_MoreFiles_Click">
-                    </MenuItem>
-                    <MenuItem x:Name="ctxMenuRemoveItem" Header="Remove file" Click="Ctx_Remove_Click">
-                    </MenuItem>
-                    <MenuItem Header="Clear" Click="Ctx_Clear_Click">
-                    </MenuItem>
+                    <MenuItem Header="Add more files.." Click="Ctx_MoreFiles_Click" />
+                    <MenuItem x:Name="ctxMenuRemoveItem" Header="Remove file" Click="Ctx_Remove_Click" />
+                    <MenuItem Header="Clear" Click="Ctx_Clear_Click" />
                 </ContextMenu>
             </ListBox.ContextMenu>
         </ListBox>

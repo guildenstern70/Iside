@@ -1,10 +1,4 @@
-﻿/**
-    Iside - .NET WPF Version 
-    Copyright (C) LittleLite Software
-    Author Alessio Saltarin
-**/
-
-using System.Windows.Input;
+﻿using System.Windows.Input;
 
 namespace Iside.Logic
 {
@@ -57,17 +51,18 @@ namespace Iside.Logic
             MultiFile = new RoutedUICommand("Show hash code of more than one file", "Multifile Hash", typeof(Commands));
             CdDvd = new RoutedUICommand("Compute hash code of an entire CD/DVD", "CD/DVD Hash", typeof(Commands));
             Md5Gen = new RoutedUICommand("Generate the Md5Sum of a directory", "Generate Md5Sum", typeof(Commands));
-            Md5Verify = new RoutedUICommand("Verify a previously saved Md5Sum against a directory", "Verify Md5Sum", typeof(Commands));
+            Md5Verify = new RoutedUICommand("Verify a previously saved Md5Sum against a directory", "Verify Md5Sum",
+                typeof(Commands));
             SfvGen = new RoutedUICommand("Generate the SFV of a directory", "Generate SFV", typeof(Commands));
-            SfvVerify = new RoutedUICommand("Verify a previously saved SFV against a directory", "Verify SFV", typeof(Commands));
+            SfvVerify = new RoutedUICommand("Verify a previously saved SFV against a directory", "Verify SFV",
+                typeof(Commands));
 
             // HELP
             CheckForUpdates = new RoutedUICommand("Check for Iside updates", "Check For Updates", typeof(Commands));
             IsideWeb = new RoutedUICommand("Navigate to Iside Home Page", "Iside Home Page", typeof(Commands));
-            LittleLiteWeb = new RoutedUICommand("Navigate to LittleLite Home Page", "LittleLite Home Page", typeof(Commands));
+            LittleLiteWeb = new RoutedUICommand("Navigate to LittleLite Home Page", "LittleLite Home Page",
+                typeof(Commands));
             About = new RoutedUICommand("Show Iside program details", "About", typeof(Commands));
-
-            
         }
     }
 }

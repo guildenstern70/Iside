@@ -41,7 +41,7 @@
             </Grid.RowDefinitions>
             <Menu Grid.Row="0" x:Name="MenuBar" Height="22" Margin="5,5,0,5" Background="WhiteSmoke">
                 <MenuItem Header="_File" LostFocus="Menu_Exit" >
-                    <MenuItem Header="_New" MouseMove="MenuHelper_StatusBar" Command="commands:Commands.NewHash"></MenuItem>
+                    <MenuItem Header="_New" MouseMove="MenuHelper_StatusBar" Command="commands:Commands.NewHash" />
                     <MenuItem Header="Open _Left File..." MouseMove="MenuHelper_StatusBar" Command="commands:Commands.OpenLeft">
                         <MenuItem.Icon>
                             <Image Source="/Iside;component/Resources/folder-open_left_32.png" Width="16" Height="16" />
@@ -195,22 +195,20 @@
                                     <ColumnDefinition Width="100" />
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
-                                <ComboBox Grid.Row="0" Grid.Column="0" Name="cboSelHashLeft1" Margin="1,2,2,2" FontSize="10.667" SelectionChanged="cboSelHashLeft1_SelectionChanged">
-                                </ComboBox>
+                                <ComboBox Grid.Row="0" Grid.Column="0" Name="cboSelHashLeft1" Margin="1,2,2,2" FontSize="10.667" SelectionChanged="cboSelHashLeft1_SelectionChanged" />
                                 <TextBox Grid.Row="1" Grid.ColumnSpan="2" Name="txtHash1Left" IsReadOnly="True"
                                          TextWrapping="Wrap"
                                          AllowDrop="True" 
                                          PreviewDragEnter="txtFileName_DragEnter"
                                          PreviewDragOver="txtFileName_DragEnter"
-                                         PreviewDrop="txtFileName_Drop"></TextBox>
-                                <ComboBox Grid.Row="2" Grid.Column="0" Name="cboSelHashLeft2" Margin="1,2,2,2" FontSize="10.667" SelectionChanged="cboSelHashLeft2_SelectionChanged">
-                                </ComboBox>
+                                         PreviewDrop="txtFileName_Drop" />
+                                <ComboBox Grid.Row="2" Grid.Column="0" Name="cboSelHashLeft2" Margin="1,2,2,2" FontSize="10.667" SelectionChanged="cboSelHashLeft2_SelectionChanged" />
                                 <TextBox Grid.Row="3" Grid.ColumnSpan="2" Name="txtHash2Left" IsReadOnly="True"
                                          TextWrapping="Wrap"
                                          AllowDrop="True" 
                                          PreviewDragEnter="txtFileName_DragEnter"
                                          PreviewDragOver="txtFileName_DragEnter"
-                                         PreviewDrop="txtFileName_Drop"></TextBox>
+                                         PreviewDrop="txtFileName_Drop" />
                             </Grid>
                         </TabItem>
                         <TabItem Name="tabDetailsLeft" Header="Details">
@@ -283,22 +281,20 @@
                                     <ColumnDefinition Width="90" />
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
-                                <ComboBox Grid.Row="0" Grid.Column="0" Name="cboSelHashRight1" Margin="1,2,2,2" FontSize="10.667" SelectionChanged="cboSelHashRight1_SelectionChanged">
-                                </ComboBox>
+                                <ComboBox Grid.Row="0" Grid.Column="0" Name="cboSelHashRight1" Margin="1,2,2,2" FontSize="10.667" SelectionChanged="cboSelHashRight1_SelectionChanged" />
                                 <TextBox Grid.Row="1" Grid.ColumnSpan="2" Name="txtHash1Right" IsReadOnly="True"
                                          TextWrapping="Wrap"
                                          AllowDrop="True" 
                                          PreviewDragEnter="txtFileNameVS_DragEnter"
                                          PreviewDragOver="txtFileNameVS_DragEnter"
-                                         PreviewDrop="txtFileNameVS_Drop"></TextBox>
-                                <ComboBox Grid.Row="2" Grid.Column="0" Name="cboSelHashRight2" Margin="1,2,2,2" FontSize="10.667" SelectionChanged="cboSelHashRight2_SelectionChanged">
-                                </ComboBox>
+                                         PreviewDrop="txtFileNameVS_Drop" />
+                                <ComboBox Grid.Row="2" Grid.Column="0" Name="cboSelHashRight2" Margin="1,2,2,2" FontSize="10.667" SelectionChanged="cboSelHashRight2_SelectionChanged" />
                                 <TextBox Grid.Row="3" Grid.ColumnSpan="2" Name="txtHash2Right" IsReadOnly="True"
                                          TextWrapping="Wrap"
                                          AllowDrop="True" 
                                          PreviewDragEnter="txtFileNameVS_DragEnter"
                                          PreviewDragOver="txtFileNameVS_DragEnter"
-                                         PreviewDrop="txtFileNameVS_Drop"></TextBox>
+                                         PreviewDrop="txtFileNameVS_Drop" />
                             </Grid>
                         </TabItem>
                         <TabItem Name="tabDetailsRight" Header="Details">
@@ -342,7 +338,7 @@
                     <ColumnDefinition Width="34" />
                 </Grid.ColumnDefinitions>
 
-                <ProgressBar Name="progressBar" Grid.Column="0" Margin="10,6,4.83,2.698" Grid.ColumnSpan="2" Visibility="Hidden"></ProgressBar>
+                <ProgressBar Name="progressBar" Grid.Column="0" Margin="10,6,4.83,2.698" Grid.ColumnSpan="2" Visibility="Hidden" />
 
                 <Button Background="Transparent" Grid.Column="1" BorderThickness="0"  
                         Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"

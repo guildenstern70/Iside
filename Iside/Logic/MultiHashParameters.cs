@@ -5,52 +5,22 @@ using LLCryptoLib.Utils;
 
 namespace Iside.Logic
 {
-    class MultiHashParameters
+    internal class MultiHashParameters
     {
-        private FileInfo[] _files;
-        private HexEnum _hs;
-        private CallbackEntry _cbe;
-        private Hash _hash;
-
         public MultiHashParameters(FileInfo[] files, Hash hash, HexEnum hs, CallbackEntry cbe)
         {
-            this._files = files;
-            this._hs = hs;
-            this._cbe = cbe;
-            this._hash = hash;
+            this.Files = files;
+            this.HexStyle = hs;
+            this.Callback = cbe;
+            this.Hash = hash;
         }
 
-        public CallbackEntry Callback
-        {
-            get
-            {
-                return _cbe;
-            }
-        }
+        public CallbackEntry Callback { get; }
 
-        public FileInfo[] Files
-        {
-            get
-            {
-                return _files;
-            }
-        }
+        public FileInfo[] Files { get; }
 
-        public Hash Hash
-        {
-            get
-            {
-                return _hash;
-            }
-        }
+        public Hash Hash { get; }
 
-        public HexEnum HexStyle
-        {
-            get
-            {
-                return _hs;
-            }
-        }
-
+        public HexEnum HexStyle { get; }
     }
 }
