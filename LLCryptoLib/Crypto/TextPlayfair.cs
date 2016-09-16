@@ -1,58 +1,31 @@
-/*
- * LLCryptoLib - Advanced .NET Encryption and Hashing Library
- * v.$id$
- * 
- * The contents of this file are subject to the license distributed with
- * the package (the License). This file cannot be distributed without the 
- * original LittleLite Software license file. The distribution of this
- * file is subject to the agreement between the licensee and LittleLite
- * Software.
- * 
- * Customer that has purchased Source Code License may alter this
- * file and distribute the modified binary redistributables with applications. 
- * Except as expressly authorized in the License, customer shall not rent,
- * lease, distribute, sell, make available for download of this file. 
- * 
- * This software is not Open Source, nor Free. Its usage must adhere
- * with the License obtained from LittleLite Software.
- * 
- * The source code in this file may be derived, all or in part, from existing
- * other source code, where the original license permit to do so.
- * 
- * 
- * Copyright (C) 2003-2014 LittleLite Software
- * 
- */
-
-
-using System;
+﻿using System;
 using System.Text;
 
 namespace LLCryptoLib.Crypto
 {
-
-	/// <summary>
-	/// TextPlayfair cipher.
-	/// The TextPlayfair is a primitively modern reckoning block cipher. Any new personal computer sold 
-	/// today can break a message encoded with it in a matter of seconds. That is, with the proper 
-	/// software, you could use such a computer to discover the original text without knowing the cipher key. 
-	/// Some skilled cryptogrophists and puzzle experts can even break it with nothing more than pen and paper.
-	/// Nonetheless, it uses some principles common to modern computer block ciphers. Understanding the 
-	/// TextPlayfair will give you a beginning insight into modern cryptographywithout all the complex mathematics 
-	/// and number theory.
-	/// TextPlayfair Cipher uses a 5x5 or 9x9 square, in which the letters of an agreed key word or phrase are entered 
-	/// (suppressing duplicates), followed by the rest of the alphabet in order (if 5x5 is used then an alphabet with
-    /// 25 letters is used where I and J would usually be combined together, if 9x9 is used a broader range of symbols
-    /// is used. The more the symbols, the more the characters that can be encrypted).
-	/// The message to be enciphered is split into pairs of letters. If the two letters in the pair are in the same row, 
-	/// the letters to the right of each are used. If they are in the same column, the letters below each are used. 
-	/// Otherwise, the letters at the opposite corners of the rectangle are used. 
-	/// Special treatment is required for identical pairs of letters and a single letter left over at the end. 
-	/// Typically an obscure letter such as X would have been inserted to pad out the message.
-    /// LLCryptoLib implementations assumes, instead of the original 5x5 or 9x9 cipher, a combined 36x36 square.
-	/// </summary>
-    /// <example>Playfair text encryption:
-    /// <code>
+    /// <summary>
+    ///     TextPlayfair cipher.
+    ///     The TextPlayfair is a primitively modern reckoning block cipher. Any new personal computer sold
+    ///     today can break a message encoded with it in a matter of seconds. That is, with the proper
+    ///     software, you could use such a computer to discover the original text without knowing the cipher key.
+    ///     Some skilled cryptogrophists and puzzle experts can even break it with nothing more than pen and paper.
+    ///     Nonetheless, it uses some principles common to modern computer block ciphers. Understanding the
+    ///     TextPlayfair will give you a beginning insight into modern cryptographywithout all the complex mathematics
+    ///     and number theory.
+    ///     TextPlayfair Cipher uses a 5x5 or 9x9 square, in which the letters of an agreed key word or phrase are entered
+    ///     (suppressing duplicates), followed by the rest of the alphabet in order (if 5x5 is used then an alphabet with
+    ///     25 letters is used where I and J would usually be combined together, if 9x9 is used a broader range of symbols
+    ///     is used. The more the symbols, the more the characters that can be encrypted).
+    ///     The message to be enciphered is split into pairs of letters. If the two letters in the pair are in the same row,
+    ///     the letters to the right of each are used. If they are in the same column, the letters below each are used.
+    ///     Otherwise, the letters at the opposite corners of the rectangle are used.
+    ///     Special treatment is required for identical pairs of letters and a single letter left over at the end.
+    ///     Typically an obscure letter such as X would have been inserted to pad out the message.
+    ///     LLCryptoLib implementations assumes, instead of the original 5x5 or 9x9 cipher, a combined 36x36 square.
+    /// </summary>
+    /// <example>
+    ///     Playfair text encryption:
+    ///     <code>
     /// TextAlgorithmParameters parms = null;
     /// TextCrypter textEncrypter = TextCrypterFactory.Create(SupportedTextAlgorithms.PLAYFAIR, parms);
     /// string encrypted = textEncrypter.TextEncryptDecrypt(origString, true);
@@ -62,22 +35,21 @@ namespace LLCryptoLib.Crypto
     /// Console.WriteLine();
     /// </code>
     /// </example>
-	public class TextPlayfair : TextAlgorithm
-	{
+    public class TextPlayfair : TextAlgorithm
+    {
+        private class RowCol
+        {
+            public readonly short Col;
+            public readonly short Row;
 
-		class RowCol
-		{
-			public short Row;
-			public short Col;
+            public RowCol(short r, short c)
+            {
+                this.Row = r;
+                this.Col = c;
+            }
+        }
 
-			public RowCol(short r, short c)
-			{
-				this.Row=r;
-				this.Col=c;
-			}
-		}
-
-		private const char SPECIAL = '^';
+        private const char SPECIAL = '^';
 
 #if MONO
 
@@ -136,196 +108,190 @@ namespace LLCryptoLib.Crypto
 
 #else
 
-		private static readonly char[][] CIPHER1 =
-		{ 
-			new char[] { 'q', 'b', 'c', 'd', 'S', 'A', 'B', 'C', '*' },
-			new char[] { 'f', 'g', 'Y', 'i', 'j', 'D', 'E', 'F', 'Q' },
-			new char[] { 'p', 'a', 'r', '(', 't', '7', 'K', '4', '/' },
-			new char[] { 'u', 'w', 'v', 'x', 'z', 'M', 'N', 'O', '"' },
-			new char[] { 'P', '+', 'y', 'R', 'e', 'T', 'U', 'V', 'ò' },
-			new char[] { 'W', '=', 'h', 'Z', ' ', '.', ',', ';', 'à' },
-			new char[] { 'k', 'è', 'm', 'n', 'o', 'G', 'H', 'I', 'X' },
-			new char[] { '1', '2', '3', 'L', '5', '6', 'J', '8', 'ì' },
-			new char[] { '9', '0', '!', '@', '$', '%', 's', ')', 'l' }
-		};
+        private static readonly char[][] CIPHER1 =
+        {
+            new[] {'q', 'b', 'c', 'd', 'S', 'A', 'B', 'C', '*'},
+            new[] {'f', 'g', 'Y', 'i', 'j', 'D', 'E', 'F', 'Q'},
+            new[] {'p', 'a', 'r', '(', 't', '7', 'K', '4', '/'},
+            new[] {'u', 'w', 'v', 'x', 'z', 'M', 'N', 'O', '"'},
+            new[] {'P', '+', 'y', 'R', 'e', 'T', 'U', 'V', 'ò'},
+            new[] {'W', '=', 'h', 'Z', ' ', '.', ',', ';', 'à'},
+            new[] {'k', 'è', 'm', 'n', 'o', 'G', 'H', 'I', 'X'},
+            new[] {'1', '2', '3', 'L', '5', '6', 'J', '8', 'ì'},
+            new[] {'9', '0', '!', '@', '$', '%', 's', ')', 'l'}
+        };
 
-		private static readonly char[][] CIPHER2 = 								
-		{ 
+        private static readonly char[][] CIPHER2 =
+        {
+            new[] {'P', '@', 'y', 'R', 'S', 'T', 'U', 'V', 'ò'},
+            new[] {'u', 'w', 'v', 'e', 'z', 'M', 'N', 'O', '"'},
+            new[] {'a', 'b', 'c', 'd', 'x', 'A', '5', 'C', '*'},
+            new[] {'f', 'g', '%', 'i', 'j', 'D', 'E', '9', '+'},
+            new[] {'p', 'q', 'r', 's', 't', 'J', 'K', 'L', '/'},
+            new[] {'k', 'l', 'm', 'n', 'o', 'G', 'H', 'I', '='},
+            new[] {'W', 'X', 'Y', 'Z', ' ', '.', ',', ';', 'à'},
+            new[] {'1', '2', '3', '4', 'B', '6', '7', '8', 'ì'},
+            new[] {'F', '0', '!', 'Q', '$', 'h', '(', ')', 'è'}
+        };
 
-			new char[] { 'P', '@', 'y', 'R', 'S', 'T', 'U', 'V', 'ò' },
-			new char[] { 'u', 'w', 'v', 'e', 'z', 'M', 'N', 'O', '"' },
-			new char[] { 'a', 'b', 'c', 'd', 'x', 'A', '5', 'C', '*' },
-			new char[] { 'f', 'g', '%', 'i', 'j', 'D', 'E', '9', '+' },
-			new char[] { 'p', 'q', 'r', 's', 't', 'J', 'K', 'L', '/' },
-			new char[] { 'k', 'l', 'm', 'n', 'o', 'G', 'H', 'I', '=' },
-			new char[] { 'W', 'X', 'Y', 'Z', ' ', '.', ',', ';', 'à' },
-			new char[] { '1', '2', '3', '4', 'B', '6', '7', '8', 'ì' },
-			new char[] { 'F', '0', '!', 'Q', '$', 'h', '(', ')', 'è' }
-		};
+        private static readonly char[][] CIPHER3 =
+        {
+            new[] {'f', 'g', 'w', 'i', 'j', 'D', 'ò', 'F', '+'},
+            new[] {'k', 'l', '$', 'n', 'o', 'G', 'H', 'I', '='},
+            new[] {'p', '8', 'r', 's', 't', 'J', 'K', 'L', '/'},
+            new[] {'a', '!', 'c', 'd', 'e', 'A', 'T', 'C', '*'},
+            new[] {'u', 'h', 'v', 'x', 'z', 'M', 'N', 'O', '"'},
+            new[] {'P', 'Q', 'y', 'R', '3', 'B', 'U', 'V', 'E'},
+            new[] {'W', 'X', 'Y', 'Z', ' ', '.', ',', ';', 'à'},
+            new[] {'1', '5', 'S', '4', '2', '6', '7', 'q', 'ì'},
+            new[] {'9', '0', 'b', '@', 'm', '%', '(', ')', 'è'}
+        };
 
-		private static readonly char[][] CIPHER3 = 				
-		{ 
-
-			new char[] { 'f', 'g', 'w', 'i', 'j', 'D', 'ò', 'F', '+' },
-			new char[] { 'k', 'l', '$', 'n', 'o', 'G', 'H', 'I', '=' },
-			new char[] { 'p', '8', 'r', 's', 't', 'J', 'K', 'L', '/' },
-			new char[] { 'a', '!', 'c', 'd', 'e', 'A', 'T', 'C', '*' },
-			new char[] { 'u', 'h', 'v', 'x', 'z', 'M', 'N', 'O', '"' },
-			new char[] { 'P', 'Q', 'y', 'R', '3', 'B', 'U', 'V', 'E' },
-			new char[] { 'W', 'X', 'Y', 'Z', ' ', '.', ',', ';', 'à' },
-			new char[] { '1', '5', 'S', '4', '2', '6', '7', 'q', 'ì' },
-			new char[] { '9', '0', 'b', '@', 'm', '%', '(', ')', 'è' }
-		};
-
-		private static readonly char[][] CIPHER4 = 				
-		{ 
-			new char[] { '$', 'l', 'B', 'n', 'o', 'G', 'H', 'I', '=' },
-			new char[] { 'p', 'q', 'r', 's', 't', 'J', 'K', 'L', '/' },
-			new char[] { '9', '0', '!', 'e', 'k', '%', '(', ')', 'è' },
-			new char[] { 'P', 'X', 'y', 'R', 'S', '4', '6', 'V', 'ò' },
-			new char[] { 'f', 'g', 'h', 'N', 'j', 'D', '8', 'F', '+' },
-			new char[] { 'W', 'Q', 'Y', 'Z', ' ', '.', ',', ';', 'à' },
-			new char[] { 'a', 'ì', 'c', 'd', '@', 'A', 'm', 'C', '*' },
-			new char[] { '1', 'u', '3', 'T', '5', 'U', '7', 'E', 'b' },
-			new char[] { '2', 'w', 'v', 'x', 'z', 'M', 'i', 'O', '"' }
-		};
+        private static readonly char[][] CIPHER4 =
+        {
+            new[] {'$', 'l', 'B', 'n', 'o', 'G', 'H', 'I', '='},
+            new[] {'p', 'q', 'r', 's', 't', 'J', 'K', 'L', '/'},
+            new[] {'9', '0', '!', 'e', 'k', '%', '(', ')', 'è'},
+            new[] {'P', 'X', 'y', 'R', 'S', '4', '6', 'V', 'ò'},
+            new[] {'f', 'g', 'h', 'N', 'j', 'D', '8', 'F', '+'},
+            new[] {'W', 'Q', 'Y', 'Z', ' ', '.', ',', ';', 'à'},
+            new[] {'a', 'ì', 'c', 'd', '@', 'A', 'm', 'C', '*'},
+            new[] {'1', 'u', '3', 'T', '5', 'U', '7', 'E', 'b'},
+            new[] {'2', 'w', 'v', 'x', 'z', 'M', 'i', 'O', '"'}
+        };
 
 #endif
 
-		internal TextPlayfair() : base(TextAlgorithmType.TEXT)
-		{
-		}
+        internal TextPlayfair() : base(TextAlgorithmType.TEXT)
+        {
+        }
 
-		/// <summary>
-		/// Encoding algorithm for TextPlayfair.
-		/// </summary>
-		/// <param name="txt">String to encode</param>
-		/// <returns>Encoded string</returns>
-		public override string Code(string txt)
-		{
-			StringBuilder sb = new StringBuilder();
-			string workTxt = txt;
+        /// <summary>
+        ///     Encoding algorithm for TextPlayfair.
+        /// </summary>
+        /// <param name="txt">String to encode</param>
+        /// <returns>Encoded string</returns>
+        public override string Code(string txt)
+        {
+            StringBuilder sb = new StringBuilder();
+            string workTxt = txt;
 
-			if ((workTxt.Length % 2)>0)  // if len is not pair
-			{
-				workTxt += " ";
-			}
+            if (workTxt.Length%2 > 0) // if len is not pair
+            {
+                workTxt += " ";
+            }
 
-			int len = workTxt.Length;
+            int len = workTxt.Length;
 
-			char clear0, clear1;
-			char coded0, coded1;
+            char clear0, clear1;
+            char coded0, coded1;
 
-			for (int j=0; j<len-1; j+=2)
-			{
-				clear0 = workTxt[j];
-				clear1 = workTxt[j+1];
-			
-				RowCol rc_clear0 = TextPlayfair.isIn(CIPHER1, clear0);
-                RowCol rc_clear1 = TextPlayfair.isIn(CIPHER4, clear1);
+            for (int j = 0; j < len - 1; j += 2)
+            {
+                clear0 = workTxt[j];
+                clear1 = workTxt[j + 1];
 
-				if (rc_clear0!=null && rc_clear1!=null)
-				{
-					coded0 = CIPHER3[rc_clear1.Row][rc_clear0.Col];
-					coded1 = CIPHER2[rc_clear0.Row][rc_clear1.Col];
-				}
-				else
-				{
-					coded0 = clear0;
-					coded1 = clear1;
-				}
+                RowCol rc_clear0 = isIn(CIPHER1, clear0);
+                RowCol rc_clear1 = isIn(CIPHER4, clear1);
 
-				sb.Append(coded0);
-				sb.Append(coded1);
-			}
+                if ((rc_clear0 != null) && (rc_clear1 != null))
+                {
+                    coded0 = CIPHER3[rc_clear1.Row][rc_clear0.Col];
+                    coded1 = CIPHER2[rc_clear0.Row][rc_clear1.Col];
+                }
+                else
+                {
+                    coded0 = clear0;
+                    coded1 = clear1;
+                }
 
-			return sb.ToString();
-		}
+                sb.Append(coded0);
+                sb.Append(coded1);
+            }
 
-		/// <summary>
-		/// Decoding algorithm for TextPlayfair.
-		/// </summary>
-		/// <param name="txt">Encoded string</param>
-		/// <returns>Decoded string</returns>
+            return sb.ToString();
+        }
+
+        /// <summary>
+        ///     Decoding algorithm for TextPlayfair.
+        /// </summary>
+        /// <param name="txt">Encoded string</param>
+        /// <returns>Decoded string</returns>
         /// <exception cref="ArgumentNullException" />
         public override string Decode(string txt)
-		{
+        {
             if (txt == null)
             {
                 throw new ArgumentNullException("txt");
             }
 
-			StringBuilder sb = new StringBuilder();
+            StringBuilder sb = new StringBuilder();
 
-			if ((txt.Length % 2)>0)  // if len is not pair
-			{
-				txt += " ";
-			}
+            if (txt.Length%2 > 0) // if len is not pair
+            {
+                txt += " ";
+            }
 
-			int len = txt.Length;
+            int len = txt.Length;
 
-			char clear0, clear1;
-			char coded0, coded1;
+            char clear0, clear1;
+            char coded0, coded1;
 
-			for (int j=0; j<len-1; j+=2)
-			{
-				coded0 = txt[j];
-				coded1 = txt[j+1];
+            for (int j = 0; j < len - 1; j += 2)
+            {
+                coded0 = txt[j];
+                coded1 = txt[j + 1];
 
-                RowCol rc_coded0 = TextPlayfair.isIn(CIPHER3, coded0);
-                RowCol rc_coded1 = TextPlayfair.isIn(CIPHER2, coded1);
+                RowCol rc_coded0 = isIn(CIPHER3, coded0);
+                RowCol rc_coded1 = isIn(CIPHER2, coded1);
 
-				if (rc_coded0!=null && rc_coded1!=null)
-				{
-					clear0 = CIPHER1[rc_coded1.Row][rc_coded0.Col];
-					clear1 = CIPHER4[rc_coded0.Row][rc_coded1.Col];
-				}
-				else
-				{
-					clear0 = coded0;
-					clear1 = coded1;
-				}
+                if ((rc_coded0 != null) && (rc_coded1 != null))
+                {
+                    clear0 = CIPHER1[rc_coded1.Row][rc_coded0.Col];
+                    clear1 = CIPHER4[rc_coded0.Row][rc_coded1.Col];
+                }
+                else
+                {
+                    clear0 = coded0;
+                    clear1 = coded1;
+                }
 
-				sb.Append(clear0);
-				sb.Append(clear1);
-			}
+                sb.Append(clear0);
+                sb.Append(clear1);
+            }
 
-			return sb.ToString();
-		}
+            return sb.ToString();
+        }
 
 
         /// <summary>
-        /// Returns a <see cref="T:System.String"></see> that represents the current <see cref="T:System.Object"></see>.
+        ///     Returns a <see cref="T:System.String"></see> that represents the current <see cref="T:System.Object"></see>.
         /// </summary>
         /// <returns>
-        /// A <see cref="T:System.String"></see> that represents the current <see cref="T:System.Object"></see>.
+        ///     A <see cref="T:System.String"></see> that represents the current <see cref="T:System.Object"></see>.
         /// </returns>
-		public override string ToString()
-		{
-			return "Playfair cipher";
-		}
+        public override string ToString()
+        {
+            return "Playfair cipher";
+        }
 
 
-		private static RowCol isIn(char[][] cipher, char toBeFound)
-		{
+        private static RowCol isIn(char[][] cipher, char toBeFound)
+        {
+            RowCol ret = null;
 
-			RowCol ret = null;
+            for (short rr = 0; rr < cipher.Length; ++rr)
+            {
+                for (short cc = 0; cc < cipher[rr].Length; ++cc)
+                {
+                    if (cipher[rr][cc] == toBeFound)
+                    {
+                        ret = new RowCol(rr, cc);
+                    }
+                }
+            }
 
-			for (short rr=0; rr<cipher.Length; ++rr)
-			{
-				for (short cc=0; cc<cipher[rr].Length; ++cc)
-				{
-					if (cipher[rr][cc]==toBeFound)
-					{
-						ret = new RowCol(rr,cc);
-					}
-				}
-			}
-
-			return ret;
-		}
-
-
-	}
+            return ret;
+        }
+    }
 }
-

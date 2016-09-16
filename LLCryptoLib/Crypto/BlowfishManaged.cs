@@ -1,38 +1,14 @@
-/*
- * LLCryptoLib - Advanced .NET Encryption and Hashing Library
- * v.$id$
- * 
- * The contents of this file are subject to the license distributed with
- * the package (the License). This file cannot be distributed without the 
- * original LittleLite Software license file. The distribution of this
- * file is subject to the agreement between the licensee and LittleLite
- * Software.
- * 
- * Customer that has purchased Source Code License may alter this
- * file and distribute the modified binary redistributables with applications. 
- * Except as expressly authorized in the License, customer shall not rent,
- * lease, distribute, sell, make available for download of this file. 
- * 
- * This software is not Open Source, nor Free. Its usage must adhere
- * with the License obtained from LittleLite Software.
- * 
- * The source code in this file may be derived, all or in part, from existing
- * other source code, where the original license permit to do so.
- * 
- * 
- * Copyright (C) 2003-2014 LittleLite Software
- * 
- */
-
 using System;
 using System.Security.Cryptography;
 
 namespace LLCryptoLib.Crypto
 {
     /// <summary>Blowfish ECB implementation.</summary>
-    /// <remarks>Use this class to encrypt or decrypt byte arrays or a single
-    /// block with Blowfish in the ECB (Electronic Code Book) mode. The key
-    /// length can be flexible from zero up to 56 bytes.</remarks>
+    /// <remarks>
+    ///     Use this class to encrypt or decrypt byte arrays or a single
+    ///     block with Blowfish in the ECB (Electronic Code Book) mode. The key
+    ///     length can be flexible from zero up to 56 bytes.
+    /// </remarks>
     public class BlowfishECB : ICloneable
     {
         /// <summary>The maximum and recommended key size in bytes.</summary>
@@ -41,37 +17,38 @@ namespace LLCryptoLib.Crypto
         /// <summary>The block size in bytes.</summary>
         public const int BLOCK_SIZE = 8;
 
-        const int PBOX_ENTRIES = 18;
-        const int SBOX_ENTRIES = 256;
+        private const int PBOX_ENTRIES = 18;
+        private const int SBOX_ENTRIES = 256;
 
-        #region Cipher State
-        
-        /// <summary>Runtime p-box.</summary>
-        protected uint[] pbox = new uint[PBOX_ENTRIES];
-        /// <summary>Runtime s-box #1.</summary>
-        protected uint[] sbox1 = new uint[SBOX_ENTRIES];
-        /// <summary>Runtime s-box #2.</summary>
-        protected uint[] sbox2 = new uint[SBOX_ENTRIES];
-        /// <summary>Runtime s-box #3.</summary>
-        protected uint[] sbox3 = new uint[SBOX_ENTRIES];
-        /// <summary>Runtime s-box #4.</summary>
-        protected uint[] sbox4 = new uint[SBOX_ENTRIES];
-        /// <summary>Single block cache.</summary>
-        protected byte[] block = new byte[BLOCK_SIZE];
-        /// <summary>1 if a weak key was detected, 0 if not and -1 if it hasn't
-        /// been determined yet.</summary>
-        protected int isWeakKey;
+        private static readonly byte[] TEST_KEY = {0x1c, 0x58, 0x7f, 0x1c, 0x13, 0x92, 0x4f, 0xef};
+        private static readonly uint[] TEST_VECTOR_PLAIN = {0x30553228, 0x6d6f295a};
+        private static readonly uint[] TEST_VECTOR_CIPHER = {0x55cb3774, 0xd13ef201};
 
-        #endregion
+        /// <summary>
+        ///     Zero constructor, properly initializes an instance. Initialize afterwards
+        ///     to set up a valid key!
+        /// </summary>
+        public BlowfishECB()
+        {
+            this.Initialize(null, 0, 0);
+        }
+
+        /// <see cref="BlowfishECB.Initialize" />
+        public BlowfishECB(byte[] key, int ofs, int len)
+        {
+            this.Initialize(key, ofs, len);
+        }
 
         /// <summary>To check if the key used is weak.</summary>
-        /// <remarks>If a key is weak i means that eventually an attack is easier to apply than
-        /// just a simple brute force on keys. Due to the randomness in the key setup process
-        /// such a case however is unlikely to happen, yet checking after each setup might still
-        /// be the preferred way. In the case of a weak key detected a simple recreation with a
-        /// different key (or just a different salt value) is the recommended soltution. For
-        /// performance reasons we don't do the weak key check during the initialization, but on
-        /// demand only, and then only once to determine the flag.</remarks>
+        /// <remarks>
+        ///     If a key is weak i means that eventually an attack is easier to apply than
+        ///     just a simple brute force on keys. Due to the randomness in the key setup process
+        ///     such a case however is unlikely to happen, yet checking after each setup might still
+        ///     be the preferred way. In the case of a weak key detected a simple recreation with a
+        ///     different key (or just a different salt value) is the recommended soltution. For
+        ///     performance reasons we don't do the weak key check during the initialization, but on
+        ///     demand only, and then only once to determine the flag.
+        /// </remarks>
         public bool IsWeakKey
         {
             get
@@ -81,16 +58,16 @@ namespace LLCryptoLib.Crypto
                     this.isWeakKey = 0;
 
                     int i, j;
-                    for (i = 0; i < SBOX_ENTRIES - 1; i++) 
+                    for (i = 0; i < SBOX_ENTRIES - 1; i++)
                     {
                         j = i + 1;
-                        while (j < SBOX_ENTRIES) 
+                        while (j < SBOX_ENTRIES)
                         {
                             if ((this.sbox1[i] == this.sbox1[j]) |
-                                (this.sbox2[i] == this.sbox2[j]) | 
+                                (this.sbox2[i] == this.sbox2[j]) |
                                 (this.sbox3[i] == this.sbox3[j]) |
                                 (this.sbox4[i] == this.sbox4[j])) break;
-                            else j++;
+                            j++;
                         }
                         if (j < SBOX_ENTRIES)
                         {
@@ -100,16 +77,43 @@ namespace LLCryptoLib.Crypto
                     }
                 }
 
-                return (1 == this.isWeakKey);
+                return 1 == this.isWeakKey;
             }
         }
 
-        /// <summary>Resets the instance with new or initial key material. Allows the switch of
-        /// keys at runtime without any new internal object allocation.</summary>
+        /// <remarks>
+        ///     Cloning can be very useful if you need multiple instances all using
+        ///     the same key, since the expensive cipher setup will be bypassed.
+        /// </remarks>
+        /// <see cref="System.ICloneable.Clone()" />
+        public object Clone()
+        {
+            BlowfishECB result;
+
+            result = new BlowfishECB();
+
+            result.pbox = (uint[]) this.pbox.Clone();
+
+            result.sbox1 = (uint[]) this.sbox1.Clone();
+            result.sbox2 = (uint[]) this.sbox2.Clone();
+            result.sbox3 = (uint[]) this.sbox3.Clone();
+            result.sbox4 = (uint[]) this.sbox4.Clone();
+
+            result.block = (byte[]) this.block.Clone();
+
+            result.isWeakKey = this.isWeakKey;
+
+            return result;
+        }
+
+        /// <summary>
+        ///     Resets the instance with new or initial key material. Allows the switch of
+        ///     keys at runtime without any new internal object allocation.
+        /// </summary>
         /// <param name="key">The buffer with the key material.</param>
         /// <param name="ofs">Position at which the key material starts in the buffer.</param>
         /// <param name="len">Size of the key material, up to MAX_KEY_LENGTH bytes.</param>
-        public void Initialize(byte[] key, int ofs, int len) 
+        public void Initialize(byte[] key, int ofs, int len)
         {
             int i, j, keyPos, keyEnd;
             uint build, hi, lo;
@@ -117,29 +121,29 @@ namespace LLCryptoLib.Crypto
 
             this.isWeakKey = -1;
 
-            Array.Copy(PBOX_INIT  , 0, this.pbox , 0, PBOX_INIT.Length); 
-            Array.Copy(SBOX_INIT_1, 0, this.sbox1, 0, SBOX_INIT_1.Length); 
-            Array.Copy(SBOX_INIT_2, 0, this.sbox2, 0, SBOX_INIT_2.Length); 
-            Array.Copy(SBOX_INIT_3, 0, this.sbox3, 0, SBOX_INIT_3.Length); 
-            Array.Copy(SBOX_INIT_4, 0, this.sbox4, 0, SBOX_INIT_4.Length); 
+            Array.Copy(PBOX_INIT, 0, this.pbox, 0, PBOX_INIT.Length);
+            Array.Copy(SBOX_INIT_1, 0, this.sbox1, 0, SBOX_INIT_1.Length);
+            Array.Copy(SBOX_INIT_2, 0, this.sbox2, 0, SBOX_INIT_2.Length);
+            Array.Copy(SBOX_INIT_3, 0, this.sbox3, 0, SBOX_INIT_3.Length);
+            Array.Copy(SBOX_INIT_4, 0, this.sbox4, 0, SBOX_INIT_4.Length);
 
             if (0 == len)
             {
                 return;
             }
-            
+
             keyPos = ofs;
             keyEnd = ofs + len;
             build = 0;
 
             for (i = 0; i < PBOX_ENTRIES; i++)
             {
-                for (j = 0; j < 4; j++) 
+                for (j = 0; j < 4; j++)
                 {
                     build = (build << 8) | key[keyPos];
-      
-                    if (++keyPos == keyEnd) 
-                    { 
+
+                    if (++keyPos == keyEnd)
+                    {
                         keyPos = ofs;
                     }
                 }
@@ -149,63 +153,52 @@ namespace LLCryptoLib.Crypto
             hi = lo = 0;
 
             box = this.pbox;
-            for (i = 0; i < PBOX_ENTRIES;) 
+            for (i = 0; i < PBOX_ENTRIES;)
             {
-                EncryptBlock(hi, lo, out hi, out lo);
+                this.EncryptBlock(hi, lo, out hi, out lo);
                 box[i++] = hi;
                 box[i++] = lo;
             }
             box = this.sbox1;
-            for (i = 0; i < SBOX_ENTRIES;) 
+            for (i = 0; i < SBOX_ENTRIES;)
             {
-                EncryptBlock(hi, lo, out hi, out lo);
+                this.EncryptBlock(hi, lo, out hi, out lo);
                 box[i++] = hi;
                 box[i++] = lo;
             }
             box = this.sbox2;
-            for (i = 0; i < SBOX_ENTRIES;) 
+            for (i = 0; i < SBOX_ENTRIES;)
             {
-                EncryptBlock(hi, lo, out hi, out lo);
+                this.EncryptBlock(hi, lo, out hi, out lo);
                 box[i++] = hi;
                 box[i++] = lo;
             }
             box = this.sbox3;
-            for (i = 0; i < SBOX_ENTRIES;) 
+            for (i = 0; i < SBOX_ENTRIES;)
             {
-                EncryptBlock(hi, lo, out hi, out lo);
+                this.EncryptBlock(hi, lo, out hi, out lo);
                 box[i++] = hi;
                 box[i++] = lo;
             }
             box = this.sbox4;
-            for (i = 0; i < SBOX_ENTRIES;) 
+            for (i = 0; i < SBOX_ENTRIES;)
             {
-                EncryptBlock(hi, lo, out hi, out lo);
+                this.EncryptBlock(hi, lo, out hi, out lo);
                 box[i++] = hi;
                 box[i++] = lo;
             }
         }
 
-        /// <summary>Zero constructor, properly initializes an instance. Initialize afterwards
-        /// to set up a valid key!</summary>
-        public BlowfishECB()
-        {
-            Initialize(null, 0, 0);     
-        }
-
-        /// <see cref="BlowfishECB.Initialize"/>
-        public BlowfishECB(byte[] key, int ofs, int len) 
-        {
-            Initialize(key, ofs, len);
-        }
-
         /// <summary> Deletes all internal data structures and invalidates this instance.</summary>
-        /// <remarks>Call this method as soon as the work with a particular instance is done,
-        /// so no sensitive translated key material remains. The instance is invalid after this
-        /// call and usage can lead to unexpected results!</remarks> 
-        public void Invalidate() 
+        /// <remarks>
+        ///     Call this method as soon as the work with a particular instance is done,
+        ///     so no sensitive translated key material remains. The instance is invalid after this
+        ///     call and usage can lead to unexpected results!
+        /// </remarks>
+        public void Invalidate()
         {
             Array.Clear(this.pbox, 0, this.pbox.Length);
-            
+
             Array.Clear(this.sbox1, 0, this.sbox1.Length);
             Array.Clear(this.sbox2, 0, this.sbox2.Length);
             Array.Clear(this.sbox3, 0, this.sbox3.Length);
@@ -214,16 +207,16 @@ namespace LLCryptoLib.Crypto
             Array.Clear(this.block, 0, this.block.Length);
         }
 
-        static readonly byte[] TEST_KEY = { 0x1c, 0x58, 0x7f, 0x1c, 0x13, 0x92, 0x4f, 0xef };
-        static readonly uint[] TEST_VECTOR_PLAIN  = { 0x30553228, 0x6d6f295a };
-        static readonly uint[] TEST_VECTOR_CIPHER = { 0x55cb3774, 0xd13ef201 };
-
         /// <summary>To execute a selftest.</summary>
-        /// <remarks>Call this method to make sure that the implemenation is able to produce
-        /// valid output according to the specification. This should usually be done at process
-        /// startup time, before the usage of this class and its inherited variants.</remarks>
-        /// <returns>True if the selftest passed or false is it failed. In such a case you must
-        /// not use the cipher to avoid data corruption!</returns>
+        /// <remarks>
+        ///     Call this method to make sure that the implemenation is able to produce
+        ///     valid output according to the specification. This should usually be done at process
+        ///     startup time, before the usage of this class and its inherited variants.
+        /// </remarks>
+        /// <returns>
+        ///     True if the selftest passed or false is it failed. In such a case you must
+        ///     not use the cipher to avoid data corruption!
+        /// </returns>
         public static bool RunSelfTest()
         {
             uint hi, lo;
@@ -253,7 +246,7 @@ namespace LLCryptoLib.Crypto
 
             return true;
         }
-        
+
         /// <summary>Encrypts a single block.</summary>
         /// <param name="hi">The high 32bit word of the block.</param>
         /// <param name="lo">The low 32bit word of the block.</param>
@@ -267,27 +260,27 @@ namespace LLCryptoLib.Crypto
         {
             byte[] block;
             block = this.block;
-        
-            block[0] = (byte)(hi >> 24);  
-            block[1] = (byte)(hi >> 16);  
-            block[2] = (byte)(hi >>  8);  
-            block[3] = (byte) hi; 
-            block[4] = (byte)(lo >> 24);  
-            block[5] = (byte)(lo >> 16);  
-            block[6] = (byte)(lo >>  8);  
-            block[7] = (byte) lo; 
 
-            Encrypt(block, 0, block, 0, BLOCK_SIZE);
+            block[0] = (byte) (hi >> 24);
+            block[1] = (byte) (hi >> 16);
+            block[2] = (byte) (hi >> 8);
+            block[3] = (byte) hi;
+            block[4] = (byte) (lo >> 24);
+            block[5] = (byte) (lo >> 16);
+            block[6] = (byte) (lo >> 8);
+            block[7] = (byte) lo;
 
-            outHi = (((uint)block[0]) << 24) |
-                    (((uint)block[1]) << 16) |
-                    (((uint)block[2]) <<  8) |
-                            block[3];
+            this.Encrypt(block, 0, block, 0, BLOCK_SIZE);
 
-            outLo = (((uint)block[4]) << 24) |
-                    (((uint)block[5]) << 16) |
-                    (((uint)block[6]) <<  8) |
-                            block[7];
+            outHi = ((uint) block[0] << 24) |
+                    ((uint) block[1] << 16) |
+                    ((uint) block[2] << 8) |
+                    block[3];
+
+            outLo = ((uint) block[4] << 24) |
+                    ((uint) block[5] << 16) |
+                    ((uint) block[6] << 8) |
+                    block[7];
         }
 
         /// <summary>Decrypts a single block.</summary>
@@ -304,34 +297,36 @@ namespace LLCryptoLib.Crypto
             byte[] block;
 
             block = this.block;
-        
-            block[0] = (byte)(hi >> 24);  
-            block[1] = (byte)(hi >> 16);  
-            block[2] = (byte)(hi >>  8);  
-            block[3] = (byte) hi; 
-            block[4] = (byte)(lo >> 24);  
-            block[5] = (byte)(lo >> 16);  
-            block[6] = (byte)(lo >>  8);  
-            block[7] = (byte) lo; 
 
-            Decrypt(block, 0, block, 0, BLOCK_SIZE);
+            block[0] = (byte) (hi >> 24);
+            block[1] = (byte) (hi >> 16);
+            block[2] = (byte) (hi >> 8);
+            block[3] = (byte) hi;
+            block[4] = (byte) (lo >> 24);
+            block[5] = (byte) (lo >> 16);
+            block[6] = (byte) (lo >> 8);
+            block[7] = (byte) lo;
 
-            outHi = (((uint)block[0]) << 24) |
-                    (((uint)block[1]) << 16) |
-                    (((uint)block[2]) <<  8) |
-                            block[3];
+            this.Decrypt(block, 0, block, 0, BLOCK_SIZE);
 
-            outLo = (((uint)block[4]) << 24) |
-                    (((uint)block[5]) << 16) |
-                    (((uint)block[6]) <<  8) |
-                            block[7];
+            outHi = ((uint) block[0] << 24) |
+                    ((uint) block[1] << 16) |
+                    ((uint) block[2] << 8) |
+                    block[3];
+
+            outLo = ((uint) block[4] << 24) |
+                    ((uint) block[5] << 16) |
+                    ((uint) block[6] << 8) |
+                    block[7];
         }
 
         /// <summary>Encrypts byte buffers.</summary>
-        /// <remarks>Use this method to encrypt bytes from one array to another one. You can also 
-        /// use the same array for input and output. Note that the number of bytes must be adjusted
-        /// to the block size of the algorithm. Overlapping bytes will not be encrypted. No check for
-        /// buffer overflows are made.</remarks>
+        /// <remarks>
+        ///     Use this method to encrypt bytes from one array to another one. You can also
+        ///     use the same array for input and output. Note that the number of bytes must be adjusted
+        ///     to the block size of the algorithm. Overlapping bytes will not be encrypted. No check for
+        ///     buffer overflows are made.
+        /// </remarks>
         /// <param name="dataIn">The input buffer.</param>
         /// <param name="posIn">Where to start reading in the input buffer.</param>
         /// <param name="dataOut">The output buffer.</param>
@@ -343,11 +338,11 @@ namespace LLCryptoLib.Crypto
             int posIn,
             byte[] dataOut,
             int posOut,
-            int count) 
+            int count)
         {
             int end;
             uint hi, lo;
-            
+
             uint[] sbox1 = this.sbox1;
             uint[] sbox2 = this.sbox2;
             uint[] sbox3 = this.sbox3;
@@ -355,16 +350,16 @@ namespace LLCryptoLib.Crypto
 
             uint[] pbox = this.pbox;
 
-            uint pbox00 = pbox[ 0];
-            uint pbox01 = pbox[ 1];
-            uint pbox02 = pbox[ 2];
-            uint pbox03 = pbox[ 3];
-            uint pbox04 = pbox[ 4];
-            uint pbox05 = pbox[ 5];
-            uint pbox06 = pbox[ 6];
-            uint pbox07 = pbox[ 7];
-            uint pbox08 = pbox[ 8];
-            uint pbox09 = pbox[ 9];
+            uint pbox00 = pbox[0];
+            uint pbox01 = pbox[1];
+            uint pbox02 = pbox[2];
+            uint pbox03 = pbox[3];
+            uint pbox04 = pbox[4];
+            uint pbox05 = pbox[5];
+            uint pbox06 = pbox[6];
+            uint pbox07 = pbox[7];
+            uint pbox08 = pbox[8];
+            uint pbox09 = pbox[9];
             uint pbox10 = pbox[10];
             uint pbox11 = pbox[11];
             uint pbox12 = pbox[12];
@@ -380,45 +375,61 @@ namespace LLCryptoLib.Crypto
 
             while (posIn < end)
             {
-                hi = (((uint)dataIn[posIn    ]) << 24) |
-                     (((uint)dataIn[posIn + 1]) << 16) |
-                     (((uint)dataIn[posIn + 2]) <<  8) |
-                             dataIn[posIn + 3];
- 
-                lo = (((uint)dataIn[posIn + 4]) << 24) |
-                     (((uint)dataIn[posIn + 5]) << 16) |
-                     (((uint)dataIn[posIn + 6]) <<  8) |
-                             dataIn[posIn + 7];
-                posIn += 8; 
+                hi = ((uint) dataIn[posIn] << 24) |
+                     ((uint) dataIn[posIn + 1] << 16) |
+                     ((uint) dataIn[posIn + 2] << 8) |
+                     dataIn[posIn + 3];
+
+                lo = ((uint) dataIn[posIn + 4] << 24) |
+                     ((uint) dataIn[posIn + 5] << 16) |
+                     ((uint) dataIn[posIn + 6] << 8) |
+                     dataIn[posIn + 7];
+                posIn += 8;
 
                 hi ^= pbox00;
-                lo ^= (((sbox1[(int)(hi >> 24)] + sbox2[(int)((hi >> 16) & 0x0ff)]) ^ sbox3[(int)((hi >> 8) & 0x0ff)]) + sbox4[(int)(hi & 0x0ff)]) ^ pbox01;
-                hi ^= (((sbox1[(int)(lo >> 24)] + sbox2[(int)((lo >> 16) & 0x0ff)]) ^ sbox3[(int)((lo >> 8) & 0x0ff)]) + sbox4[(int)(lo & 0x0ff)]) ^ pbox02;
-                lo ^= (((sbox1[(int)(hi >> 24)] + sbox2[(int)((hi >> 16) & 0x0ff)]) ^ sbox3[(int)((hi >> 8) & 0x0ff)]) + sbox4[(int)(hi & 0x0ff)]) ^ pbox03;
-                hi ^= (((sbox1[(int)(lo >> 24)] + sbox2[(int)((lo >> 16) & 0x0ff)]) ^ sbox3[(int)((lo >> 8) & 0x0ff)]) + sbox4[(int)(lo & 0x0ff)]) ^ pbox04;
-                lo ^= (((sbox1[(int)(hi >> 24)] + sbox2[(int)((hi >> 16) & 0x0ff)]) ^ sbox3[(int)((hi >> 8) & 0x0ff)]) + sbox4[(int)(hi & 0x0ff)]) ^ pbox05;
-                hi ^= (((sbox1[(int)(lo >> 24)] + sbox2[(int)((lo >> 16) & 0x0ff)]) ^ sbox3[(int)((lo >> 8) & 0x0ff)]) + sbox4[(int)(lo & 0x0ff)]) ^ pbox06;
-                lo ^= (((sbox1[(int)(hi >> 24)] + sbox2[(int)((hi >> 16) & 0x0ff)]) ^ sbox3[(int)((hi >> 8) & 0x0ff)]) + sbox4[(int)(hi & 0x0ff)]) ^ pbox07;
-                hi ^= (((sbox1[(int)(lo >> 24)] + sbox2[(int)((lo >> 16) & 0x0ff)]) ^ sbox3[(int)((lo >> 8) & 0x0ff)]) + sbox4[(int)(lo & 0x0ff)]) ^ pbox08;
-                lo ^= (((sbox1[(int)(hi >> 24)] + sbox2[(int)((hi >> 16) & 0x0ff)]) ^ sbox3[(int)((hi >> 8) & 0x0ff)]) + sbox4[(int)(hi & 0x0ff)]) ^ pbox09;
-                hi ^= (((sbox1[(int)(lo >> 24)] + sbox2[(int)((lo >> 16) & 0x0ff)]) ^ sbox3[(int)((lo >> 8) & 0x0ff)]) + sbox4[(int)(lo & 0x0ff)]) ^ pbox10;
-                lo ^= (((sbox1[(int)(hi >> 24)] + sbox2[(int)((hi >> 16) & 0x0ff)]) ^ sbox3[(int)((hi >> 8) & 0x0ff)]) + sbox4[(int)(hi & 0x0ff)]) ^ pbox11;
-                hi ^= (((sbox1[(int)(lo >> 24)] + sbox2[(int)((lo >> 16) & 0x0ff)]) ^ sbox3[(int)((lo >> 8) & 0x0ff)]) + sbox4[(int)(lo & 0x0ff)]) ^ pbox12;
-                lo ^= (((sbox1[(int)(hi >> 24)] + sbox2[(int)((hi >> 16) & 0x0ff)]) ^ sbox3[(int)((hi >> 8) & 0x0ff)]) + sbox4[(int)(hi & 0x0ff)]) ^ pbox13;
-                hi ^= (((sbox1[(int)(lo >> 24)] + sbox2[(int)((lo >> 16) & 0x0ff)]) ^ sbox3[(int)((lo >> 8) & 0x0ff)]) + sbox4[(int)(lo & 0x0ff)]) ^ pbox14;
-                lo ^= (((sbox1[(int)(hi >> 24)] + sbox2[(int)((hi >> 16) & 0x0ff)]) ^ sbox3[(int)((hi >> 8) & 0x0ff)]) + sbox4[(int)(hi & 0x0ff)]) ^ pbox15;
-                hi ^= (((sbox1[(int)(lo >> 24)] + sbox2[(int)((lo >> 16) & 0x0ff)]) ^ sbox3[(int)((lo >> 8) & 0x0ff)]) + sbox4[(int)(lo & 0x0ff)]) ^ pbox16;
+                lo ^= (((sbox1[(int) (hi >> 24)] + sbox2[(int) ((hi >> 16) & 0x0ff)]) ^ sbox3[(int) ((hi >> 8) & 0x0ff)]) +
+                       sbox4[(int) (hi & 0x0ff)]) ^ pbox01;
+                hi ^= (((sbox1[(int) (lo >> 24)] + sbox2[(int) ((lo >> 16) & 0x0ff)]) ^ sbox3[(int) ((lo >> 8) & 0x0ff)]) +
+                       sbox4[(int) (lo & 0x0ff)]) ^ pbox02;
+                lo ^= (((sbox1[(int) (hi >> 24)] + sbox2[(int) ((hi >> 16) & 0x0ff)]) ^ sbox3[(int) ((hi >> 8) & 0x0ff)]) +
+                       sbox4[(int) (hi & 0x0ff)]) ^ pbox03;
+                hi ^= (((sbox1[(int) (lo >> 24)] + sbox2[(int) ((lo >> 16) & 0x0ff)]) ^ sbox3[(int) ((lo >> 8) & 0x0ff)]) +
+                       sbox4[(int) (lo & 0x0ff)]) ^ pbox04;
+                lo ^= (((sbox1[(int) (hi >> 24)] + sbox2[(int) ((hi >> 16) & 0x0ff)]) ^ sbox3[(int) ((hi >> 8) & 0x0ff)]) +
+                       sbox4[(int) (hi & 0x0ff)]) ^ pbox05;
+                hi ^= (((sbox1[(int) (lo >> 24)] + sbox2[(int) ((lo >> 16) & 0x0ff)]) ^ sbox3[(int) ((lo >> 8) & 0x0ff)]) +
+                       sbox4[(int) (lo & 0x0ff)]) ^ pbox06;
+                lo ^= (((sbox1[(int) (hi >> 24)] + sbox2[(int) ((hi >> 16) & 0x0ff)]) ^ sbox3[(int) ((hi >> 8) & 0x0ff)]) +
+                       sbox4[(int) (hi & 0x0ff)]) ^ pbox07;
+                hi ^= (((sbox1[(int) (lo >> 24)] + sbox2[(int) ((lo >> 16) & 0x0ff)]) ^ sbox3[(int) ((lo >> 8) & 0x0ff)]) +
+                       sbox4[(int) (lo & 0x0ff)]) ^ pbox08;
+                lo ^= (((sbox1[(int) (hi >> 24)] + sbox2[(int) ((hi >> 16) & 0x0ff)]) ^ sbox3[(int) ((hi >> 8) & 0x0ff)]) +
+                       sbox4[(int) (hi & 0x0ff)]) ^ pbox09;
+                hi ^= (((sbox1[(int) (lo >> 24)] + sbox2[(int) ((lo >> 16) & 0x0ff)]) ^ sbox3[(int) ((lo >> 8) & 0x0ff)]) +
+                       sbox4[(int) (lo & 0x0ff)]) ^ pbox10;
+                lo ^= (((sbox1[(int) (hi >> 24)] + sbox2[(int) ((hi >> 16) & 0x0ff)]) ^ sbox3[(int) ((hi >> 8) & 0x0ff)]) +
+                       sbox4[(int) (hi & 0x0ff)]) ^ pbox11;
+                hi ^= (((sbox1[(int) (lo >> 24)] + sbox2[(int) ((lo >> 16) & 0x0ff)]) ^ sbox3[(int) ((lo >> 8) & 0x0ff)]) +
+                       sbox4[(int) (lo & 0x0ff)]) ^ pbox12;
+                lo ^= (((sbox1[(int) (hi >> 24)] + sbox2[(int) ((hi >> 16) & 0x0ff)]) ^ sbox3[(int) ((hi >> 8) & 0x0ff)]) +
+                       sbox4[(int) (hi & 0x0ff)]) ^ pbox13;
+                hi ^= (((sbox1[(int) (lo >> 24)] + sbox2[(int) ((lo >> 16) & 0x0ff)]) ^ sbox3[(int) ((lo >> 8) & 0x0ff)]) +
+                       sbox4[(int) (lo & 0x0ff)]) ^ pbox14;
+                lo ^= (((sbox1[(int) (hi >> 24)] + sbox2[(int) ((hi >> 16) & 0x0ff)]) ^ sbox3[(int) ((hi >> 8) & 0x0ff)]) +
+                       sbox4[(int) (hi & 0x0ff)]) ^ pbox15;
+                hi ^= (((sbox1[(int) (lo >> 24)] + sbox2[(int) ((lo >> 16) & 0x0ff)]) ^ sbox3[(int) ((lo >> 8) & 0x0ff)]) +
+                       sbox4[(int) (lo & 0x0ff)]) ^ pbox16;
 
                 lo ^= pbox17;
 
-                dataOut[posOut    ] = (byte)(lo >> 24);
-                dataOut[posOut + 1] = (byte)(lo >> 16);
-                dataOut[posOut + 2] = (byte)(lo >>  8);
+                dataOut[posOut] = (byte) (lo >> 24);
+                dataOut[posOut + 1] = (byte) (lo >> 16);
+                dataOut[posOut + 2] = (byte) (lo >> 8);
                 dataOut[posOut + 3] = (byte) lo;
-                
-                dataOut[posOut + 4] = (byte)(hi >> 24);
-                dataOut[posOut + 5] = (byte)(hi >> 16);
-                dataOut[posOut + 6] = (byte)(hi >>  8);
+
+                dataOut[posOut + 4] = (byte) (hi >> 24);
+                dataOut[posOut + 5] = (byte) (hi >> 16);
+                dataOut[posOut + 6] = (byte) (hi >> 8);
                 dataOut[posOut + 7] = (byte) hi;
 
                 posOut += 8;
@@ -428,10 +439,12 @@ namespace LLCryptoLib.Crypto
         }
 
         /// <summary>Decrypts single bytes.</summary>
-        /// <remarks>Use this method to decrypt bytes from one array to another one. You can also use
-        /// the same array for input and output. Note that the number of bytes must be adjusted to the
-        /// block size of the algorithm. Overlapping bytes will not be decrypted. No check for buffer
-        /// overflows are made.</remarks>
+        /// <remarks>
+        ///     Use this method to decrypt bytes from one array to another one. You can also use
+        ///     the same array for input and output. Note that the number of bytes must be adjusted to the
+        ///     block size of the algorithm. Overlapping bytes will not be decrypted. No check for buffer
+        ///     overflows are made.
+        /// </remarks>
         /// <param name="dataIn">The input buffer.</param>
         /// <param name="posIn">Where to start reading in the input buffer.</param>
         /// <param name="dataOut">The output buffer.</param>
@@ -443,11 +456,11 @@ namespace LLCryptoLib.Crypto
             int posIn,
             byte[] dataOut,
             int posOut,
-            int count) 
+            int count)
         {
             int end;
             uint hi, lo;
-            
+
             uint[] sbox1 = this.sbox1;
             uint[] sbox2 = this.sbox2;
             uint[] sbox3 = this.sbox3;
@@ -455,16 +468,16 @@ namespace LLCryptoLib.Crypto
 
             uint[] pbox = this.pbox;
 
-            uint pbox00 = pbox[ 0];
-            uint pbox01 = pbox[ 1];
-            uint pbox02 = pbox[ 2];
-            uint pbox03 = pbox[ 3];
-            uint pbox04 = pbox[ 4];
-            uint pbox05 = pbox[ 5];
-            uint pbox06 = pbox[ 6];
-            uint pbox07 = pbox[ 7];
-            uint pbox08 = pbox[ 8];
-            uint pbox09 = pbox[ 9];
+            uint pbox00 = pbox[0];
+            uint pbox01 = pbox[1];
+            uint pbox02 = pbox[2];
+            uint pbox03 = pbox[3];
+            uint pbox04 = pbox[4];
+            uint pbox05 = pbox[5];
+            uint pbox06 = pbox[6];
+            uint pbox07 = pbox[7];
+            uint pbox08 = pbox[8];
+            uint pbox09 = pbox[9];
             uint pbox10 = pbox[10];
             uint pbox11 = pbox[11];
             uint pbox12 = pbox[12];
@@ -480,45 +493,61 @@ namespace LLCryptoLib.Crypto
 
             while (posIn < end)
             {
-                hi = (((uint)dataIn[posIn    ]) << 24) |
-                     (((uint)dataIn[posIn + 1]) << 16) |
-                     (((uint)dataIn[posIn + 2]) <<  8) |
-                             dataIn[posIn + 3];
- 
-                lo = (((uint)dataIn[posIn + 4]) << 24) |
-                     (((uint)dataIn[posIn + 5]) << 16) |
-                     (((uint)dataIn[posIn + 6]) <<  8) |
-                             dataIn[posIn + 7];
-                posIn += 8; 
+                hi = ((uint) dataIn[posIn] << 24) |
+                     ((uint) dataIn[posIn + 1] << 16) |
+                     ((uint) dataIn[posIn + 2] << 8) |
+                     dataIn[posIn + 3];
+
+                lo = ((uint) dataIn[posIn + 4] << 24) |
+                     ((uint) dataIn[posIn + 5] << 16) |
+                     ((uint) dataIn[posIn + 6] << 8) |
+                     dataIn[posIn + 7];
+                posIn += 8;
 
                 hi ^= pbox17;
-                lo ^= (((sbox1[(int)(hi >> 24)] + sbox2[(int)((hi >> 16) & 0x0ff)]) ^ sbox3[(int)((hi >> 8) & 0x0ff)]) + sbox4[(int)(hi & 0x0ff)]) ^ pbox16;
-                hi ^= (((sbox1[(int)(lo >> 24)] + sbox2[(int)((lo >> 16) & 0x0ff)]) ^ sbox3[(int)((lo >> 8) & 0x0ff)]) + sbox4[(int)(lo & 0x0ff)]) ^ pbox15;
-                lo ^= (((sbox1[(int)(hi >> 24)] + sbox2[(int)((hi >> 16) & 0x0ff)]) ^ sbox3[(int)((hi >> 8) & 0x0ff)]) + sbox4[(int)(hi & 0x0ff)]) ^ pbox14;
-                hi ^= (((sbox1[(int)(lo >> 24)] + sbox2[(int)((lo >> 16) & 0x0ff)]) ^ sbox3[(int)((lo >> 8) & 0x0ff)]) + sbox4[(int)(lo & 0x0ff)]) ^ pbox13;
-                lo ^= (((sbox1[(int)(hi >> 24)] + sbox2[(int)((hi >> 16) & 0x0ff)]) ^ sbox3[(int)((hi >> 8) & 0x0ff)]) + sbox4[(int)(hi & 0x0ff)]) ^ pbox12;
-                hi ^= (((sbox1[(int)(lo >> 24)] + sbox2[(int)((lo >> 16) & 0x0ff)]) ^ sbox3[(int)((lo >> 8) & 0x0ff)]) + sbox4[(int)(lo & 0x0ff)]) ^ pbox11;
-                lo ^= (((sbox1[(int)(hi >> 24)] + sbox2[(int)((hi >> 16) & 0x0ff)]) ^ sbox3[(int)((hi >> 8) & 0x0ff)]) + sbox4[(int)(hi & 0x0ff)]) ^ pbox10;
-                hi ^= (((sbox1[(int)(lo >> 24)] + sbox2[(int)((lo >> 16) & 0x0ff)]) ^ sbox3[(int)((lo >> 8) & 0x0ff)]) + sbox4[(int)(lo & 0x0ff)]) ^ pbox09;
-                lo ^= (((sbox1[(int)(hi >> 24)] + sbox2[(int)((hi >> 16) & 0x0ff)]) ^ sbox3[(int)((hi >> 8) & 0x0ff)]) + sbox4[(int)(hi & 0x0ff)]) ^ pbox08;
-                hi ^= (((sbox1[(int)(lo >> 24)] + sbox2[(int)((lo >> 16) & 0x0ff)]) ^ sbox3[(int)((lo >> 8) & 0x0ff)]) + sbox4[(int)(lo & 0x0ff)]) ^ pbox07;
-                lo ^= (((sbox1[(int)(hi >> 24)] + sbox2[(int)((hi >> 16) & 0x0ff)]) ^ sbox3[(int)((hi >> 8) & 0x0ff)]) + sbox4[(int)(hi & 0x0ff)]) ^ pbox06;
-                hi ^= (((sbox1[(int)(lo >> 24)] + sbox2[(int)((lo >> 16) & 0x0ff)]) ^ sbox3[(int)((lo >> 8) & 0x0ff)]) + sbox4[(int)(lo & 0x0ff)]) ^ pbox05;
-                lo ^= (((sbox1[(int)(hi >> 24)] + sbox2[(int)((hi >> 16) & 0x0ff)]) ^ sbox3[(int)((hi >> 8) & 0x0ff)]) + sbox4[(int)(hi & 0x0ff)]) ^ pbox04;
-                hi ^= (((sbox1[(int)(lo >> 24)] + sbox2[(int)((lo >> 16) & 0x0ff)]) ^ sbox3[(int)((lo >> 8) & 0x0ff)]) + sbox4[(int)(lo & 0x0ff)]) ^ pbox03;
-                lo ^= (((sbox1[(int)(hi >> 24)] + sbox2[(int)((hi >> 16) & 0x0ff)]) ^ sbox3[(int)((hi >> 8) & 0x0ff)]) + sbox4[(int)(hi & 0x0ff)]) ^ pbox02;
-                hi ^= (((sbox1[(int)(lo >> 24)] + sbox2[(int)((lo >> 16) & 0x0ff)]) ^ sbox3[(int)((lo >> 8) & 0x0ff)]) + sbox4[(int)(lo & 0x0ff)]) ^ pbox01;
+                lo ^= (((sbox1[(int) (hi >> 24)] + sbox2[(int) ((hi >> 16) & 0x0ff)]) ^ sbox3[(int) ((hi >> 8) & 0x0ff)]) +
+                       sbox4[(int) (hi & 0x0ff)]) ^ pbox16;
+                hi ^= (((sbox1[(int) (lo >> 24)] + sbox2[(int) ((lo >> 16) & 0x0ff)]) ^ sbox3[(int) ((lo >> 8) & 0x0ff)]) +
+                       sbox4[(int) (lo & 0x0ff)]) ^ pbox15;
+                lo ^= (((sbox1[(int) (hi >> 24)] + sbox2[(int) ((hi >> 16) & 0x0ff)]) ^ sbox3[(int) ((hi >> 8) & 0x0ff)]) +
+                       sbox4[(int) (hi & 0x0ff)]) ^ pbox14;
+                hi ^= (((sbox1[(int) (lo >> 24)] + sbox2[(int) ((lo >> 16) & 0x0ff)]) ^ sbox3[(int) ((lo >> 8) & 0x0ff)]) +
+                       sbox4[(int) (lo & 0x0ff)]) ^ pbox13;
+                lo ^= (((sbox1[(int) (hi >> 24)] + sbox2[(int) ((hi >> 16) & 0x0ff)]) ^ sbox3[(int) ((hi >> 8) & 0x0ff)]) +
+                       sbox4[(int) (hi & 0x0ff)]) ^ pbox12;
+                hi ^= (((sbox1[(int) (lo >> 24)] + sbox2[(int) ((lo >> 16) & 0x0ff)]) ^ sbox3[(int) ((lo >> 8) & 0x0ff)]) +
+                       sbox4[(int) (lo & 0x0ff)]) ^ pbox11;
+                lo ^= (((sbox1[(int) (hi >> 24)] + sbox2[(int) ((hi >> 16) & 0x0ff)]) ^ sbox3[(int) ((hi >> 8) & 0x0ff)]) +
+                       sbox4[(int) (hi & 0x0ff)]) ^ pbox10;
+                hi ^= (((sbox1[(int) (lo >> 24)] + sbox2[(int) ((lo >> 16) & 0x0ff)]) ^ sbox3[(int) ((lo >> 8) & 0x0ff)]) +
+                       sbox4[(int) (lo & 0x0ff)]) ^ pbox09;
+                lo ^= (((sbox1[(int) (hi >> 24)] + sbox2[(int) ((hi >> 16) & 0x0ff)]) ^ sbox3[(int) ((hi >> 8) & 0x0ff)]) +
+                       sbox4[(int) (hi & 0x0ff)]) ^ pbox08;
+                hi ^= (((sbox1[(int) (lo >> 24)] + sbox2[(int) ((lo >> 16) & 0x0ff)]) ^ sbox3[(int) ((lo >> 8) & 0x0ff)]) +
+                       sbox4[(int) (lo & 0x0ff)]) ^ pbox07;
+                lo ^= (((sbox1[(int) (hi >> 24)] + sbox2[(int) ((hi >> 16) & 0x0ff)]) ^ sbox3[(int) ((hi >> 8) & 0x0ff)]) +
+                       sbox4[(int) (hi & 0x0ff)]) ^ pbox06;
+                hi ^= (((sbox1[(int) (lo >> 24)] + sbox2[(int) ((lo >> 16) & 0x0ff)]) ^ sbox3[(int) ((lo >> 8) & 0x0ff)]) +
+                       sbox4[(int) (lo & 0x0ff)]) ^ pbox05;
+                lo ^= (((sbox1[(int) (hi >> 24)] + sbox2[(int) ((hi >> 16) & 0x0ff)]) ^ sbox3[(int) ((hi >> 8) & 0x0ff)]) +
+                       sbox4[(int) (hi & 0x0ff)]) ^ pbox04;
+                hi ^= (((sbox1[(int) (lo >> 24)] + sbox2[(int) ((lo >> 16) & 0x0ff)]) ^ sbox3[(int) ((lo >> 8) & 0x0ff)]) +
+                       sbox4[(int) (lo & 0x0ff)]) ^ pbox03;
+                lo ^= (((sbox1[(int) (hi >> 24)] + sbox2[(int) ((hi >> 16) & 0x0ff)]) ^ sbox3[(int) ((hi >> 8) & 0x0ff)]) +
+                       sbox4[(int) (hi & 0x0ff)]) ^ pbox02;
+                hi ^= (((sbox1[(int) (lo >> 24)] + sbox2[(int) ((lo >> 16) & 0x0ff)]) ^ sbox3[(int) ((lo >> 8) & 0x0ff)]) +
+                       sbox4[(int) (lo & 0x0ff)]) ^ pbox01;
 
                 lo ^= pbox00;
-                
-                dataOut[posOut    ] = (byte)(lo >> 24);
-                dataOut[posOut + 1] = (byte)(lo >> 16);
-                dataOut[posOut + 2] = (byte)(lo >>  8);
+
+                dataOut[posOut] = (byte) (lo >> 24);
+                dataOut[posOut + 1] = (byte) (lo >> 16);
+                dataOut[posOut + 2] = (byte) (lo >> 8);
                 dataOut[posOut + 3] = (byte) lo;
-                
-                dataOut[posOut + 4] = (byte)(hi >> 24);
-                dataOut[posOut + 5] = (byte)(hi >> 16);
-                dataOut[posOut + 6] = (byte)(hi >>  8);
+
+                dataOut[posOut + 4] = (byte) (hi >> 24);
+                dataOut[posOut + 5] = (byte) (hi >> 16);
+                dataOut[posOut + 6] = (byte) (hi >> 8);
                 dataOut[posOut + 7] = (byte) hi;
 
                 posOut += 8;
@@ -527,41 +556,46 @@ namespace LLCryptoLib.Crypto
             return count;
         }
 
-        /// <remarks>Cloning can be very useful if you need multiple instances all using
-        /// the same key, since the expensive cipher setup will be bypassed.</remarks>
-        /// <see cref="System.ICloneable.Clone()"/>
-        public object Clone()
-        {
-            BlowfishECB result;
+        #region Cipher State
 
-            result = new BlowfishECB();
+        /// <summary>Runtime p-box.</summary>
+        protected uint[] pbox = new uint[PBOX_ENTRIES];
 
-            result.pbox = (uint[]) this.pbox.Clone();
-            
-            result.sbox1 = (uint[]) this.sbox1.Clone();
-            result.sbox2 = (uint[]) this.sbox2.Clone();
-            result.sbox3 = (uint[]) this.sbox3.Clone();
-            result.sbox4 = (uint[]) this.sbox4.Clone();
+        /// <summary>Runtime s-box #1.</summary>
+        protected uint[] sbox1 = new uint[SBOX_ENTRIES];
 
-            result.block = (byte[]) this.block.Clone();
+        /// <summary>Runtime s-box #2.</summary>
+        protected uint[] sbox2 = new uint[SBOX_ENTRIES];
 
-            result.isWeakKey = this.isWeakKey;
+        /// <summary>Runtime s-box #3.</summary>
+        protected uint[] sbox3 = new uint[SBOX_ENTRIES];
 
-            return result;
-        }
+        /// <summary>Runtime s-box #4.</summary>
+        protected uint[] sbox4 = new uint[SBOX_ENTRIES];
+
+        /// <summary>Single block cache.</summary>
+        protected byte[] block = new byte[BLOCK_SIZE];
+
+        /// <summary>
+        ///     1 if a weak key was detected, 0 if not and -1 if it hasn't
+        ///     been determined yet.
+        /// </summary>
+        protected int isWeakKey;
+
+        #endregion
 
         #region Boxes Initialization Data
 
         /// <summary>The P-box initialization data.</summary>
-        protected static readonly uint[] PBOX_INIT = 
+        protected static readonly uint[] PBOX_INIT =
         {
             0x243f6a88, 0x85a308d3, 0x13198a2e, 0x03707344, 0xa4093822, 0x299f31d0,
             0x082efa98, 0xec4e6c89, 0x452821e6, 0x38d01377, 0xbe5466cf, 0x34e90c6c,
-            0xc0ac29b7, 0xc97c50dd, 0x3f84d5b5, 0xb5470917, 0x9216d5d9, 0x8979fb1b  
+            0xc0ac29b7, 0xc97c50dd, 0x3f84d5b5, 0xb5470917, 0x9216d5d9, 0x8979fb1b
         };
 
         /// <summary>The first S-box initialization data.</summary>
-        protected static readonly uint[] SBOX_INIT_1 = 
+        protected static readonly uint[] SBOX_INIT_1 =
         {
             0xd1310ba6, 0x98dfb5ac, 0x2ffd72db, 0xd01adfb7, 0xb8e1afed, 0x6a267e96,
             0xba7c9045, 0xf12c7f99, 0x24a19947, 0xb3916cf7, 0x0801f2e2, 0x858efc16,
@@ -605,11 +639,11 @@ namespace LLCryptoLib.Crypto
             0x11c81968, 0x4e734a41, 0xb3472dca, 0x7b14a94a, 0x1b510052, 0x9a532915,
             0xd60f573f, 0xbc9bc6e4, 0x2b60a476, 0x81e67400, 0x08ba6fb5, 0x571be91f,
             0xf296ec6b, 0x2a0dd915, 0xb6636521, 0xe7b9f9b6, 0xff34052e, 0xc5855664,
-            0x53b02d5d, 0xa99f8fa1, 0x08ba4799, 0x6e85076a 
+            0x53b02d5d, 0xa99f8fa1, 0x08ba4799, 0x6e85076a
         };
 
         /// <summary>The second S-box initialization data.</summary>
-        protected static readonly uint[] SBOX_INIT_2 = 
+        protected static readonly uint[] SBOX_INIT_2 =
         {
             0x4b7a70e9, 0xb5b32944,
             0xdb75092e, 0xc4192623, 0xad6ea6b0, 0x49a7df7d, 0x9cee60b8, 0x8fedb266,
@@ -654,11 +688,11 @@ namespace LLCryptoLib.Crypto
             0xa969a7aa, 0xc50c06c2, 0x5a04abfc, 0x800bcadc, 0x9e447a2e, 0xc3453484,
             0xfdd56705, 0x0e1e9ec9, 0xdb73dbd3, 0x105588cd, 0x675fda79, 0xe3674340,
             0xc5c43465, 0x713e38d8, 0x3d28f89e, 0xf16dff20, 0x153e21e7, 0x8fb03d4a,
-            0xe6e39f2b, 0xdb83adf7 
+            0xe6e39f2b, 0xdb83adf7
         };
 
         /// <summary>The third S-box initialization data.</summary>
-        protected static readonly uint[] SBOX_INIT_3 = 
+        protected static readonly uint[] SBOX_INIT_3 =
         {
             0xe93d5a68, 0x948140f7, 0xf64c261c, 0x94692934,
             0x411520f7, 0x7602d4f7, 0xbcf46b2e, 0xd4a20068, 0xd4082471, 0x3320f46a,
@@ -702,11 +736,11 @@ namespace LLCryptoLib.Crypto
             0x6f05e409, 0x4b7c0188, 0x39720a3d, 0x7c927c24, 0x86e3725f, 0x724d9db9,
             0x1ac15bb4, 0xd39eb8fc, 0xed545578, 0x08fca5b5, 0xd83d7cd3, 0x4dad0fc4,
             0x1e50ef5e, 0xb161e6f8, 0xa28514d9, 0x6c51133c, 0x6fd5c7e7, 0x56e14ec4,
-            0x362abfce, 0xddc6c837, 0xd79a3234, 0x92638212, 0x670efa8e, 0x406000e0 
+            0x362abfce, 0xddc6c837, 0xd79a3234, 0x92638212, 0x670efa8e, 0x406000e0
         };
 
         /// <summary>The fourth S-box initialization data.</summary>
-        protected static readonly uint[] SBOX_INIT_4 = 
+        protected static readonly uint[] SBOX_INIT_4 =
         {
             0x3a39ce37, 0xd3faf5cf, 0xabc27737, 0x5ac52d1b, 0x5cb0679e, 0x4fa33742,
             0xd3822740, 0x99bc9bbe, 0xd5118e9d, 0xbf0f7315, 0xd62d1c7e, 0xc700c47b,
@@ -750,36 +784,55 @@ namespace LLCryptoLib.Crypto
             0x38abbd60, 0x2547adf0, 0xba38209c, 0xf746ce76, 0x77afa1c5, 0x20756060,
             0x85cbfe4e, 0x8ae88dd8, 0x7aaaf9b0, 0x4cf9aa7e, 0x1948c25c, 0x02fb8a8c,
             0x01c36ae4, 0xd6ebe1f9, 0x90d4f869, 0xa65cdea0, 0x3f09252d, 0xc208e69f,
-            0xb74e6132, 0xce77e25b, 0x578fdfe3, 0x3ac372e6 
+            0xb74e6132, 0xce77e25b, 0x578fdfe3, 0x3ac372e6
         };
+
         #endregion
     }
 
     /// <summary>Blowfish CBC implementation.</summary>
-    /// <remarks>Use this class to encrypt or decrypt byte arrays or a single blocks
-    /// with Blowfish in CBC (Cipher Block Block Chaining) mode. This is the recommended
-    /// way to use Blowfish.NET, unless certain requirements (e.g. moving block without
-    /// decryption) exist.
+    /// <remarks>
+    ///     Use this class to encrypt or decrypt byte arrays or a single blocks
+    ///     with Blowfish in CBC (Cipher Block Block Chaining) mode. This is the recommended
+    ///     way to use Blowfish.NET, unless certain requirements (e.g. moving block without
+    ///     decryption) exist.
     /// </remarks>
     public class BlowfishCBC : BlowfishECB
     {
         // we store the IV as two 32bit integers, to void packing and
         // unpacking inbetween the handling of data chunks
-        uint ivHi;
-        uint ivLo;
-    
+        private uint ivHi;
+        private uint ivLo;
+
+        /// <summary>
+        ///     Default constructor.
+        /// </summary>
+        /// <param name="key">The key.</param>
+        /// <param name="ofs">The ofs.</param>
+        /// <param name="len">The len.</param>
+        /// <remarks>The IV needs to be assigned after the instance has been created!</remarks>
+        /// <see cref="BlowfishECB.Initialize" />
+        public BlowfishCBC(byte[] key, int ofs, int len) : base(key, ofs, len)
+        {
+        }
+
+        /// <summary>
+        ///     Zero key constructor.
+        /// </summary>
+        /// <remarks>After construction you need to initialize the instance and then apply the IV.</remarks>
+        public BlowfishCBC() : base(null, 0, 0)
+        {
+        }
+
         /// <summary>The current initialization vector (IV), which measures one block.</summary>
         public byte[] IV
         {
-            set 
-            { 
-                SetIV(value, 0);
-            }
+            set { this.SetIV(value, 0); }
 
-            get 
-            { 
+            get
+            {
                 byte[] result = new byte[BLOCK_SIZE];
-                GetIV(result, 0);
+                this.GetIV(result, 0);
                 return result;
             }
         }
@@ -789,15 +842,15 @@ namespace LLCryptoLib.Crypto
         /// <param name="ofs">Where the IV material starts.</param>
         public void SetIV(byte[] buf, int ofs)
         {
-            this.ivHi = (((uint)buf[ofs    ]) << 24) |
-                        (((uint)buf[ofs + 1]) << 16) |
-                        (((uint)buf[ofs + 2]) <<  8) |
-                                buf[ofs + 3];
+            this.ivHi = ((uint) buf[ofs] << 24) |
+                        ((uint) buf[ofs + 1] << 16) |
+                        ((uint) buf[ofs + 2] << 8) |
+                        buf[ofs + 3];
 
-            this.ivLo = (((uint)buf[ofs + 4]) << 24) |
-                        (((uint)buf[ofs + 5]) << 16) |
-                        (((uint)buf[ofs + 6]) <<  8) |
-                                buf[ofs + 7];         
+            this.ivLo = ((uint) buf[ofs + 4] << 24) |
+                        ((uint) buf[ofs + 5] << 16) |
+                        ((uint) buf[ofs + 6] << 8) |
+                        buf[ofs + 7];
         }
 
         /// <summary>Gets the current IV material (of the size of one block).</summary>
@@ -808,56 +861,36 @@ namespace LLCryptoLib.Crypto
             uint ivHi = this.ivHi;
             uint ivLo = this.ivLo;
 
-            buf[ofs++] = (byte)(ivHi >> 24);   
-            buf[ofs++] = (byte)(ivHi >> 16);   
-            buf[ofs++] = (byte)(ivHi >>  8);   
+            buf[ofs++] = (byte) (ivHi >> 24);
+            buf[ofs++] = (byte) (ivHi >> 16);
+            buf[ofs++] = (byte) (ivHi >> 8);
             buf[ofs++] = (byte) ivHi;
-    
-            buf[ofs++] = (byte)(ivLo >> 24);   
-            buf[ofs++] = (byte)(ivLo >> 16);   
-            buf[ofs++] = (byte)(ivLo >>  8);   
-            buf[ofs  ] = (byte) ivLo;              
+
+            buf[ofs++] = (byte) (ivLo >> 24);
+            buf[ofs++] = (byte) (ivLo >> 16);
+            buf[ofs++] = (byte) (ivLo >> 8);
+            buf[ofs] = (byte) ivLo;
         }
 
         /// <summary>
-        /// Default constructor.
+        ///     Deletes all internal data structures and invalidates this instance.
         /// </summary>
-        /// <param name="key">The key.</param>
-        /// <param name="ofs">The ofs.</param>
-        /// <param name="len">The len.</param>
-        /// <remarks>The IV needs to be assigned after the instance has been created!</remarks>
-        /// <see cref="BlowfishECB.Initialize"/>
-        public BlowfishCBC(byte[] key, int ofs, int len) : base(key, ofs, len)
-        {
-        }
-
-        /// <summary>
-        /// Zero key constructor.
-        /// </summary>
-        /// <remarks>After construction you need to initialize the instance and then apply the IV.</remarks>
-        public BlowfishCBC() : base(null, 0, 0)
-        {
-        }
-
-        /// <summary>
-        /// Deletes all internal data structures and invalidates this instance.
-        /// </summary>
-        /// <see cref="BlowfishECB.Invalidate"/>
-        public new void Invalidate() 
+        /// <see cref="BlowfishECB.Invalidate" />
+        public new void Invalidate()
         {
             base.Invalidate();
-  
+
             this.ivHi = this.ivLo = 0;
         }
 
         /// <summary>
-        /// Encrypts a single block.
+        ///     Encrypts a single block.
         /// </summary>
         /// <param name="hi">The high 32bit word of the block.</param>
         /// <param name="lo">The low 32bit word of the block.</param>
         /// <param name="outHi">Where to put the encrypted high word.</param>
         /// <param name="outLo">Where to put the encrypted low word.</param>
-        /// <see cref="BlowfishECB.EncryptBlock"/>
+        /// <see cref="BlowfishECB.EncryptBlock" />
         public new void EncryptBlock(
             uint hi,
             uint lo,
@@ -866,36 +899,36 @@ namespace LLCryptoLib.Crypto
         {
             byte[] block = this.block;
 
-            block[0] = (byte)(hi >> 24);  
-            block[1] = (byte)(hi >> 16);  
-            block[2] = (byte)(hi >>  8);  
-            block[3] = (byte) hi; 
-            block[4] = (byte)(lo >> 24);  
-            block[5] = (byte)(lo >> 16);  
-            block[6] = (byte)(lo >>  8);  
-            block[7] = (byte) lo; 
+            block[0] = (byte) (hi >> 24);
+            block[1] = (byte) (hi >> 16);
+            block[2] = (byte) (hi >> 8);
+            block[3] = (byte) hi;
+            block[4] = (byte) (lo >> 24);
+            block[5] = (byte) (lo >> 16);
+            block[6] = (byte) (lo >> 8);
+            block[7] = (byte) lo;
 
-            Encrypt(block, 0, block, 0, BLOCK_SIZE);
+            this.Encrypt(block, 0, block, 0, BLOCK_SIZE);
 
-            outHi = (((uint)block[0]) << 24) |
-                    (((uint)block[1]) << 16) |
-                    (((uint)block[2]) <<  8) |
-                            block[3];
+            outHi = ((uint) block[0] << 24) |
+                    ((uint) block[1] << 16) |
+                    ((uint) block[2] << 8) |
+                    block[3];
 
-            outLo = (((uint)block[4]) << 24) |
-                    (((uint)block[5]) << 16) |
-                    (((uint)block[6]) <<  8) |
-                            block[7];
+            outLo = ((uint) block[4] << 24) |
+                    ((uint) block[5] << 16) |
+                    ((uint) block[6] << 8) |
+                    block[7];
         }
 
         /// <summary>
-        /// Decrypts a single block.
+        ///     Decrypts a single block.
         /// </summary>
         /// <param name="hi">The high 32bit word of the block.</param>
         /// <param name="lo">The low 32bit word of the block.</param>
         /// <param name="outHi">Where to put the decrypted high word.</param>
         /// <param name="outLo">Where to put the decrypted low word.</param>
-        /// <see cref="BlowfishECB.DecryptBlock"/>
+        /// <see cref="BlowfishECB.DecryptBlock" />
         public new void DecryptBlock(
             uint hi,
             uint lo,
@@ -903,31 +936,31 @@ namespace LLCryptoLib.Crypto
             out uint outLo)
         {
             byte[] block = this.block;
-        
-            block[0] = (byte)(hi >> 24);  
-            block[1] = (byte)(hi >> 16);  
-            block[2] = (byte)(hi >>  8);  
-            block[3] = (byte) hi; 
-            block[4] = (byte)(lo >> 24);  
-            block[5] = (byte)(lo >> 16);  
-            block[6] = (byte)(lo >>  8);  
-            block[7] = (byte) lo; 
 
-            Decrypt(block, 0, block, 0, BLOCK_SIZE);
+            block[0] = (byte) (hi >> 24);
+            block[1] = (byte) (hi >> 16);
+            block[2] = (byte) (hi >> 8);
+            block[3] = (byte) hi;
+            block[4] = (byte) (lo >> 24);
+            block[5] = (byte) (lo >> 16);
+            block[6] = (byte) (lo >> 8);
+            block[7] = (byte) lo;
 
-            outHi = (((uint)block[0]) << 24) |
-                    (((uint)block[1]) << 16) |
-                    (((uint)block[2]) <<  8) |
-                            block[3];
+            this.Decrypt(block, 0, block, 0, BLOCK_SIZE);
 
-            outLo = (((uint)block[4]) << 24) |
-                    (((uint)block[5]) << 16) |
-                    (((uint)block[6]) <<  8) |
-                            block[7];
+            outHi = ((uint) block[0] << 24) |
+                    ((uint) block[1] << 16) |
+                    ((uint) block[2] << 8) |
+                    block[3];
+
+            outLo = ((uint) block[4] << 24) |
+                    ((uint) block[5] << 16) |
+                    ((uint) block[6] << 8) |
+                    block[7];
         }
 
         /// <summary>
-        /// Encrypts byte buffers.
+        ///     Encrypts byte buffers.
         /// </summary>
         /// <param name="dataIn">The input buffer.</param>
         /// <param name="posIn">Where to start reading in the input buffer.</param>
@@ -935,17 +968,17 @@ namespace LLCryptoLib.Crypto
         /// <param name="posOut">Where to start writing to the output buffer.</param>
         /// <param name="count">The number ob bytes to encrypt.</param>
         /// <returns>The number of bytes processed.</returns>
-        /// <see cref="BlowfishECB.Encrypt"/>
+        /// <see cref="BlowfishECB.Encrypt" />
         public new int Encrypt(
             byte[] dataIn,
             int posIn,
             byte[] dataOut,
             int posOut,
-            int count) 
+            int count)
         {
             int end;
             uint swap;
-            
+
             uint[] sbox1 = this.sbox1;
             uint[] sbox2 = this.sbox2;
             uint[] sbox3 = this.sbox3;
@@ -953,16 +986,16 @@ namespace LLCryptoLib.Crypto
 
             uint[] pbox = this.pbox;
 
-            uint pbox00 = pbox[ 0];
-            uint pbox01 = pbox[ 1];
-            uint pbox02 = pbox[ 2];
-            uint pbox03 = pbox[ 3];
-            uint pbox04 = pbox[ 4];
-            uint pbox05 = pbox[ 5];
-            uint pbox06 = pbox[ 6];
-            uint pbox07 = pbox[ 7];
-            uint pbox08 = pbox[ 8];
-            uint pbox09 = pbox[ 9];
+            uint pbox00 = pbox[0];
+            uint pbox01 = pbox[1];
+            uint pbox02 = pbox[2];
+            uint pbox03 = pbox[3];
+            uint pbox04 = pbox[4];
+            uint pbox05 = pbox[5];
+            uint pbox06 = pbox[6];
+            uint pbox07 = pbox[7];
+            uint pbox08 = pbox[8];
+            uint pbox09 = pbox[9];
             uint pbox10 = pbox[10];
             uint pbox11 = pbox[11];
             uint pbox12 = pbox[12];
@@ -982,48 +1015,64 @@ namespace LLCryptoLib.Crypto
 
             while (posIn < end)
             {
-                hi ^= (((uint)dataIn[posIn    ]) << 24) |
-                      (((uint)dataIn[posIn + 1]) << 16) |
-                      (((uint)dataIn[posIn + 2]) <<  8) |
-                              dataIn[posIn + 3];
- 
-                lo ^= (((uint)dataIn[posIn + 4]) << 24) |
-                      (((uint)dataIn[posIn + 5]) << 16) |
-                      (((uint)dataIn[posIn + 6]) <<  8) |
-                              dataIn[posIn + 7];
+                hi ^= ((uint) dataIn[posIn] << 24) |
+                      ((uint) dataIn[posIn + 1] << 16) |
+                      ((uint) dataIn[posIn + 2] << 8) |
+                      dataIn[posIn + 3];
 
-                posIn += 8; 
+                lo ^= ((uint) dataIn[posIn + 4] << 24) |
+                      ((uint) dataIn[posIn + 5] << 16) |
+                      ((uint) dataIn[posIn + 6] << 8) |
+                      dataIn[posIn + 7];
+
+                posIn += 8;
 
                 hi ^= pbox00;
-                lo ^= (((sbox1[(int)(hi >> 24)] + sbox2[(int)((hi >> 16) & 0x0ff)]) ^ sbox3[(int)((hi >> 8) & 0x0ff)]) + sbox4[(int)(hi & 0x0ff)]) ^ pbox01;
-                hi ^= (((sbox1[(int)(lo >> 24)] + sbox2[(int)((lo >> 16) & 0x0ff)]) ^ sbox3[(int)((lo >> 8) & 0x0ff)]) + sbox4[(int)(lo & 0x0ff)]) ^ pbox02;
-                lo ^= (((sbox1[(int)(hi >> 24)] + sbox2[(int)((hi >> 16) & 0x0ff)]) ^ sbox3[(int)((hi >> 8) & 0x0ff)]) + sbox4[(int)(hi & 0x0ff)]) ^ pbox03;
-                hi ^= (((sbox1[(int)(lo >> 24)] + sbox2[(int)((lo >> 16) & 0x0ff)]) ^ sbox3[(int)((lo >> 8) & 0x0ff)]) + sbox4[(int)(lo & 0x0ff)]) ^ pbox04;
-                lo ^= (((sbox1[(int)(hi >> 24)] + sbox2[(int)((hi >> 16) & 0x0ff)]) ^ sbox3[(int)((hi >> 8) & 0x0ff)]) + sbox4[(int)(hi & 0x0ff)]) ^ pbox05;
-                hi ^= (((sbox1[(int)(lo >> 24)] + sbox2[(int)((lo >> 16) & 0x0ff)]) ^ sbox3[(int)((lo >> 8) & 0x0ff)]) + sbox4[(int)(lo & 0x0ff)]) ^ pbox06;
-                lo ^= (((sbox1[(int)(hi >> 24)] + sbox2[(int)((hi >> 16) & 0x0ff)]) ^ sbox3[(int)((hi >> 8) & 0x0ff)]) + sbox4[(int)(hi & 0x0ff)]) ^ pbox07;
-                hi ^= (((sbox1[(int)(lo >> 24)] + sbox2[(int)((lo >> 16) & 0x0ff)]) ^ sbox3[(int)((lo >> 8) & 0x0ff)]) + sbox4[(int)(lo & 0x0ff)]) ^ pbox08;
-                lo ^= (((sbox1[(int)(hi >> 24)] + sbox2[(int)((hi >> 16) & 0x0ff)]) ^ sbox3[(int)((hi >> 8) & 0x0ff)]) + sbox4[(int)(hi & 0x0ff)]) ^ pbox09;
-                hi ^= (((sbox1[(int)(lo >> 24)] + sbox2[(int)((lo >> 16) & 0x0ff)]) ^ sbox3[(int)((lo >> 8) & 0x0ff)]) + sbox4[(int)(lo & 0x0ff)]) ^ pbox10;
-                lo ^= (((sbox1[(int)(hi >> 24)] + sbox2[(int)((hi >> 16) & 0x0ff)]) ^ sbox3[(int)((hi >> 8) & 0x0ff)]) + sbox4[(int)(hi & 0x0ff)]) ^ pbox11;
-                hi ^= (((sbox1[(int)(lo >> 24)] + sbox2[(int)((lo >> 16) & 0x0ff)]) ^ sbox3[(int)((lo >> 8) & 0x0ff)]) + sbox4[(int)(lo & 0x0ff)]) ^ pbox12;
-                lo ^= (((sbox1[(int)(hi >> 24)] + sbox2[(int)((hi >> 16) & 0x0ff)]) ^ sbox3[(int)((hi >> 8) & 0x0ff)]) + sbox4[(int)(hi & 0x0ff)]) ^ pbox13;
-                hi ^= (((sbox1[(int)(lo >> 24)] + sbox2[(int)((lo >> 16) & 0x0ff)]) ^ sbox3[(int)((lo >> 8) & 0x0ff)]) + sbox4[(int)(lo & 0x0ff)]) ^ pbox14;
-                lo ^= (((sbox1[(int)(hi >> 24)] + sbox2[(int)((hi >> 16) & 0x0ff)]) ^ sbox3[(int)((hi >> 8) & 0x0ff)]) + sbox4[(int)(hi & 0x0ff)]) ^ pbox15;
-                hi ^= (((sbox1[(int)(lo >> 24)] + sbox2[(int)((lo >> 16) & 0x0ff)]) ^ sbox3[(int)((lo >> 8) & 0x0ff)]) + sbox4[(int)(lo & 0x0ff)]) ^ pbox16;
+                lo ^= (((sbox1[(int) (hi >> 24)] + sbox2[(int) ((hi >> 16) & 0x0ff)]) ^ sbox3[(int) ((hi >> 8) & 0x0ff)]) +
+                       sbox4[(int) (hi & 0x0ff)]) ^ pbox01;
+                hi ^= (((sbox1[(int) (lo >> 24)] + sbox2[(int) ((lo >> 16) & 0x0ff)]) ^ sbox3[(int) ((lo >> 8) & 0x0ff)]) +
+                       sbox4[(int) (lo & 0x0ff)]) ^ pbox02;
+                lo ^= (((sbox1[(int) (hi >> 24)] + sbox2[(int) ((hi >> 16) & 0x0ff)]) ^ sbox3[(int) ((hi >> 8) & 0x0ff)]) +
+                       sbox4[(int) (hi & 0x0ff)]) ^ pbox03;
+                hi ^= (((sbox1[(int) (lo >> 24)] + sbox2[(int) ((lo >> 16) & 0x0ff)]) ^ sbox3[(int) ((lo >> 8) & 0x0ff)]) +
+                       sbox4[(int) (lo & 0x0ff)]) ^ pbox04;
+                lo ^= (((sbox1[(int) (hi >> 24)] + sbox2[(int) ((hi >> 16) & 0x0ff)]) ^ sbox3[(int) ((hi >> 8) & 0x0ff)]) +
+                       sbox4[(int) (hi & 0x0ff)]) ^ pbox05;
+                hi ^= (((sbox1[(int) (lo >> 24)] + sbox2[(int) ((lo >> 16) & 0x0ff)]) ^ sbox3[(int) ((lo >> 8) & 0x0ff)]) +
+                       sbox4[(int) (lo & 0x0ff)]) ^ pbox06;
+                lo ^= (((sbox1[(int) (hi >> 24)] + sbox2[(int) ((hi >> 16) & 0x0ff)]) ^ sbox3[(int) ((hi >> 8) & 0x0ff)]) +
+                       sbox4[(int) (hi & 0x0ff)]) ^ pbox07;
+                hi ^= (((sbox1[(int) (lo >> 24)] + sbox2[(int) ((lo >> 16) & 0x0ff)]) ^ sbox3[(int) ((lo >> 8) & 0x0ff)]) +
+                       sbox4[(int) (lo & 0x0ff)]) ^ pbox08;
+                lo ^= (((sbox1[(int) (hi >> 24)] + sbox2[(int) ((hi >> 16) & 0x0ff)]) ^ sbox3[(int) ((hi >> 8) & 0x0ff)]) +
+                       sbox4[(int) (hi & 0x0ff)]) ^ pbox09;
+                hi ^= (((sbox1[(int) (lo >> 24)] + sbox2[(int) ((lo >> 16) & 0x0ff)]) ^ sbox3[(int) ((lo >> 8) & 0x0ff)]) +
+                       sbox4[(int) (lo & 0x0ff)]) ^ pbox10;
+                lo ^= (((sbox1[(int) (hi >> 24)] + sbox2[(int) ((hi >> 16) & 0x0ff)]) ^ sbox3[(int) ((hi >> 8) & 0x0ff)]) +
+                       sbox4[(int) (hi & 0x0ff)]) ^ pbox11;
+                hi ^= (((sbox1[(int) (lo >> 24)] + sbox2[(int) ((lo >> 16) & 0x0ff)]) ^ sbox3[(int) ((lo >> 8) & 0x0ff)]) +
+                       sbox4[(int) (lo & 0x0ff)]) ^ pbox12;
+                lo ^= (((sbox1[(int) (hi >> 24)] + sbox2[(int) ((hi >> 16) & 0x0ff)]) ^ sbox3[(int) ((hi >> 8) & 0x0ff)]) +
+                       sbox4[(int) (hi & 0x0ff)]) ^ pbox13;
+                hi ^= (((sbox1[(int) (lo >> 24)] + sbox2[(int) ((lo >> 16) & 0x0ff)]) ^ sbox3[(int) ((lo >> 8) & 0x0ff)]) +
+                       sbox4[(int) (lo & 0x0ff)]) ^ pbox14;
+                lo ^= (((sbox1[(int) (hi >> 24)] + sbox2[(int) ((hi >> 16) & 0x0ff)]) ^ sbox3[(int) ((hi >> 8) & 0x0ff)]) +
+                       sbox4[(int) (hi & 0x0ff)]) ^ pbox15;
+                hi ^= (((sbox1[(int) (lo >> 24)] + sbox2[(int) ((lo >> 16) & 0x0ff)]) ^ sbox3[(int) ((lo >> 8) & 0x0ff)]) +
+                       sbox4[(int) (lo & 0x0ff)]) ^ pbox16;
 
                 swap = lo ^ pbox17;
                 lo = hi;
                 hi = swap;
-                
-                dataOut[posOut    ] = (byte)(hi >> 24);
-                dataOut[posOut + 1] = (byte)(hi >> 16);
-                dataOut[posOut + 2] = (byte)(hi >>  8);
+
+                dataOut[posOut] = (byte) (hi >> 24);
+                dataOut[posOut + 1] = (byte) (hi >> 16);
+                dataOut[posOut + 2] = (byte) (hi >> 8);
                 dataOut[posOut + 3] = (byte) hi;
-                
-                dataOut[posOut + 4] = (byte)(lo >> 24);
-                dataOut[posOut + 5] = (byte)(lo >> 16);
-                dataOut[posOut + 6] = (byte)(lo >>  8);
+
+                dataOut[posOut + 4] = (byte) (lo >> 24);
+                dataOut[posOut + 5] = (byte) (lo >> 16);
+                dataOut[posOut + 6] = (byte) (lo >> 8);
                 dataOut[posOut + 7] = (byte) lo;
 
                 posOut += 8;
@@ -1036,7 +1085,7 @@ namespace LLCryptoLib.Crypto
         }
 
         /// <summary>
-        /// Decrypts single bytes.
+        ///     Decrypts single bytes.
         /// </summary>
         /// <param name="dataIn">The input buffer.</param>
         /// <param name="posIn">Where to start reading in the input buffer.</param>
@@ -1044,17 +1093,17 @@ namespace LLCryptoLib.Crypto
         /// <param name="posOut">Where to start writing to the output buffer.</param>
         /// <param name="count">Number ob bytes to decrypt.</param>
         /// <returns>The number of bytes processed.</returns>
-        /// <see cref="BlowfishECB.Decrypt"/>
+        /// <see cref="BlowfishECB.Decrypt" />
         public new int Decrypt(
             byte[] dataIn,
             int posIn,
             byte[] dataOut,
             int posOut,
-            int count) 
+            int count)
         {
             int end;
             uint hi, lo, hiBak, loBak;
-            
+
             uint[] sbox1 = this.sbox1;
             uint[] sbox2 = this.sbox2;
             uint[] sbox3 = this.sbox3;
@@ -1062,16 +1111,16 @@ namespace LLCryptoLib.Crypto
 
             uint[] pbox = this.pbox;
 
-            uint pbox00 = pbox[ 0];
-            uint pbox01 = pbox[ 1];
-            uint pbox02 = pbox[ 2];
-            uint pbox03 = pbox[ 3];
-            uint pbox04 = pbox[ 4];
-            uint pbox05 = pbox[ 5];
-            uint pbox06 = pbox[ 6];
-            uint pbox07 = pbox[ 7];
-            uint pbox08 = pbox[ 8];
-            uint pbox09 = pbox[ 9];
+            uint pbox00 = pbox[0];
+            uint pbox01 = pbox[1];
+            uint pbox02 = pbox[2];
+            uint pbox03 = pbox[3];
+            uint pbox04 = pbox[4];
+            uint pbox05 = pbox[5];
+            uint pbox06 = pbox[6];
+            uint pbox07 = pbox[7];
+            uint pbox08 = pbox[8];
+            uint pbox09 = pbox[9];
             uint pbox10 = pbox[10];
             uint pbox11 = pbox[11];
             uint pbox12 = pbox[12];
@@ -1082,7 +1131,7 @@ namespace LLCryptoLib.Crypto
             uint pbox17 = pbox[17];
 
             uint ivHi = this.ivHi;
-            uint ivLo = this.ivLo;         
+            uint ivLo = this.ivLo;
 
             count &= ~(BLOCK_SIZE - 1);
 
@@ -1090,46 +1139,62 @@ namespace LLCryptoLib.Crypto
 
             while (posIn < end)
             {
-                hi = hiBak = (((uint)dataIn[posIn    ]) << 24) |
-                                 (((uint)dataIn[posIn + 1]) << 16) |
-                                 (((uint)dataIn[posIn + 2]) <<  8) |
-                                         dataIn[posIn + 3];
- 
-                lo = loBak = (((uint)dataIn[posIn + 4]) << 24) |
-                                 (((uint)dataIn[posIn + 5]) << 16) |
-                                 (((uint)dataIn[posIn + 6]) <<  8) |
-                                         dataIn[posIn + 7];
-                posIn += 8; 
+                hi = hiBak = ((uint) dataIn[posIn] << 24) |
+                             ((uint) dataIn[posIn + 1] << 16) |
+                             ((uint) dataIn[posIn + 2] << 8) |
+                             dataIn[posIn + 3];
+
+                lo = loBak = ((uint) dataIn[posIn + 4] << 24) |
+                             ((uint) dataIn[posIn + 5] << 16) |
+                             ((uint) dataIn[posIn + 6] << 8) |
+                             dataIn[posIn + 7];
+                posIn += 8;
 
                 hi ^= pbox17;
-                lo ^= (((sbox1[(int)(hi >> 24)] + sbox2[(int)((hi >> 16) & 0x0ff)]) ^ sbox3[(int)((hi >> 8) & 0x0ff)]) + sbox4[(int)(hi & 0x0ff)]) ^ pbox16;
-                hi ^= (((sbox1[(int)(lo >> 24)] + sbox2[(int)((lo >> 16) & 0x0ff)]) ^ sbox3[(int)((lo >> 8) & 0x0ff)]) + sbox4[(int)(lo & 0x0ff)]) ^ pbox15;
-                lo ^= (((sbox1[(int)(hi >> 24)] + sbox2[(int)((hi >> 16) & 0x0ff)]) ^ sbox3[(int)((hi >> 8) & 0x0ff)]) + sbox4[(int)(hi & 0x0ff)]) ^ pbox14;
-                hi ^= (((sbox1[(int)(lo >> 24)] + sbox2[(int)((lo >> 16) & 0x0ff)]) ^ sbox3[(int)((lo >> 8) & 0x0ff)]) + sbox4[(int)(lo & 0x0ff)]) ^ pbox13;
-                lo ^= (((sbox1[(int)(hi >> 24)] + sbox2[(int)((hi >> 16) & 0x0ff)]) ^ sbox3[(int)((hi >> 8) & 0x0ff)]) + sbox4[(int)(hi & 0x0ff)]) ^ pbox12;
-                hi ^= (((sbox1[(int)(lo >> 24)] + sbox2[(int)((lo >> 16) & 0x0ff)]) ^ sbox3[(int)((lo >> 8) & 0x0ff)]) + sbox4[(int)(lo & 0x0ff)]) ^ pbox11;
-                lo ^= (((sbox1[(int)(hi >> 24)] + sbox2[(int)((hi >> 16) & 0x0ff)]) ^ sbox3[(int)((hi >> 8) & 0x0ff)]) + sbox4[(int)(hi & 0x0ff)]) ^ pbox10;
-                hi ^= (((sbox1[(int)(lo >> 24)] + sbox2[(int)((lo >> 16) & 0x0ff)]) ^ sbox3[(int)((lo >> 8) & 0x0ff)]) + sbox4[(int)(lo & 0x0ff)]) ^ pbox09;
-                lo ^= (((sbox1[(int)(hi >> 24)] + sbox2[(int)((hi >> 16) & 0x0ff)]) ^ sbox3[(int)((hi >> 8) & 0x0ff)]) + sbox4[(int)(hi & 0x0ff)]) ^ pbox08;
-                hi ^= (((sbox1[(int)(lo >> 24)] + sbox2[(int)((lo >> 16) & 0x0ff)]) ^ sbox3[(int)((lo >> 8) & 0x0ff)]) + sbox4[(int)(lo & 0x0ff)]) ^ pbox07;
-                lo ^= (((sbox1[(int)(hi >> 24)] + sbox2[(int)((hi >> 16) & 0x0ff)]) ^ sbox3[(int)((hi >> 8) & 0x0ff)]) + sbox4[(int)(hi & 0x0ff)]) ^ pbox06;
-                hi ^= (((sbox1[(int)(lo >> 24)] + sbox2[(int)((lo >> 16) & 0x0ff)]) ^ sbox3[(int)((lo >> 8) & 0x0ff)]) + sbox4[(int)(lo & 0x0ff)]) ^ pbox05;
-                lo ^= (((sbox1[(int)(hi >> 24)] + sbox2[(int)((hi >> 16) & 0x0ff)]) ^ sbox3[(int)((hi >> 8) & 0x0ff)]) + sbox4[(int)(hi & 0x0ff)]) ^ pbox04;
-                hi ^= (((sbox1[(int)(lo >> 24)] + sbox2[(int)((lo >> 16) & 0x0ff)]) ^ sbox3[(int)((lo >> 8) & 0x0ff)]) + sbox4[(int)(lo & 0x0ff)]) ^ pbox03;
-                lo ^= (((sbox1[(int)(hi >> 24)] + sbox2[(int)((hi >> 16) & 0x0ff)]) ^ sbox3[(int)((hi >> 8) & 0x0ff)]) + sbox4[(int)(hi & 0x0ff)]) ^ pbox02;
-                hi ^= (((sbox1[(int)(lo >> 24)] + sbox2[(int)((lo >> 16) & 0x0ff)]) ^ sbox3[(int)((lo >> 8) & 0x0ff)]) + sbox4[(int)(lo & 0x0ff)]) ^ pbox01;
+                lo ^= (((sbox1[(int) (hi >> 24)] + sbox2[(int) ((hi >> 16) & 0x0ff)]) ^ sbox3[(int) ((hi >> 8) & 0x0ff)]) +
+                       sbox4[(int) (hi & 0x0ff)]) ^ pbox16;
+                hi ^= (((sbox1[(int) (lo >> 24)] + sbox2[(int) ((lo >> 16) & 0x0ff)]) ^ sbox3[(int) ((lo >> 8) & 0x0ff)]) +
+                       sbox4[(int) (lo & 0x0ff)]) ^ pbox15;
+                lo ^= (((sbox1[(int) (hi >> 24)] + sbox2[(int) ((hi >> 16) & 0x0ff)]) ^ sbox3[(int) ((hi >> 8) & 0x0ff)]) +
+                       sbox4[(int) (hi & 0x0ff)]) ^ pbox14;
+                hi ^= (((sbox1[(int) (lo >> 24)] + sbox2[(int) ((lo >> 16) & 0x0ff)]) ^ sbox3[(int) ((lo >> 8) & 0x0ff)]) +
+                       sbox4[(int) (lo & 0x0ff)]) ^ pbox13;
+                lo ^= (((sbox1[(int) (hi >> 24)] + sbox2[(int) ((hi >> 16) & 0x0ff)]) ^ sbox3[(int) ((hi >> 8) & 0x0ff)]) +
+                       sbox4[(int) (hi & 0x0ff)]) ^ pbox12;
+                hi ^= (((sbox1[(int) (lo >> 24)] + sbox2[(int) ((lo >> 16) & 0x0ff)]) ^ sbox3[(int) ((lo >> 8) & 0x0ff)]) +
+                       sbox4[(int) (lo & 0x0ff)]) ^ pbox11;
+                lo ^= (((sbox1[(int) (hi >> 24)] + sbox2[(int) ((hi >> 16) & 0x0ff)]) ^ sbox3[(int) ((hi >> 8) & 0x0ff)]) +
+                       sbox4[(int) (hi & 0x0ff)]) ^ pbox10;
+                hi ^= (((sbox1[(int) (lo >> 24)] + sbox2[(int) ((lo >> 16) & 0x0ff)]) ^ sbox3[(int) ((lo >> 8) & 0x0ff)]) +
+                       sbox4[(int) (lo & 0x0ff)]) ^ pbox09;
+                lo ^= (((sbox1[(int) (hi >> 24)] + sbox2[(int) ((hi >> 16) & 0x0ff)]) ^ sbox3[(int) ((hi >> 8) & 0x0ff)]) +
+                       sbox4[(int) (hi & 0x0ff)]) ^ pbox08;
+                hi ^= (((sbox1[(int) (lo >> 24)] + sbox2[(int) ((lo >> 16) & 0x0ff)]) ^ sbox3[(int) ((lo >> 8) & 0x0ff)]) +
+                       sbox4[(int) (lo & 0x0ff)]) ^ pbox07;
+                lo ^= (((sbox1[(int) (hi >> 24)] + sbox2[(int) ((hi >> 16) & 0x0ff)]) ^ sbox3[(int) ((hi >> 8) & 0x0ff)]) +
+                       sbox4[(int) (hi & 0x0ff)]) ^ pbox06;
+                hi ^= (((sbox1[(int) (lo >> 24)] + sbox2[(int) ((lo >> 16) & 0x0ff)]) ^ sbox3[(int) ((lo >> 8) & 0x0ff)]) +
+                       sbox4[(int) (lo & 0x0ff)]) ^ pbox05;
+                lo ^= (((sbox1[(int) (hi >> 24)] + sbox2[(int) ((hi >> 16) & 0x0ff)]) ^ sbox3[(int) ((hi >> 8) & 0x0ff)]) +
+                       sbox4[(int) (hi & 0x0ff)]) ^ pbox04;
+                hi ^= (((sbox1[(int) (lo >> 24)] + sbox2[(int) ((lo >> 16) & 0x0ff)]) ^ sbox3[(int) ((lo >> 8) & 0x0ff)]) +
+                       sbox4[(int) (lo & 0x0ff)]) ^ pbox03;
+                lo ^= (((sbox1[(int) (hi >> 24)] + sbox2[(int) ((hi >> 16) & 0x0ff)]) ^ sbox3[(int) ((hi >> 8) & 0x0ff)]) +
+                       sbox4[(int) (hi & 0x0ff)]) ^ pbox02;
+                hi ^= (((sbox1[(int) (lo >> 24)] + sbox2[(int) ((lo >> 16) & 0x0ff)]) ^ sbox3[(int) ((lo >> 8) & 0x0ff)]) +
+                       sbox4[(int) (lo & 0x0ff)]) ^ pbox01;
 
                 lo ^= ivHi ^ pbox00;
                 hi ^= ivLo;
 
-                dataOut[posOut    ] = (byte)(lo >> 24);
-                dataOut[posOut + 1] = (byte)(lo >> 16);
-                dataOut[posOut + 2] = (byte)(lo >>  8);
+                dataOut[posOut] = (byte) (lo >> 24);
+                dataOut[posOut + 1] = (byte) (lo >> 16);
+                dataOut[posOut + 2] = (byte) (lo >> 8);
                 dataOut[posOut + 3] = (byte) lo;
-                
-                dataOut[posOut + 4] = (byte)(hi >> 24);
-                dataOut[posOut + 5] = (byte)(hi >> 16);
-                dataOut[posOut + 6] = (byte)(hi >>  8);
+
+                dataOut[posOut + 4] = (byte) (hi >> 24);
+                dataOut[posOut + 5] = (byte) (hi >> 16);
+                dataOut[posOut + 6] = (byte) (hi >> 8);
                 dataOut[posOut + 7] = (byte) hi;
 
                 ivHi = hiBak;
@@ -1145,10 +1210,10 @@ namespace LLCryptoLib.Crypto
         }
 
         /// <summary>
-        /// Clone
+        ///     Clone
         /// </summary>
         /// <returns></returns>
-        /// <see cref="BlowfishECB.Clone"/>
+        /// <see cref="BlowfishECB.Clone" />
         public new object Clone()
         {
             BlowfishCBC result;
@@ -1156,7 +1221,7 @@ namespace LLCryptoLib.Crypto
             result = new BlowfishCBC();
 
             result.pbox = (uint[]) this.pbox.Clone();
-            
+
             result.sbox1 = (uint[]) this.sbox1.Clone();
             result.sbox2 = (uint[]) this.sbox2.Clone();
             result.sbox3 = (uint[]) this.sbox3.Clone();
@@ -1165,98 +1230,93 @@ namespace LLCryptoLib.Crypto
             result.block = (byte[]) this.block.Clone();
 
             result.isWeakKey = this.isWeakKey;
-        
-            result.ivHi = this.ivHi;    
-            result.ivLo = this.ivLo;    
+
+            result.ivHi = this.ivHi;
+            result.ivLo = this.ivLo;
 
             return result;
         }
     }
 
     /// <summary>
-    /// Blowfish is a keyed, symmetric block cipher, designed in 1993 by Bruce Schneier and included
-    /// in a large number of cipher suites and encryption products. Blowfish provides a good encryption
-    /// rate in software and no effective cryptanalysis of it has been found to date.
-    /// Schneier designed Blowfish as a general-purpose algorithm, intended as a replacement for the
-    /// aging DES and free of the problems and constraints associated with other algorithms.
-    /// This implementation of the Blowfish algorithm as a standard component for
-    /// the .NET security framework.
+    ///     Blowfish is a keyed, symmetric block cipher, designed in 1993 by Bruce Schneier and included
+    ///     in a large number of cipher suites and encryption products. Blowfish provides a good encryption
+    ///     rate in software and no effective cryptanalysis of it has been found to date.
+    ///     Schneier designed Blowfish as a general-purpose algorithm, intended as a replacement for the
+    ///     aging DES and free of the problems and constraints associated with other algorithms.
+    ///     This implementation of the Blowfish algorithm as a standard component for
+    ///     the .NET security framework.
     /// </summary>
     public class BlowfishManaged : SymmetricAlgorithm, ICryptoTransform
     {
+        private readonly BlowfishCBC bfc;
         // in factory mode the Blowfish instances are always null, they only get
         // initialized in transformation mode
 
-        BlowfishECB bfe;
-        BlowfishCBC bfc;
+        private readonly BlowfishECB bfe;
+        private byte[] block;
 
-        bool isEncryptor;
-        byte[] block;
+        private readonly bool isEncryptor;
 
-        RNGCryptoServiceProvider rng;
+        private RNGCryptoServiceProvider rng;
 
         /// <summary>
-        /// Default constructor. Starts as an uninitialized ECB instance.
+        ///     Default constructor. Starts as an uninitialized ECB instance.
         /// </summary>
         /// <exception cref="T:System.Security.Cryptography.CryptographicException">
-        /// The implementation of the class derived from the symmetric algorithm is not valid.
+        ///     The implementation of the class derived from the symmetric algorithm is not valid.
         /// </exception>
         public BlowfishManaged()
         {
-            KeySizeValue = BlowfishECB.MAX_KEY_LENGTH << 3;
+            this.KeySizeValue = BlowfishECB.MAX_KEY_LENGTH << 3;
 
-            LegalBlockSizesValue = new KeySizes[1];
-            LegalBlockSizesValue[0] = new KeySizes(
-                BlockSize,
-                BlockSize,
+            this.LegalBlockSizesValue = new KeySizes[1];
+            this.LegalBlockSizesValue[0] = new KeySizes(this.BlockSize, this.BlockSize,
                 BlowfishECB.BLOCK_SIZE);
 
-            LegalKeySizesValue = new KeySizes[1];
-            LegalKeySizesValue[0] = new KeySizes(
+            this.LegalKeySizesValue = new KeySizes[1];
+            this.LegalKeySizesValue[0] = new KeySizes(
                 0,
                 BlowfishECB.MAX_KEY_LENGTH << 3,
                 8);
 
-            ModeValue = CipherMode.ECB;
+            this.ModeValue = CipherMode.ECB;
         }
 
         private BlowfishManaged(byte[] key, byte[] iv, bool useCBC, bool isEncryptor)
         {
             if (null == key)
             {
-                GenerateKey();
+                this.GenerateKey();
             }
             else
             {
-                Key = key;
+                this.Key = key;
             }
 
             if (useCBC)
             {
-                IV = iv;
+                this.IV = iv;
 
-                this.bfc = new BlowfishCBC(KeyValue, 0, KeyValue.Length);
-                this.bfc.SetIV(IVValue, 0);
+                this.bfc = new BlowfishCBC(this.KeyValue, 0, this.KeyValue.Length);
+                this.bfc.SetIV(this.IVValue, 0);
             }
             else
             {
-                this.bfe = new BlowfishECB(KeyValue, 0, KeyValue.Length);
+                this.bfe = new BlowfishECB(this.KeyValue, 0, this.KeyValue.Length);
             }
 
             this.isEncryptor = isEncryptor;
         }
 
         /// <summary>
-        /// Gets or sets the block size, in bits, of the cryptographic operation.
+        ///     Gets or sets the block size, in bits, of the cryptographic operation.
         /// </summary>
         /// <value></value>
-        /// <see cref="System.Security.Cryptography.SymmetricAlgorithm.BlockSize"/>
+        /// <see cref="System.Security.Cryptography.SymmetricAlgorithm.BlockSize" />
         public override int BlockSize
         {
-            get
-            {
-                return BlowfishECB.BLOCK_SIZE << 3;
-            }
+            get { return BlowfishECB.BLOCK_SIZE << 3; }
             set
             {
                 if (value != BlowfishECB.BLOCK_SIZE << 3)
@@ -1267,19 +1327,20 @@ namespace LLCryptoLib.Crypto
         }
 
         /// <summary>
-        /// Gets or sets the initialization vector (<see cref="P:System.Security.Cryptography.SymmetricAlgorithm.IV"/>) for the symmetric algorithm.
+        ///     Gets or sets the initialization vector (<see cref="P:System.Security.Cryptography.SymmetricAlgorithm.IV" />) for
+        ///     the symmetric algorithm.
         /// </summary>
         /// <value></value>
-        /// <see cref="System.Security.Cryptography.SymmetricAlgorithm.IV"/>
+        /// <see cref="System.Security.Cryptography.SymmetricAlgorithm.IV" />
         public override byte[] IV
         {
             get
             {
-                if (null == IVValue)
+                if (null == this.IVValue)
                 {
-                    GenerateIV();
+                    this.GenerateIV();
                 }
-                return (byte[])IVValue.Clone();
+                return (byte[]) this.IVValue.Clone();
             }
             set
             {
@@ -1291,221 +1352,104 @@ namespace LLCryptoLib.Crypto
                 {
                     throw new CryptographicException("Invalid IV length");
                 }
-                IVValue = (byte[])value.Clone();
+                this.IVValue = (byte[]) value.Clone();
             }
         }
 
         /// <summary>
-        /// Gets or sets the secret key for the symmetric algorithm.
+        ///     Gets or sets the secret key for the symmetric algorithm.
         /// </summary>
         /// <value></value>
-        /// <see cref="System.Security.Cryptography.SymmetricAlgorithm.Key"/>
+        /// <see cref="System.Security.Cryptography.SymmetricAlgorithm.Key" />
         public override byte[] Key
         {
-            get
-            {
-                return KeyValue;
-            }
-            set
-            {
-                KeyValue = value;
-            }
+            get { return this.KeyValue; }
+            set { this.KeyValue = value; }
         }
 
         /// <summary>
-        /// Gets or sets the size, in bits, of the secret key used by the symmetric algorithm.
+        ///     Gets or sets the size, in bits, of the secret key used by the symmetric algorithm.
         /// </summary>
         /// <value></value>
-        /// <see cref="System.Security.Cryptography.SymmetricAlgorithm.KeySize"/>
+        /// <see cref="System.Security.Cryptography.SymmetricAlgorithm.KeySize" />
         public override int KeySize
         {
-            get
-            {
-                return KeySizeValue;
-            }
+            get { return this.KeySizeValue; }
             set
             {
-                KeySizes ks = LegalKeySizes[0];
+                KeySizes ks = this.LegalKeySizes[0];
 
-                if ((0 != (value % ks.SkipSize)) ||
+                if ((0 != value%ks.SkipSize) ||
                     (value > ks.MaxSize) ||
                     (value < ks.MinSize))
                 {
                     throw new CryptographicException("Invalid key size");
                 }
-                KeySizeValue = value;
+                this.KeySizeValue = value;
             }
         }
 
         /// <summary>
-        /// Gets or sets the mode for operation of the symmetric algorithm.
+        ///     Gets or sets the mode for operation of the symmetric algorithm.
         /// </summary>
         /// <value></value>
-        /// <see cref="System.Security.Cryptography.SymmetricAlgorithm.Mode"/>
+        /// <see cref="System.Security.Cryptography.SymmetricAlgorithm.Mode" />
         public override CipherMode Mode
         {
-            get
-            {
-                return ModeValue;
-            }
+            get { return this.ModeValue; }
             set
             {
-                if (value != CipherMode.CBC &&
-                    value != CipherMode.ECB)
+                if ((value != CipherMode.CBC) &&
+                    (value != CipherMode.ECB))
                 {
                     throw new CryptographicException("Invalid cipher mode");
                 }
-                ModeValue = value;
-            }
-        }
-
-        void CopyPadding(BlowfishManaged ba)
-        {
-            switch (Padding)
-            {
-                case PaddingMode.ANSIX923:
-                case PaddingMode.ISO10126:
-                case PaddingMode.PKCS7:
-                case PaddingMode.Zeros:
-                    {
-                        ba.Padding = Padding;
-                        break;
-                    }
-                default:
-                    {
-                        throw new CryptographicException("Unsupported padding mode");
-                    }
+                this.ModeValue = value;
             }
         }
 
         /// <summary>
-        /// Creates the encryptor.
-        /// </summary>
-        /// <param name="rgbKey">The key.</param>
-        /// <param name="rgbIV">The iv.</param>
-        /// <returns></returns>
-        /// <see cref="System.Security.Cryptography.SymmetricAlgorithm.CreateEncryptor(byte[], byte[])"/>
-        public override ICryptoTransform CreateEncryptor(
-            byte[] rgbKey,
-            byte[] rgbIV)
-        {
-            BlowfishManaged result = new BlowfishManaged(
-                rgbKey,
-                rgbIV,
-                (CipherMode.CBC == ModeValue),
-                true);
-
-            CopyPadding(result);
-            return result;
-        }
-
-        /// <summary>
-        /// Creates the decryptor.
-        /// </summary>
-        /// <param name="key">The key.</param>
-        /// <param name="iv">The iv.</param>
-        /// <returns></returns>
-        /// <see cref="System.Security.Cryptography.SymmetricAlgorithm.CreateDecryptor(byte[], byte[])"/>
-        public override ICryptoTransform CreateDecryptor(
-            byte[] key,
-            byte[] iv)
-        {
-            BlowfishManaged result = new BlowfishManaged(
-                key,
-                iv,
-                (CipherMode.CBC == ModeValue),
-                false);
-
-            CopyPadding(result);
-            return result;
-        }
-
-        /// <summary>
-        /// When overridden in a derived class, generates a random key (<see cref="P:System.Security.Cryptography.SymmetricAlgorithm.Key"/>) to use for the algorithm.
-        /// </summary>
-        /// <see cref="System.Security.Cryptography.SymmetricAlgorithm.GenerateKey"/>
-        public override void GenerateKey()
-        {
-            if (null == this.rng)
-            {
-                this.rng = new RNGCryptoServiceProvider();
-            }
-
-            KeyValue = new byte[KeySizeValue >> 3];
-
-            this.rng.GetBytes(KeyValue);
-        }
-
-        /// <summary>
-        /// When overridden in a derived class, generates a random initialization vector (<see cref="P:System.Security.Cryptography.SymmetricAlgorithm.IV"/>) to use for the algorithm.
-        /// </summary>
-        /// <see cref="System.Security.Cryptography.SymmetricAlgorithm.GenerateIV"/>
-        public override void GenerateIV()
-        {
-            if (null == this.rng)
-            {
-                this.rng = new RNGCryptoServiceProvider();
-            }
-
-            IVValue = new byte[BlowfishECB.BLOCK_SIZE];
-
-            this.rng.GetBytes(IVValue);
-        }
-
-        /// <summary>
-        /// Gets a value indicating whether the current transform can be reused.
+        ///     Gets a value indicating whether the current transform can be reused.
         /// </summary>
         /// <value></value>
-        /// <see cref="System.Security.Cryptography.ICryptoTransform.CanReuseTransform"/>
+        /// <see cref="System.Security.Cryptography.ICryptoTransform.CanReuseTransform" />
         public bool CanReuseTransform
         {
-            get
-            {
-                return true;
-            }
+            get { return true; }
         }
 
         /// <summary>
-        /// Gets a value indicating whether multiple blocks can be transformed.
+        ///     Gets a value indicating whether multiple blocks can be transformed.
         /// </summary>
         /// <value></value>
-        /// <see cref="System.Security.Cryptography.ICryptoTransform.CanTransformMultipleBlocks"/>
+        /// <see cref="System.Security.Cryptography.ICryptoTransform.CanTransformMultipleBlocks" />
         public bool CanTransformMultipleBlocks
         {
-            get
-            {
-                return true;
-            }
+            get { return true; }
         }
 
         /// <summary>
-        /// Gets the input block size.
+        ///     Gets the input block size.
         /// </summary>
         /// <value></value>
-        /// <see cref="System.Security.Cryptography.ICryptoTransform.InputBlockSize"/>
+        /// <see cref="System.Security.Cryptography.ICryptoTransform.InputBlockSize" />
         public int InputBlockSize
         {
-            get
-            {
-                return BlowfishECB.BLOCK_SIZE;
-            }
+            get { return BlowfishECB.BLOCK_SIZE; }
         }
 
         /// <summary>
-        /// Gets the output block size.
+        ///     Gets the output block size.
         /// </summary>
         /// <value></value>
-        /// <see cref="System.Security.Cryptography.ICryptoTransform.OutputBlockSize"/>
+        /// <see cref="System.Security.Cryptography.ICryptoTransform.OutputBlockSize" />
         public int OutputBlockSize
         {
-            get
-            {
-                return BlowfishECB.BLOCK_SIZE;
-            }
+            get { return BlowfishECB.BLOCK_SIZE; }
         }
 
         /// <summary>
-        /// Transforms the block.
+        ///     Transforms the block.
         /// </summary>
         /// <param name="inputBuffer">The input for which to compute the transform.</param>
         /// <param name="inputOffset">The offset into the input byte array from which to begin using data.</param>
@@ -1513,65 +1457,67 @@ namespace LLCryptoLib.Crypto
         /// <param name="outputBuffer">The output to which to write the transform.</param>
         /// <param name="outputOffset">The offset into the output byte array from which to begin writing data.</param>
         /// <returns>The number of bytes written.</returns>
-        /// <see cref="System.Security.Cryptography.ICryptoTransform.TransformBlock"/>
-        public int TransformBlock(byte[] inputBuffer, int inputOffset, int inputCount, byte[] outputBuffer, int outputOffset)
+        /// <see cref="System.Security.Cryptography.ICryptoTransform.TransformBlock" />
+        public int TransformBlock(byte[] inputBuffer, int inputOffset, int inputCount, byte[] outputBuffer,
+            int outputOffset)
         {
             if (0 == inputCount)
             {
                 return 0;
             }
-            if (0 != inputCount % BlowfishECB.BLOCK_SIZE)
+            if (0 != inputCount%BlowfishECB.BLOCK_SIZE)
             {
                 throw new CryptographicException("unexpected unaligned data");
             }
             if (this.isEncryptor)
             {
-                if (null == this.bfe) return this.bfc.Encrypt(inputBuffer, inputOffset, outputBuffer, outputOffset, inputCount);
-                else return this.bfe.Encrypt(inputBuffer, inputOffset, outputBuffer, outputOffset, inputCount);
+                if (null == this.bfe)
+                    return this.bfc.Encrypt(inputBuffer, inputOffset, outputBuffer, outputOffset, inputCount);
+                return this.bfe.Encrypt(inputBuffer, inputOffset, outputBuffer, outputOffset, inputCount);
+            }
+            // for decryption we have to buffer the last block, since it could be the very last one
+            int offset = 0;
+            if (null == this.block)
+            {
+                this.block = new byte[BlowfishECB.BLOCK_SIZE];
             }
             else
             {
-                // for decryption we have to buffer the last block, since it could be the very last one
-                int offset = 0;
-                if (null == this.block)
-                {
-                    this.block = new byte[BlowfishECB.BLOCK_SIZE];
-                }
-                else
-                {
-                    // and also flush the former last one
-                    if (null == this.bfe) this.bfc.Decrypt(this.block, 0, outputBuffer, outputOffset, BlowfishECB.BLOCK_SIZE);
-                    else this.bfe.Decrypt(this.block, 0, outputBuffer, outputOffset, BlowfishECB.BLOCK_SIZE);
-                    outputOffset += BlowfishECB.BLOCK_SIZE;
-                    offset += BlowfishECB.BLOCK_SIZE;
-                }
-                inputCount -= BlowfishECB.BLOCK_SIZE;
-                // keep the last block as _ciphertext_ (for safety reasons)
-                Array.Copy(inputBuffer, inputOffset + inputCount, this.block, 0, this.block.Length);
-
-                int processedBytes = 0;
-
+                // and also flush the former last one
                 if (null == this.bfe)
-                {
-                    processedBytes = offset + this.bfc.Decrypt(inputBuffer, inputOffset, outputBuffer, outputOffset, inputCount);
-                }
-                else
-                {
-                    processedBytes = offset + this.bfe.Decrypt(inputBuffer, inputOffset, outputBuffer, outputOffset, inputCount);
-                }
-
-                return processedBytes;
+                    this.bfc.Decrypt(this.block, 0, outputBuffer, outputOffset, BlowfishECB.BLOCK_SIZE);
+                else this.bfe.Decrypt(this.block, 0, outputBuffer, outputOffset, BlowfishECB.BLOCK_SIZE);
+                outputOffset += BlowfishECB.BLOCK_SIZE;
+                offset += BlowfishECB.BLOCK_SIZE;
             }
+            inputCount -= BlowfishECB.BLOCK_SIZE;
+            // keep the last block as _ciphertext_ (for safety reasons)
+            Array.Copy(inputBuffer, inputOffset + inputCount, this.block, 0, this.block.Length);
+
+            int processedBytes = 0;
+
+            if (null == this.bfe)
+            {
+                processedBytes = offset +
+                                 this.bfc.Decrypt(inputBuffer, inputOffset, outputBuffer, outputOffset, inputCount);
+            }
+            else
+            {
+                processedBytes = offset +
+                                 this.bfe.Decrypt(inputBuffer, inputOffset, outputBuffer, outputOffset, inputCount);
+            }
+
+            return processedBytes;
         }
 
         /// <summary>
-        /// Transforms the final block.
+        ///     Transforms the final block.
         /// </summary>
         /// <param name="inputBuffer">The input for which to compute the transform.</param>
         /// <param name="inputOffset">The offset into the byte array from which to begin using data.</param>
         /// <param name="inputCount">The number of bytes in the byte array to use as data.</param>
         /// <returns>The computed transform.</returns>
-        /// <see cref="System.Security.Cryptography.ICryptoTransform.TransformFinalBlock"/>
+        /// <see cref="System.Security.Cryptography.ICryptoTransform.TransformFinalBlock" />
         public byte[] TransformFinalBlock(byte[] inputBuffer, int inputOffset, int inputCount)
         {
             int outputBufferLen, rest, i;
@@ -1586,24 +1532,24 @@ namespace LLCryptoLib.Crypto
             if (this.isEncryptor)
             {
                 outputBufferLen = BlowfishECB.BLOCK_SIZE +
-                        (BlowfishECB.BLOCK_SIZE == inputCount ? BlowfishECB.BLOCK_SIZE : 0);
+                                  (BlowfishECB.BLOCK_SIZE == inputCount ? BlowfishECB.BLOCK_SIZE : 0);
                 outputBuffer = new byte[outputBufferLen];
 
-                if (PaddingMode.PKCS7 == PaddingValue)
+                if (PaddingMode.PKCS7 == this.PaddingValue)
                 {
-                    pval = (byte)(outputBufferLen - inputCount);
+                    pval = (byte) (outputBufferLen - inputCount);
                     for (i = inputCount; i < outputBufferLen; i++) outputBuffer[i] = pval;
                 }
-                else if (PaddingMode.Zeros == PaddingValue)
+                else if (PaddingMode.Zeros == this.PaddingValue)
                 {
                     for (i = inputCount; i < outputBufferLen; i++) outputBuffer[i] = 0;
                 }
-                else if (PaddingMode.ANSIX923 == PaddingValue)
+                else if (PaddingMode.ANSIX923 == this.PaddingValue)
                 {
                     for (i = inputCount; i < outputBufferLen - 1; i++) outputBuffer[i] = 0;
-                    outputBuffer[outputBufferLen - 1] = (byte)(outputBufferLen - inputCount);
+                    outputBuffer[outputBufferLen - 1] = (byte) (outputBufferLen - inputCount);
                 }
-                else if (PaddingMode.ISO10126 == PaddingValue)
+                else if (PaddingMode.ISO10126 == this.PaddingValue)
                 {
                     RandomNumberGenerator.Create().GetBytes(outputBuffer);
                 }
@@ -1638,10 +1584,10 @@ namespace LLCryptoLib.Crypto
                 else this.bfe.Decrypt(tmp, 0, tmp, 0, BlowfishECB.BLOCK_SIZE);
 
                 // make sure the padding looks ok as far as we can tell
-                if (PaddingMode.PKCS7 == PaddingValue)
+                if (PaddingMode.PKCS7 == this.PaddingValue)
                 {
                     pval = tmp[tmp.Length - 1];
-                    if (BlowfishECB.BLOCK_SIZE < (int)pval)
+                    if (BlowfishECB.BLOCK_SIZE < pval)
                     {
                         throw new CryptographicException("INVALID_PADVAL_PKCS7_1");
                     }
@@ -1654,13 +1600,13 @@ namespace LLCryptoLib.Crypto
                         }
                     }
                 }
-                else if (PaddingMode.Zeros == PaddingValue ||
-                         PaddingMode.ISO10126 == PaddingValue)
+                else if ((PaddingMode.Zeros == this.PaddingValue) ||
+                         (PaddingMode.ISO10126 == this.PaddingValue))
                 {
                     // (there's no real way of telling, since the plaintext could be padding or vice versa)
                     rest = tmp.Length;
                 }
-                else if (PaddingMode.ANSIX923 == PaddingValue)
+                else if (PaddingMode.ANSIX923 == this.PaddingValue)
                 {
                     pval = tmp[tmp.Length - 1];
                     if (BlowfishECB.BLOCK_SIZE < pval)
@@ -1695,6 +1641,101 @@ namespace LLCryptoLib.Crypto
             }
 
             return outputBuffer;
+        }
+
+        private void CopyPadding(BlowfishManaged ba)
+        {
+            switch (this.Padding)
+            {
+                case PaddingMode.ANSIX923:
+                case PaddingMode.ISO10126:
+                case PaddingMode.PKCS7:
+                case PaddingMode.Zeros:
+                {
+                    ba.Padding = this.Padding;
+                    break;
+                }
+                default:
+                {
+                    throw new CryptographicException("Unsupported padding mode");
+                }
+            }
+        }
+
+        /// <summary>
+        ///     Creates the encryptor.
+        /// </summary>
+        /// <param name="rgbKey">The key.</param>
+        /// <param name="rgbIV">The iv.</param>
+        /// <returns></returns>
+        /// <see cref="System.Security.Cryptography.SymmetricAlgorithm.CreateEncryptor(byte[], byte[])" />
+        public override ICryptoTransform CreateEncryptor(
+            byte[] rgbKey,
+            byte[] rgbIV)
+        {
+            BlowfishManaged result = new BlowfishManaged(
+                rgbKey,
+                rgbIV,
+                CipherMode.CBC == this.ModeValue,
+                true);
+
+            this.CopyPadding(result);
+            return result;
+        }
+
+        /// <summary>
+        ///     Creates the decryptor.
+        /// </summary>
+        /// <param name="key">The key.</param>
+        /// <param name="iv">The iv.</param>
+        /// <returns></returns>
+        /// <see cref="System.Security.Cryptography.SymmetricAlgorithm.CreateDecryptor(byte[], byte[])" />
+        public override ICryptoTransform CreateDecryptor(
+            byte[] key,
+            byte[] iv)
+        {
+            BlowfishManaged result = new BlowfishManaged(
+                key,
+                iv,
+                CipherMode.CBC == this.ModeValue,
+                false);
+
+            this.CopyPadding(result);
+            return result;
+        }
+
+        /// <summary>
+        ///     When overridden in a derived class, generates a random key (
+        ///     <see cref="P:System.Security.Cryptography.SymmetricAlgorithm.Key" />) to use for the algorithm.
+        /// </summary>
+        /// <see cref="System.Security.Cryptography.SymmetricAlgorithm.GenerateKey" />
+        public override void GenerateKey()
+        {
+            if (null == this.rng)
+            {
+                this.rng = new RNGCryptoServiceProvider();
+            }
+
+            this.KeyValue = new byte[this.KeySizeValue >> 3];
+
+            this.rng.GetBytes(this.KeyValue);
+        }
+
+        /// <summary>
+        ///     When overridden in a derived class, generates a random initialization vector (
+        ///     <see cref="P:System.Security.Cryptography.SymmetricAlgorithm.IV" />) to use for the algorithm.
+        /// </summary>
+        /// <see cref="System.Security.Cryptography.SymmetricAlgorithm.GenerateIV" />
+        public override void GenerateIV()
+        {
+            if (null == this.rng)
+            {
+                this.rng = new RNGCryptoServiceProvider();
+            }
+
+            this.IVValue = new byte[BlowfishECB.BLOCK_SIZE];
+
+            this.rng.GetBytes(this.IVValue);
         }
     }
 }

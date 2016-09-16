@@ -1,33 +1,8 @@
-/*
- * LLCryptoLib - Advanced .NET Encryption and Hashing Library
- * v.$id$
- * 
- * The contents of this file are subject to the license distributed with
- * the package (the License). This file cannot be distributed without the 
- * original LittleLite Software license file. The distribution of this
- * file is subject to the agreement between the licensee and LittleLite
- * Software.
- * 
- * Customer that has purchased Source Code License may alter this
- * file and distribute the modified binary redistributables with applications. 
- * Except as expressly authorized in the License, customer shall not rent,
- * lease, distribute, sell, make available for download of this file. 
- * 
- * This software is not Open Source, nor Free. Its usage must adhere
- * with the License obtained from LittleLite Software.
- * 
- * The source code in this file may be derived, all or in part, from existing
- * other source code, where the original license permit to do so.
- * 
- * Copyright (C) 2003-2014 LittleLite Software
- * 
- */
-
 using System;
 using System.Collections.Generic;
+
 namespace LLCryptoLib.Shred
 {
-
 #if MONO
 	internal class Strings
 	{
@@ -45,54 +20,53 @@ namespace LLCryptoLib.Shred
 		internal const String S00012 = "Gutmann";
 		internal const String S00013 = "Overwrite the file area 36 times, following the Gutmann standard recommendations.";
 	}
-#endif 
+#endif
 
 
-	/// <summary>
-	/// ShredMethod is a struct describing the shredding methods and
-	/// a factory of ShredMethod objects.
-	/// </summary>
-	public static class ShredMethods
-	{
+    /// <summary>
+    ///     ShredMethod is a struct describing the shredding methods and
+    ///     a factory of ShredMethod objects.
+    /// </summary>
+    public static class ShredMethods
+    {
+        /// <summary>
+        ///     Get a shred method
+        /// </summary>
+        /// <param name="shred">Enumeration shred methods</param>
+        /// <returns>The shred method object</returns>
+        public static IShredMethod Get(AvailableShred shred)
+        {
+            IShredMethod m = null;
 
-		/// <summary>
-		/// Get a shred method
-		/// </summary>
-		/// <param name="shred">Enumeration shred methods</param>
-		/// <returns>The shred method object</returns>
-		public static IShredMethod Get(AvailableShred shred)
-		{
-			IShredMethod m = null; 
+            switch (shred)
+            {
+                case AvailableShred.NOTHING:
+                    m = new ShredNothing();
+                    break;
 
-			switch (shred)
-			{
-				case AvailableShred.NOTHING:
-					m = new ShredNothing();
-					break;
+                case AvailableShred.SIMPLE:
+                    m = new ShredSimple();
+                    break;
 
-				case AvailableShred.SIMPLE:
-					m = new ShredSimple();
-					break;
+                case AvailableShred.COMPLEX:
+                    m = new ShredComplex();
+                    break;
 
-				case AvailableShred.COMPLEX:
-					m = new ShredComplex();
-					break;
+                case AvailableShred.RANDOM:
+                    m = new ShredRandom();
+                    break;
 
-				case AvailableShred.RANDOM:
-					m = new ShredRandom();
-					break;
-
-				case AvailableShred.DOD:
-					m = new ShredDOD();
-					break;
+                case AvailableShred.DOD:
+                    m = new ShredDOD();
+                    break;
 
                 case AvailableShred.HMGIS5ENH:
                     m = new ShredHmgEnh();
                     break;
 
-				case AvailableShred.GUTMANN:
-					m = new ShredGutmann();
-					break;
+                case AvailableShred.GUTMANN:
+                    m = new ShredGutmann();
+                    break;
 
                 case AvailableShred.GERMAN:
                     m = new ShredGermanVSITR();
@@ -100,56 +74,53 @@ namespace LLCryptoLib.Shred
 
                 default:
                     throw new LLCryptoLibException("Unknonw shred method.");
-			}
+            }
 
-			return m;
-		}
+            return m;
+        }
 
-		/// <summary>
-		/// Return a shred method object from a string
-		/// </summary>
-		/// <param name="method">The method name as in GetSupportedMethods</param>
-		/// <returns>A shred object</returns>
-		public static IShredMethod FromString(string method)
-		{
-			IShredMethod m = null; 
+        /// <summary>
+        ///     Return a shred method object from a string
+        /// </summary>
+        /// <param name="method">The method name as in GetSupportedMethods</param>
+        /// <returns>A shred object</returns>
+        public static IShredMethod FromString(string method)
+        {
+            IShredMethod m = null;
 
-			if (method == null)
-			{
-				System.Diagnostics.Debug.WriteLine(">>> Method not input, defaulting to PseudoRandom!!");
-				m = new ShredRandom();
-			}
-			else
-			{
+            if (method == null)
+            {
+                System.Diagnostics.Debug.WriteLine(">>> Method not input, defaulting to PseudoRandom!!");
+                m = new ShredRandom();
+            }
+            else
+            {
                 foreach (AvailableShred xx in Enum.GetValues(typeof(AvailableShred)))
                 {
-                    m = ShredMethods.Get(xx);
+                    m = Get(xx);
                     if (m.ToString().Equals(method))
                     {
                         break;
                     }
                 }
-			}
+            }
 
-			return m;
+            return m;
+        }
 
-		}
-
-		/// <summary>
-		/// Supported methods
-		/// </summary>
-		/// <returns>String array containing the supported methods</returns>
-		public static string[] GetSupportedMethods()
-		{
+        /// <summary>
+        ///     Supported methods
+        /// </summary>
+        /// <returns>String array containing the supported methods</returns>
+        public static string[] GetSupportedMethods()
+        {
             List<string> methods = new List<string>();
             foreach (AvailableShred xx in Enum.GetValues(typeof(AvailableShred)))
             {
-                IShredMethod sb = ShredMethods.Get(xx);
+                IShredMethod sb = Get(xx);
                 methods.Add(sb.ToString());
             }
             return methods.ToArray();
-		}
-
-	}
-
+        }
+    }
 }

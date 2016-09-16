@@ -1,77 +1,68 @@
-﻿/*
- * LLCryptoLib - Advanced .NET Encryption and Hashing Library
- * v.$id$
- * 
- * The contents of this file are subject to the license distributed with
- * the package (the License). This file cannot be distributed without the 
- * original LittleLite Software license file. The distribution of this
- * file is subject to the agreement between the licensee and LittleLite
- * Software.
- * 
- * Customer that has purchased Source Code License may alter this
- * file and distribute the modified binary redistributables with applications. 
- * Except as expressly authorized in the License, customer shall not rent,
- * lease, distribute, sell, make available for download of this file. 
- * 
- * This software is not Open Source, nor Free. Its usage must adhere
- * with the License obtained from LittleLite Software.
- * 
- * The source code in this file may be derived, all or in part, from existing
- * other source code, where the original license permit to do so.
- * 
- * 
- * Copyright (C) 2003-2014 LittleLite Software
- * 
- */
-
-namespace LLCryptoLib.Crypto
+﻿namespace LLCryptoLib.Crypto
 {
     /// <summary>
-    /// Threefish 1024 bit implementation.
+    ///     Threefish 1024 bit implementation.
     /// </summary>
     internal class Threefish1024 : ThreefishCipher
     {
-        const int CIPHER_SIZE = 1024;
-        const int CIPHER_QWORDS = CIPHER_SIZE / 64;
-        const int EXPANDED_KEY_SIZE = CIPHER_QWORDS + 1;
+        private const int CIPHER_SIZE = 1024;
+        private const int CIPHER_QWORDS = CIPHER_SIZE/64;
+        private const int EXPANDED_KEY_SIZE = CIPHER_QWORDS + 1;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Threefish1024"/> class.
+        ///     Initializes a new instance of the <see cref="Threefish1024" /> class.
         /// </summary>
         public Threefish1024()
         {
             // Create the expanded key array
-            ExpandedKey = new ulong[EXPANDED_KEY_SIZE];
-            ExpandedKey[EXPANDED_KEY_SIZE - 1] = KeyScheduleConst;
+            this.ExpandedKey = new ulong[EXPANDED_KEY_SIZE];
+            this.ExpandedKey[EXPANDED_KEY_SIZE - 1] = KeyScheduleConst;
         }
 
         /// <summary>
-        /// Encrypts the specified input.
+        ///     Encrypts the specified input.
         /// </summary>
         /// <param name="input">The input.</param>
         /// <param name="output">The output.</param>
         public override void Encrypt(ulong[] input, ulong[] output)
         {
             // Cache the block, key, and tweak
-            ulong b0 = input[0], b1 = input[1],
-                  b2 = input[2], b3 = input[3],
-                  b4 = input[4], b5 = input[5],
-                  b6 = input[6], b7 = input[7],
-                  b8 = input[8], b9 = input[9],
-                  b10 = input[10], b11 = input[11],
-                  b12 = input[12], b13 = input[13],
-                  b14 = input[14], b15 = input[15];
-            ulong k0 = ExpandedKey[0], k1 = ExpandedKey[1],
-                  k2 = ExpandedKey[2], k3 = ExpandedKey[3],
-                  k4 = ExpandedKey[4], k5 = ExpandedKey[5],
-                  k6 = ExpandedKey[6], k7 = ExpandedKey[7],
-                  k8 = ExpandedKey[8], k9 = ExpandedKey[9],
-                  k10 = ExpandedKey[10], k11 = ExpandedKey[11],
-                  k12 = ExpandedKey[12], k13 = ExpandedKey[13],
-                  k14 = ExpandedKey[14], k15 = ExpandedKey[15],
-                  k16 = ExpandedKey[16];
-            ulong t0 = ExpandedTweak[0], t1 = ExpandedTweak[1],
-                  t2 = ExpandedTweak[2];
+            ulong b0 = input[0],
+                b1 = input[1],
+                b2 = input[2],
+                b3 = input[3],
+                b4 = input[4],
+                b5 = input[5],
+                b6 = input[6],
+                b7 = input[7],
+                b8 = input[8],
+                b9 = input[9],
+                b10 = input[10],
+                b11 = input[11],
+                b12 = input[12],
+                b13 = input[13],
+                b14 = input[14],
+                b15 = input[15];
+            ulong k0 = this.ExpandedKey[0],
+                k1 = this.ExpandedKey[1],
+                k2 = this.ExpandedKey[2],
+                k3 = this.ExpandedKey[3],
+                k4 = this.ExpandedKey[4],
+                k5 = this.ExpandedKey[5],
+                k6 = this.ExpandedKey[6],
+                k7 = this.ExpandedKey[7],
+                k8 = this.ExpandedKey[8],
+                k9 = this.ExpandedKey[9],
+                k10 = this.ExpandedKey[10],
+                k11 = this.ExpandedKey[11],
+                k12 = this.ExpandedKey[12],
+                k13 = this.ExpandedKey[13],
+                k14 = this.ExpandedKey[14],
+                k15 = this.ExpandedKey[15],
+                k16 = this.ExpandedKey[16];
+            ulong t0 = this.ExpandedTweak[0],
+                t1 = this.ExpandedTweak[1],
+                t2 = this.ExpandedTweak[2];
 
 
             Mix(ref b0, ref b1, 24, k0, k1);
@@ -737,25 +728,42 @@ namespace LLCryptoLib.Crypto
         public override void Decrypt(ulong[] input, ulong[] output)
         {
             // Cache the block, key, and tweak
-            ulong b0 = input[0], b1 = input[1],
-                  b2 = input[2], b3 = input[3],
-                  b4 = input[4], b5 = input[5],
-                  b6 = input[6], b7 = input[7],
-                  b8 = input[8], b9 = input[9],
-                  b10 = input[10], b11 = input[11],
-                  b12 = input[12], b13 = input[13],
-                  b14 = input[14], b15 = input[15];
-            ulong k0 = ExpandedKey[0], k1 = ExpandedKey[1],
-                  k2 = ExpandedKey[2], k3 = ExpandedKey[3],
-                  k4 = ExpandedKey[4], k5 = ExpandedKey[5],
-                  k6 = ExpandedKey[6], k7 = ExpandedKey[7],
-                  k8 = ExpandedKey[8], k9 = ExpandedKey[9],
-                  k10 = ExpandedKey[10], k11 = ExpandedKey[11],
-                  k12 = ExpandedKey[12], k13 = ExpandedKey[13],
-                  k14 = ExpandedKey[14], k15 = ExpandedKey[15],
-                  k16 = ExpandedKey[16];
-            ulong t0 = ExpandedTweak[0], t1 = ExpandedTweak[1],
-                  t2 = ExpandedTweak[2];
+            ulong b0 = input[0],
+                b1 = input[1],
+                b2 = input[2],
+                b3 = input[3],
+                b4 = input[4],
+                b5 = input[5],
+                b6 = input[6],
+                b7 = input[7],
+                b8 = input[8],
+                b9 = input[9],
+                b10 = input[10],
+                b11 = input[11],
+                b12 = input[12],
+                b13 = input[13],
+                b14 = input[14],
+                b15 = input[15];
+            ulong k0 = this.ExpandedKey[0],
+                k1 = this.ExpandedKey[1],
+                k2 = this.ExpandedKey[2],
+                k3 = this.ExpandedKey[3],
+                k4 = this.ExpandedKey[4],
+                k5 = this.ExpandedKey[5],
+                k6 = this.ExpandedKey[6],
+                k7 = this.ExpandedKey[7],
+                k8 = this.ExpandedKey[8],
+                k9 = this.ExpandedKey[9],
+                k10 = this.ExpandedKey[10],
+                k11 = this.ExpandedKey[11],
+                k12 = this.ExpandedKey[12],
+                k13 = this.ExpandedKey[13],
+                k14 = this.ExpandedKey[14],
+                k15 = this.ExpandedKey[15],
+                k16 = this.ExpandedKey[16];
+            ulong t0 = this.ExpandedTweak[0],
+                t1 = this.ExpandedTweak[1],
+                t2 = this.ExpandedTweak[2];
 
             b0 -= k3;
             b1 -= k4;

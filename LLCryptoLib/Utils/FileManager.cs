@@ -1,28 +1,3 @@
-/*
- * LLCryptoLib - Advanced .NET Encryption and Hashing Library
- * v.$id$
- * 
- * The contents of this file are subject to the license distributed with
- * the package (the License). This file cannot be distributed without the 
- * original LittleLite Software license file. The distribution of this
- * file is subject to the agreement between the licensee and LittleLite
- * Software.
- * 
- * Customer that has purchased Source Code License may alter this
- * file and distribute the modified binary redistributables with applications. 
- * Except as expressly authorized in the License, customer shall not rent,
- * lease, distribute, sell, make available for download of this file. 
- * 
- * This software is not Open Source, nor Free. Its usage must adhere
- * with the License obtained from LittleLite Software.
- * 
- * The source code in this file may be derived, all or in part, from existing
- * other source code, where the original license permit to do so.
- * 
- * Copyright (C) 2003-2014 LittleLite Software
- * 
- */
-
 using System;
 using System.IO;
 using System.Text;
@@ -31,23 +6,22 @@ using System.Text.RegularExpressions;
 namespace LLCryptoLib.Utils
 {
     /// <summary>
-    /// File Manager class is a singleton class that
-    /// exposes basic I/O operations, such as creating a text
-    /// file, delete a file or changing its attributes.
+    ///     File Manager class is a singleton class that
+    ///     exposes basic I/O operations, such as creating a text
+    ///     file, delete a file or changing its attributes.
     /// </summary>
     public class FileManager
     {
-
         private static FileManager fRef;
         private string errMsg;
 
         private FileManager()
         {
-            errMsg = String.Empty;
+            this.errMsg = string.Empty;
         }
 
         /// <summary>
-        /// Error Message. Every time it's called, reset ErrorMessage to "".
+        ///     Error Message. Every time it's called, reset ErrorMessage to "".
         /// </summary>
         /// <value>The error message.</value>
         public string ErrorMessage
@@ -55,31 +29,47 @@ namespace LLCryptoLib.Utils
             get
             {
                 string err = this.errMsg;
-                this.errMsg = String.Empty;
+                this.errMsg = string.Empty;
                 return err;
             }
         }
 
         /// <summary>
-        /// Check if filename is valid (does not contain invalid characters)
+        ///     Get the only instance of this class (singleton).
+        /// </summary>
+        /// <returns>Handle to FileManager object</returns>
+        public static FileManager Reference
+        {
+            get
+            {
+                if (fRef == null)
+                {
+                    fRef = new FileManager();
+                }
+                return fRef;
+            }
+        }
+
+        /// <summary>
+        ///     Check if filename is valid (does not contain invalid characters)
         /// </summary>
         /// <param name="inputFileName">Name of the input file.</param>
         /// <returns>
-        /// 	<c>true</c> if [is filename valid] [the specified input file name]; otherwise, <c>false</c>.
+        ///     <c>true</c> if [is filename valid] [the specified input file name]; otherwise, <c>false</c>.
         /// </returns>
         public static bool IsFileNameValid(string inputFileName)
         {
             Match m = Regex.Match(inputFileName, @"[\\\/\:\*\?\" + Convert.ToChar(34) + @"\<\>\|]");
-            return !(m.Success);
+            return !m.Success;
         }
 
         /// <summary>
-        /// Write a binary file
+        ///     Write a binary file
         /// </summary>
         /// <param name="filePath">The file path.</param>
         /// <param name="contents">The file contents.</param>
         /// <returns>True if the file was correctly written</returns>
-        /// <remarks>In case this method return false, check <see cref="ErrorMessage"/></remarks>
+        /// <remarks>In case this method return false, check <see cref="ErrorMessage" /></remarks>
         public bool WriteBinaryFile(string filePath, byte[] contents)
         {
             bool okok = true;
@@ -115,7 +105,7 @@ namespace LLCryptoLib.Utils
 
 
         /// <summary>
-        /// Returns true if the given file is Read only
+        ///     Returns true if the given file is Read only
         /// </summary>
         /// <param name="fullName">Full file path</param>
         /// <returns>True if the given file is Read only</returns>
@@ -136,11 +126,11 @@ namespace LLCryptoLib.Utils
         }
 
         /// <summary>
-        /// Set the attribute read only of a file
+        ///     Set the attribute read only of a file
         /// </summary>
         /// <param name="fullName">Full path of file</param>
         /// <param name="readOnly">If true, the file will be set readonly. Else will be set writable</param>
-        /// <remarks>In case this method return false, check <see cref="ErrorMessage"/></remarks>
+        /// <remarks>In case this method return false, check <see cref="ErrorMessage" /></remarks>
         /// <returns>True, if the attribute was set</returns>
         public bool SetReadOnly(string fullName, bool readOnly)
         {
@@ -154,15 +144,14 @@ namespace LLCryptoLib.Utils
                     FileAttributes attr;
                     if (readOnly)
                     {
-                        attr = (FileAttributes)(filePath.Attributes | FileAttributes.ReadOnly);
+                        attr = filePath.Attributes | FileAttributes.ReadOnly;
                     }
                     else
                     {
-                        attr = (FileAttributes)(filePath.Attributes - FileAttributes.ReadOnly);
+                        attr = (FileAttributes) (filePath.Attributes - FileAttributes.ReadOnly);
                     }
                     File.SetAttributes(filePath.FullName, attr);
                 }
-
             }
             catch (IOException e)
             {
@@ -177,12 +166,12 @@ namespace LLCryptoLib.Utils
         }
 
         /// <summary>
-        /// Set the attribute read only of a file
+        ///     Set the attribute read only of a file
         /// </summary>
         /// <param name="fullName">Full path of file.</param>
         /// <param name="hidden">if set to <c>true</c> then the file will be hidden, else the hidden attribute will be removed.</param>
         /// <returns>True, if the attribute was set</returns>
-        /// <remarks>In case this method return false, check <see cref="ErrorMessage"/></remarks>
+        /// <remarks>In case this method return false, check <see cref="ErrorMessage" /></remarks>
         public bool SetHidden(string fullName, bool hidden)
         {
             bool success = true;
@@ -195,15 +184,14 @@ namespace LLCryptoLib.Utils
                     FileAttributes attr;
                     if (hidden)
                     {
-                        attr = (FileAttributes)(filePath.Attributes | FileAttributes.Hidden);
+                        attr = filePath.Attributes | FileAttributes.Hidden;
                     }
                     else
                     {
-                        attr = (FileAttributes)(filePath.Attributes - FileAttributes.Hidden);
+                        attr = (FileAttributes) (filePath.Attributes - FileAttributes.Hidden);
                     }
                     File.SetAttributes(filePath.FullName, attr);
                 }
-
             }
             catch (IOException e)
             {
@@ -218,16 +206,17 @@ namespace LLCryptoLib.Utils
         }
 
         /// <summary>
-        /// Read a binary file. This method reads a small binary file.
-        /// Since it does not implement a cache, it is not suitable for large files.
+        ///     Read a binary file. This method reads a small binary file.
+        ///     Since it does not implement a cache, it is not suitable for large files.
         /// </summary>
         /// <param name="filePath">Absolute Path of file to read from.</param>
         /// <example>byte[] myFile = myFileObj.ReadBinaryFile(@"C:\log.txt");</example>
-        /// <remarks>In case this method return false, check <see cref="ErrorMessage"/></remarks>
+        /// <remarks>In case this method return false, check <see cref="ErrorMessage" /></remarks>
         /// <returns>Byte contents of the file.</returns>
         /// <exception cref="LLCryptoLibException">Input file too long</exception>
         /// <exception cref="ArgumentNullException" />
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:DisposeObjectsBeforeLosingScope")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability",
+             "CA2000:DisposeObjectsBeforeLosingScope")]
         public byte[] ReadBinaryFile(string filePath)
         {
             if (filePath == null)
@@ -251,12 +240,12 @@ namespace LLCryptoLib.Utils
                     bufs = null;
                     long lFile = bs.BaseStream.Length;
 
-                    if (lFile > Int32.MaxValue) // if file > 2GB
+                    if (lFile > int.MaxValue) // if file > 2GB
                     {
                         throw new LLCryptoLibException("Input file too long");
                     }
 
-                    file = bs.ReadBytes((int)lFile);
+                    file = bs.ReadBytes((int) lFile);
                     this.errMsg = "";
                 }
             }
@@ -285,12 +274,13 @@ namespace LLCryptoLib.Utils
         }
 
         /// <summary>
-        /// Reads a text file.
+        ///     Reads a text file.
         /// </summary>
         /// <param name="filePath">The file path.</param>
-        /// <remarks>In case this method return 'null', check <see cref="ErrorMessage"/>.</remarks>
+        /// <remarks>In case this method return 'null', check <see cref="ErrorMessage" />.</remarks>
         /// <returns>The content of the read file as a string.</returns>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:DisposeObjectsBeforeLosingScope")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability",
+             "CA2000:DisposeObjectsBeforeLosingScope")]
         public string ReadTextFile(string filePath)
         {
             TextReader tr = null;
@@ -314,14 +304,14 @@ namespace LLCryptoLib.Utils
         }
 
         /// <summary>
-        /// Reads a text file.
+        ///     Reads a text file.
         /// </summary>
         /// <param name="filePath">The file path.</param>
         /// <param name="enc">The text encoding.</param>
         /// <returns>
-        /// The content of the read file as a string.
+        ///     The content of the read file as a string.
         /// </returns>
-        /// <remarks>In case this method return 'null', check <see cref="ErrorMessage"/>.</remarks>
+        /// <remarks>In case this method return 'null', check <see cref="ErrorMessage" />.</remarks>
         public string ReadTextFile(string filePath, Encoding enc)
         {
             if (enc == null)
@@ -334,7 +324,8 @@ namespace LLCryptoLib.Utils
 
             try
             {
-                fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.None, 8192); //we use the default buffer
+                fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.None, 8192);
+                    //we use the default buffer
                 StringBuilder result = new StringBuilder(8192);
                 byte[] buffer = new byte[8192];
                 int count = fs.Read(buffer, 0, 8192); //reading a block from the file
@@ -346,7 +337,6 @@ namespace LLCryptoLib.Utils
                 }
 
                 retStr = result.ToString();
-
             }
             catch (IOException e)
             {
@@ -365,7 +355,7 @@ namespace LLCryptoLib.Utils
         }
 
         /// <summary>
-        /// Rename a file
+        ///     Rename a file
         /// </summary>
         /// <param name="pathSource">Complete path of the file to be renamed</param>
         /// <param name="newname">New name of the file - without path</param>
@@ -389,7 +379,7 @@ namespace LLCryptoLib.Utils
         }
 
         /// <summary>
-        /// Reads a Text File
+        ///     Reads a Text File
         /// </summary>
         /// <param name="absolutePath">Absolute Path of file to read from</param>
         /// <returns>Text Contents of the file</returns>
@@ -399,7 +389,7 @@ namespace LLCryptoLib.Utils
         }
 
         /// <summary>
-        /// Reads a Text File
+        ///     Reads a Text File
         /// </summary>
         /// <param name="absolutePath">Absolute Path of file to read from</param>
         /// <param name="enc">Encoding of the text file. Use Encoding static members.</param>
@@ -413,7 +403,7 @@ namespace LLCryptoLib.Utils
             {
                 objReader = new StreamReader(absolutePath, enc, false, 1024);
                 sb.Append(objReader.ReadToEnd());
-                errMsg = "";
+                this.errMsg = "";
             }
             catch (IOException e)
             {
@@ -435,7 +425,7 @@ namespace LLCryptoLib.Utils
         }
 
         /// <summary>
-        /// Returns the number of lines inside a text file
+        ///     Returns the number of lines inside a text file
         /// </summary>
         /// <param name="absolutePath">The absolute path.</param>
         /// <returns>The number of lines inside a text file</returns>
@@ -453,7 +443,6 @@ namespace LLCryptoLib.Utils
                 {
                     ++lines;
                 }
-
             }
             catch (IOException e)
             {
@@ -472,23 +461,22 @@ namespace LLCryptoLib.Utils
             }
 
             return lines;
-
         }
 
         /// <summary>
-        /// Reads a Text File Line by Line. Return an array of strings,
-        /// using the default encoding.
+        ///     Reads a Text File Line by Line. Return an array of strings,
+        ///     using the default encoding.
         /// </summary>
         /// <param name="absolutePath">Absolute Path of file to read from</param>
         /// <returns>Text Contents of the file (one string per line)</returns>
         public string[] ReadFileLines(string absolutePath)
         {
-            return (this.ReadFileLines(absolutePath, Encoding.Default));
+            return this.ReadFileLines(absolutePath, Encoding.Default);
         }
 
 
         /// <summary>
-        /// Reads a Text File Line by Line. Return an array of strings.
+        ///     Reads a Text File Line by Line. Return an array of strings.
         /// </summary>
         /// <param name="absolutePath">Absolute Path of file to read from</param>
         /// <param name="enc">Encoding of the text file. Use Encoding static members.</param>
@@ -512,7 +500,6 @@ namespace LLCryptoLib.Utils
                         contents[j] = objReader.ReadLine();
                     }
                 }
-
             }
             catch (IOException e)
             {
@@ -535,7 +522,7 @@ namespace LLCryptoLib.Utils
         }
 
         /// <summary>
-        /// Delete file
+        ///     Delete file
         /// </summary>
         /// <param name="absolutePath">Absolute path of file to delete</param>
         /// <returns>True if file was actually deleted</returns>
@@ -563,7 +550,7 @@ namespace LLCryptoLib.Utils
 
 
         /// <summary>
-        /// Save File
+        ///     Save File
         /// </summary>
         /// <param name="absolutePath">Absolute path of file to save</param>
         /// <param name="contents">String contents</param>
@@ -575,7 +562,7 @@ namespace LLCryptoLib.Utils
 
 
         /// <summary>
-        /// Get the size of a file
+        ///     Get the size of a file
         /// </summary>
         /// <param name="fileName">Name of the file.</param>
         /// <returns></returns>
@@ -598,7 +585,7 @@ namespace LLCryptoLib.Utils
 
 
         /// <summary>
-        /// Save File as UTF-8 text file
+        ///     Save File as UTF-8 text file
         /// </summary>
         /// <param name="absolutePath">Absolute path of file to sav</param>
         /// <param name="contents">String contents</param>
@@ -623,7 +610,6 @@ namespace LLCryptoLib.Utils
 
             try
             {
-
                 if (append)
                 {
                     fSave = File.AppendText(absolutePath);
@@ -635,8 +621,7 @@ namespace LLCryptoLib.Utils
 
                 fSave.WriteLine(contents);
                 okok = true;
-                this.errMsg = String.Empty;
-
+                this.errMsg = string.Empty;
             }
             catch (IOException e)
             {
@@ -657,25 +642,24 @@ namespace LLCryptoLib.Utils
         }
 
         /// <summary>
-        /// File Existance
+        ///     File Existance
         /// </summary>
         /// <param name="absolutePath"></param>
         /// <returns></returns>
         public bool ExistFile(string absolutePath)
         {
-            errMsg = "";
+            this.errMsg = "";
             return File.Exists(absolutePath);
         }
 
         /// <summary>
-        /// Return the path of a file, given its absolute path complete of file name.
-        /// It returns the string without the file name, and without the last "\".
+        ///     Return the path of a file, given its absolute path complete of file name.
+        ///     It returns the string without the file name, and without the last "\".
         /// </summary>
         /// <param name="completeAbsolutePath">absolute path complete of file name</param>
         /// <returns>A string representing the path of the file</returns>
         public static string GetPath(string completeAbsolutePath)
         {
-
             if (completeAbsolutePath == null)
             {
                 throw new ArgumentNullException("completeAbsolutePath");
@@ -686,7 +670,7 @@ namespace LLCryptoLib.Utils
         }
 
         /// <summary>
-        /// If the given file or directory exists
+        ///     If the given file or directory exists
         /// </summary>
         /// <param name="fileOrDirectoryPath">The file or directory path.</param>
         /// <returns>True if this file or directory exists</returns>
@@ -708,22 +692,5 @@ namespace LLCryptoLib.Utils
 
             return exists;
         }
-
-        /// <summary>
-        /// Get the only instance of this class (singleton).
-        /// </summary>
-        /// <returns>Handle to FileManager object</returns>
-        public static FileManager Reference
-        {
-            get
-            {
-                if (fRef == null)
-                {
-                    fRef = new FileManager();
-                }
-                return fRef;
-            }
-        }
-
     }
 }

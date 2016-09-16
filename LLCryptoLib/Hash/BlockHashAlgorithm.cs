@@ -1,157 +1,120 @@
-/*
- * LLCryptoLib - Advanced .NET Encryption and Hashing Library
- * v.$id$
- * 
- * The contents of this file are subject to the license distributed with
- * the package (the License). This file cannot be distributed without the 
- * original LittleLite Software license file. The distribution of this
- * file is subject to the agreement between the licensee and LittleLite
- * Software.
- * 
- * Customer that has purchased Source Code License may alter this
- * file and distribute the modified binary redistributables with applications. 
- * Except as expressly authorized in the License, customer shall not rent,
- * lease, distribute, sell, make available for download of this file. 
- * 
- * This software is not Open Source, nor Free. Its usage must adhere
- * with the License obtained from LittleLite Software.
- * 
- * The source code in this file may be derived, all or in part, from existing
- * other source code, where the original license permit to do so.
- * 
- * 
- * Copyright (C) 2003-2014 LittleLite Software
- * 
- */
-
-
 using System;
 
-namespace LLCryptoLib.Hash 
+namespace LLCryptoLib.Hash
 {
-	/// <summary>Represents the abstract class from which all implementations of the Classless.Hasher.BlockHashAlgorithm inherit.</summary>
-	abstract public class BlockHashAlgorithm : System.Security.Cryptography.HashAlgorithm 
+    /// <summary>
+    ///     Represents the abstract class from which all implementations of the Classless.Hasher.BlockHashAlgorithm
+    ///     inherit.
+    /// </summary>
+    public abstract class BlockHashAlgorithm : System.Security.Cryptography.HashAlgorithm
     {
-		private int blockSize;
-		private byte[] buffer;
-		private int bufferCount;
-		private long count;
+        private byte[] buffer;
 
 
-		/// <summary>The size in bytes of an individual block.</summary>
-		public int BlockSize 
+        /// <summary>Initializes a new instance of the BlockHashAlgorithm class.</summary>
+        /// <param name="blockSize">The size in bytes of an individual block.</param>
+        protected BlockHashAlgorithm(int blockSize)
         {
-			get { return blockSize; }
-		}
+            this.BlockSize = blockSize;
+        }
 
-		/// <summary>The number of bytes currently in the buffer waiting to be processed.</summary>
-		public int BufferCount 
+
+        /// <summary>The size in bytes of an individual block.</summary>
+        public int BlockSize { get; }
+
+        /// <summary>The number of bytes currently in the buffer waiting to be processed.</summary>
+        public int BufferCount { get; private set; }
+
+        /// <summary>The number of bytes that have been processed.</summary>
+        /// <remarks>This number does NOT include the bytes that are waiting in the buffer.</remarks>
+        public long Count { get; private set; }
+
+        /// <summary>Initializes the algorithm.</summary>
+        /// <remarks>
+        ///     If this function is overriden in a derived class, the new function should call back to
+        ///     this function or you could risk garbage being carried over from one calculation to the next.
+        /// </remarks>
+        public override void Initialize()
         {
-			get { return bufferCount; }
-		}
-
-		/// <summary>The number of bytes that have been processed.</summary>
-		/// <remarks>This number does NOT include the bytes that are waiting in the buffer.</remarks>
-		public long Count 
-        {
-			get { return count; }
-		}
-
-
-		/// <summary>Initializes a new instance of the BlockHashAlgorithm class.</summary>
-		/// <param name="blockSize">The size in bytes of an individual block.</param>
-		protected BlockHashAlgorithm(int blockSize) : base() 
-        {
-			this.blockSize = blockSize;
-		}
-
-		/// <summary>Initializes the algorithm.</summary>
-		/// <remarks>If this function is overriden in a derived class, the new function should call back to
-		/// this function or you could risk garbage being carried over from one calculation to the next.</remarks>
-		override public void Initialize() 
-        {
-			lock (this) 
+            lock (this)
             {
-				count = 0;
-				bufferCount = 0;
-				State = 0;
-				buffer = new byte[BlockSize];
-			}
-		}
+                this.Count = 0;
+                this.BufferCount = 0;
+                this.State = 0;
+                this.buffer = new byte[this.BlockSize];
+            }
+        }
 
-		/// <summary>Performs the hash algorithm on the data provided.</summary>
-		/// <param name="array">The array containing the data.</param>
-		/// <param name="ibStart">The position in the array to begin reading from.</param>
-		/// <param name="cbSize">How many bytes in the array to read.</param>
-		override protected void HashCore(byte[] array, int ibStart, int cbSize) 
+        /// <summary>Performs the hash algorithm on the data provided.</summary>
+        /// <param name="array">The array containing the data.</param>
+        /// <param name="ibStart">The position in the array to begin reading from.</param>
+        /// <param name="cbSize">How many bytes in the array to read.</param>
+        protected override void HashCore(byte[] array, int ibStart, int cbSize)
         {
-			lock (this) 
+            lock (this)
             {
-				int i;
+                int i;
 
-				// Use what may already be in the buffer.
-				if (BufferCount > 0) 
+                // Use what may already be in the buffer.
+                if (this.BufferCount > 0)
                 {
-					if (cbSize < (BlockSize - BufferCount)) 
+                    if (cbSize < this.BlockSize - this.BufferCount)
                     {
-						// Still don't have enough for a full block, just store it.
-						Array.Copy(array, ibStart, buffer, BufferCount, cbSize);
-						bufferCount += cbSize;
-						return;
-					}
-                    else 
-                    {
-						// Fill out the buffer to make a full block, and then process it.
-						i = BlockSize - BufferCount;
-						Array.Copy(array, ibStart, buffer, BufferCount, i);
-						ProcessBlock(buffer, 0);
-						count += (long)BlockSize;
-						bufferCount = 0;
-						ibStart += i;
-						cbSize -= i;
-					}
-				}
+                        // Still don't have enough for a full block, just store it.
+                        Array.Copy(array, ibStart, this.buffer, this.BufferCount, cbSize);
+                        this.BufferCount += cbSize;
+                        return;
+                    }
+                    // Fill out the buffer to make a full block, and then process it.
+                    i = this.BlockSize - this.BufferCount;
+                    Array.Copy(array, ibStart, this.buffer, this.BufferCount, i);
+                    this.ProcessBlock(this.buffer, 0);
+                    this.Count += this.BlockSize;
+                    this.BufferCount = 0;
+                    ibStart += i;
+                    cbSize -= i;
+                }
 
-				// For as long as we have full blocks, process them.
-				for (i = 0; i < (cbSize - (cbSize % BlockSize)); i += BlockSize) 
+                // For as long as we have full blocks, process them.
+                for (i = 0; i < cbSize - cbSize%this.BlockSize; i += this.BlockSize)
                 {
-					ProcessBlock(array, ibStart + i);
-					count += (long)BlockSize;
-				}
+                    this.ProcessBlock(array, ibStart + i);
+                    this.Count += this.BlockSize;
+                }
 
-				// If we still have some bytes left, store them for later.
-				int bytesLeft = cbSize % BlockSize;
-				if (bytesLeft != 0) 
+                // If we still have some bytes left, store them for later.
+                int bytesLeft = cbSize%this.BlockSize;
+                if (bytesLeft != 0)
                 {
-					Array.Copy(array, ((cbSize - bytesLeft) + ibStart), buffer, 0, bytesLeft);
-					bufferCount = bytesLeft;
-				}
-			}
-		}
+                    Array.Copy(array, cbSize - bytesLeft + ibStart, this.buffer, 0, bytesLeft);
+                    this.BufferCount = bytesLeft;
+                }
+            }
+        }
 
 
-		/// <summary>Performs any final activities required by the hash algorithm.</summary>
-		/// <returns>The final hash value.</returns>
-		override protected byte[] HashFinal() 
+        /// <summary>Performs any final activities required by the hash algorithm.</summary>
+        /// <returns>The final hash value.</returns>
+        protected override byte[] HashFinal()
         {
-			lock (this) 
+            lock (this)
             {
-				return ProcessFinalBlock(buffer, 0, bufferCount);
-			}
-		}
+                return this.ProcessFinalBlock(this.buffer, 0, this.BufferCount);
+            }
+        }
 
 
-		/// <summary>Process a block of data.</summary>
-		/// <param name="inputBuffer">The block of data to process.</param>
-		/// <param name="inputOffset">Where to start in the block.</param>
-		abstract protected void ProcessBlock(byte[] inputBuffer, int inputOffset);
+        /// <summary>Process a block of data.</summary>
+        /// <param name="inputBuffer">The block of data to process.</param>
+        /// <param name="inputOffset">Where to start in the block.</param>
+        protected abstract void ProcessBlock(byte[] inputBuffer, int inputOffset);
 
 
-		/// <summary>Process the last block of data.</summary>
-		/// <param name="inputBuffer">The block of data to process.</param>
-		/// <param name="inputOffset">Where to start in the block.</param>
-		/// <param name="inputCount">How many bytes need to be processed.</param>
+        /// <summary>Process the last block of data.</summary>
+        /// <param name="inputBuffer">The block of data to process.</param>
+        /// <param name="inputOffset">Where to start in the block.</param>
+        /// <param name="inputCount">How many bytes need to be processed.</param>
         /// <returns>The hash code in bytes</returns>
-		abstract protected byte[] ProcessFinalBlock(byte[] inputBuffer, int inputOffset, int inputCount);
-	}
+        protected abstract byte[] ProcessFinalBlock(byte[] inputBuffer, int inputOffset, int inputCount);
+    }
 }

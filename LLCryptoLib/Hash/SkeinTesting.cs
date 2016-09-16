@@ -1,81 +1,55 @@
-﻿/*
- * LLCryptoLib - Advanced .NET Encryption and Hashing Library
- * v.$id$
- * 
- * The contents of this file are subject to the license distributed with
- * the package (the License). This file cannot be distributed without the 
- * original LittleLite Software license file. The distribution of this
- * file is subject to the agreement between the licensee and LittleLite
- * Software.
- * 
- * Customer that has purchased Source Code License may alter this
- * file and distribute the modified binary redistributables with applications. 
- * Except as expressly authorized in the License, customer shall not rent,
- * lease, distribute, sell, make available for download of this file. 
- * 
- * This software is not Open Source, nor Free. Its usage must adhere
- * with the License obtained from LittleLite Software.
- * 
- * The source code in this file may be derived, all or in part, from existing
- * other source code, where the original license permit to do so.
- * 
- * 
- * Copyright (C) 2003-2014 LittleLite Software
- * 
- */
-
-using System;
+﻿using System;
 using System.Diagnostics;
 
 namespace LLCryptoLib.Hash
 {
     /// <summary>
-    /// Test class for Skein hash
+    ///     Test class for Skein hash
     /// </summary>
     public class SkeinTesting
     {
         private readonly Skein _sourceHash;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SkeinTesting"/> class.
+        ///     Initializes a new instance of the <see cref="SkeinTesting" /> class.
         /// </summary>
         /// <param name="sourceHash">The source hash.</param>
         public SkeinTesting(Skein sourceHash)
         {
-            _sourceHash = sourceHash;
+            this._sourceHash = sourceHash;
         }
 
         /// <summary>
-        /// Benchmarks this instance of the Skein hash function.
+        ///     Benchmarks this instance of the Skein hash function.
         /// </summary>
         /// <param name="iterations">Number of hash computations to perform.</param>
         /// <returns>Resulting speed in megabytes per second.</returns>
         public double Benchmark(long iterations)
         {
-            var outputBytes = _sourceHash.HashSize/8;
+            var outputBytes = this._sourceHash.HashSize/8;
             var hash = new byte[outputBytes];
             var sw = new Stopwatch();
 
             sw.Start();
-            _sourceHash.Initialize();
+            this._sourceHash.Initialize();
 
             for (long i = 0; i < iterations; i++)
-                _sourceHash.TransformBlock(hash, 0, outputBytes, hash, 0);
+                this._sourceHash.TransformBlock(hash, 0, outputBytes, hash, 0);
 
-            _sourceHash.TransformFinalBlock(hash, 0, outputBytes);
+            this._sourceHash.TransformFinalBlock(hash, 0, outputBytes);
             sw.Stop();
 
-            double opsPerTick = iterations / (double)sw.ElapsedTicks;
-            double opsPerSec = opsPerTick * TimeSpan.FromSeconds(1).Ticks;
+            double opsPerTick = iterations/(double) sw.ElapsedTicks;
+            double opsPerSec = opsPerTick*TimeSpan.FromSeconds(1).Ticks;
 
-            double mbs = opsPerSec * (_sourceHash.StateSize / 8) / 1024 / 1024;
+            double mbs = opsPerSec*(this._sourceHash.StateSize/8)/1024/1024;
 
             return mbs;
         }
 
         /// <summary>
-        /// Tests the 256, 512, and 1024 bit versions of Skein against
-        /// known test vectors.
+        ///     Tests the 256, 512, and 1024 bit versions of Skein against
+        ///     known test vectors.
         /// </summary>
         /// <returns>True if the test succeeded without errors, false otherwise.</returns>
         public static bool TestHash()
@@ -84,21 +58,24 @@ namespace LLCryptoLib.Hash
             var skein512 = new Skein512();
             var skein1024 = new Skein1024();
 
-            byte[] result256 = {
-                0xDF, 0x28, 0xE9, 0x16, 0x63, 0x0D, 0x0B, 0x44, 
+            byte[] result256 =
+            {
+                0xDF, 0x28, 0xE9, 0x16, 0x63, 0x0D, 0x0B, 0x44,
                 0xC4, 0xA8, 0x49, 0xDC, 0x9A, 0x02, 0xF0, 0x7A,
-                0x07, 0xCB, 0x30, 0xF7, 0x32, 0x31, 0x82, 0x56, 
+                0x07, 0xCB, 0x30, 0xF7, 0x32, 0x31, 0x82, 0x56,
                 0xB1, 0x5D, 0x86, 0x5A, 0xC4, 0xAE, 0x16, 0x2F
             };
 
-            byte[] result512 = { 
-                0x91 ,0xcc ,0xa5 ,0x10 ,0xc2 ,0x63 ,0xc4 ,0xdd ,0xd0 ,0x10 ,0x53 ,0x0a ,0x33 ,0x07 ,0x33 ,0x09,
-                0x62 ,0x86 ,0x31 ,0xf3 ,0x08 ,0x74 ,0x7e ,0x1b ,0xcb ,0xaa ,0x90 ,0xe4 ,0x51 ,0xca ,0xb9 ,0x2e,
-                0x51 ,0x88 ,0x08 ,0x7a ,0xf4 ,0x18 ,0x87 ,0x73 ,0xa3 ,0x32 ,0x30 ,0x3e ,0x66 ,0x67 ,0xa7 ,0xa2,
-                0x10 ,0x85 ,0x6f ,0x74 ,0x21 ,0x39 ,0x00 ,0x00 ,0x71 ,0xf4 ,0x8e ,0x8b ,0xa2 ,0xa5 ,0xad ,0xb7
+            byte[] result512 =
+            {
+                0x91, 0xcc, 0xa5, 0x10, 0xc2, 0x63, 0xc4, 0xdd, 0xd0, 0x10, 0x53, 0x0a, 0x33, 0x07, 0x33, 0x09,
+                0x62, 0x86, 0x31, 0xf3, 0x08, 0x74, 0x7e, 0x1b, 0xcb, 0xaa, 0x90, 0xe4, 0x51, 0xca, 0xb9, 0x2e,
+                0x51, 0x88, 0x08, 0x7a, 0xf4, 0x18, 0x87, 0x73, 0xa3, 0x32, 0x30, 0x3e, 0x66, 0x67, 0xa7, 0xa2,
+                0x10, 0x85, 0x6f, 0x74, 0x21, 0x39, 0x00, 0x00, 0x71, 0xf4, 0x8e, 0x8b, 0xa2, 0xa5, 0xad, 0xb7
             };
 
-            byte[] result1024 = {
+            byte[] result1024 =
+            {
                 0x1F, 0x3E, 0x02, 0xC4, 0x6F, 0xB8, 0x0A, 0x3F, 0xCD, 0x2D, 0xFB, 0xBC, 0x7C, 0x17, 0x38, 0x00,
                 0xB4, 0x0C, 0x60, 0xC2, 0x35, 0x4A, 0xF5, 0x51, 0x18, 0x9E, 0xBF, 0x43, 0x3C, 0x3D, 0x85, 0xF9,
                 0xFF, 0x18, 0x03, 0xE6, 0xD9, 0x20, 0x49, 0x31, 0x79, 0xED, 0x7A, 0xE7, 0xFC, 0xE6, 0x9C, 0x35,
@@ -126,12 +103,12 @@ namespace LLCryptoLib.Hash
             // Compare with 256-bit test vector)
             for (i = 0; i < result256.Length; i++)
                 if (hash[i] != result256[i]) return false;
-            
+
 
             // Make the test vector for the 512 and 1024-bit hash
             testVector = new byte[128];
             for (i = 0; i < testVector.Length; i++)
-                testVector[i] = (byte)(255 - i);
+                testVector[i] = (byte) (255 - i);
 
             hash = skein512.ComputeHash(testVector);
             hash = skein512.ComputeHash(testVector);

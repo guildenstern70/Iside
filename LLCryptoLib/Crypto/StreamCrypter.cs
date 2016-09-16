@@ -1,219 +1,69 @@
-/*
- * LLCryptoLib - Advanced .NET Encryption and Hashing Library
- * v.$id$
- * 
- * The contents of this file are subject to the license distributed with
- * the package (the License). This file cannot be distributed without the 
- * original LittleLite Software license file. The distribution of this
- * file is subject to the agreement between the licensee and LittleLite
- * Software.
- * 
- * Customer that has purchased Source Code License may alter this
- * file and distribute the modified binary redistributables with applications. 
- * Except as expressly authorized in the License, customer shall not rent,
- * lease, distribute, sell, make available for download of this file. 
- * 
- * This software is not Open Source, nor Free. Its usage must adhere
- * with the License obtained from LittleLite Software.
- * 
- * The source code in this file may be derived, all or in part, from existing
- * other source code, where the original license permit to do so.
- * 
- * 
- * Copyright (C) 2003-2014 LittleLite Software
- * 
- */
-
 using System;
 using System.IO;
 using System.Security.Cryptography;
 
 namespace LLCryptoLib.Crypto
 {
-	/// <summary>
-	/// This class wraps the operations on encryption streams.
-	/// </summary>
-    /// <example><code>
+    /// <summary>
+    ///     This class wraps the operations on encryption streams.
+    /// </summary>
+    /// <example>
+    ///     <code>
+    ///  
+    ///   // 1. Set algorithm
+    ///   IStreamAlgorithm cryptoAlgo = StreamAlgorithmFactory.Create(SupportedStreamAlgorithms.BLOWFISH);
     /// 
-    ///  // 1. Set algorithm
-    ///  IStreamAlgorithm cryptoAlgo = StreamAlgorithmFactory.Create(SupportedStreamAlgorithms.BLOWFISH);
-    ///
-    ///  // 2. Encrypt 
-    ///  StreamCrypter crypter = new StreamCrypter(cryptoAlgo);
-    ///  crypter.GenerateKeys("littlelitesoftware");
-    ///  crypter.EncryptDecrypt(rndFile.FullName, encryptedFile, true, null);
-    ///  Console.WriteLine("File encrypted into " + encryptedFile);
-    ///
-    ///  // 3. Decrypt
-    ///  StreamCrypter decrypter = new StreamCrypter(cryptoAlgo);
-    ///  crypter.GenerateKeys("littlelitesoftware");
-    ///  crypter.EncryptDecrypt(encryptedFile, decryptedFile, false, null);
-    ///  Console.WriteLine("File decrypted into " + decryptedFile);
+    ///   // 2. Encrypt 
+    ///   StreamCrypter crypter = new StreamCrypter(cryptoAlgo);
+    ///   crypter.GenerateKeys("littlelitesoftware");
+    ///   crypter.EncryptDecrypt(rndFile.FullName, encryptedFile, true, null);
+    ///   Console.WriteLine("File encrypted into " + encryptedFile);
     /// 
-    /// </code></example>
-	public class StreamCrypter
-	{
+    ///   // 3. Decrypt
+    ///   StreamCrypter decrypter = new StreamCrypter(cryptoAlgo);
+    ///   crypter.GenerateKeys("littlelitesoftware");
+    ///   crypter.EncryptDecrypt(encryptedFile, decryptedFile, false, null);
+    ///   Console.WriteLine("File decrypted into " + decryptedFile);
+    ///  
+    ///  </code>
+    /// </example>
+    public class StreamCrypter
+    {
+        /// <summary>
+        ///     The size of the buffer when reading and writing files.
+        /// </summary>
+        public const short CACHESIZE = 4096;
 
-		/// <summary>
-		/// The KeyFactory class generates symmetric algorithm keys
-		/// according to the choosen algorithm
-		/// </summary>
-		class KeyFactory : LLCryptoLib.Crypto.TextAlgorithm
-		{
-			short keySize;
-			short blockSize;
+        private short blockSize;
 
-			/// <summary>
-			/// KeyFactory constructor.
-			/// </summary>
-			/// <param name="sa">Encryption algorithm</param>
-			/// <param name="keyLen">Length in bits of the key</param>
-			/// <param name="blockLen">Length in bits of the block</param>
-			internal KeyFactory(SymmetricAlgorithm sa, short keyLen, short blockLen) : base(TextAlgorithmType.BINARY)
-			{
-				this.keySize = keyLen;
-				this.blockSize = blockLen;
-				this.CheckKeySizes(sa);
-			}
-
-			/// <summary>
-			/// This method transforms a normal string into a strong password
-			/// by applying hash trasformation on that. The strong password is
-			/// then used to create the key vector and the block vector to
-			/// run the algorithm.
-			/// </summary>
-			/// <param name="password"></param>
-			internal void GenerateKeys(string password)
-			{
-				this.GenerateKey(password,this.keySize,this.blockSize);
-			}
-
-			/// <summary>
-			/// Get the computed key in bytes
-			/// </summary>
-			internal byte[] Key
-			{
-				get
-				{
-					return this.maKey;
-				}
-			}
-
-			/// <summary>
-			/// Get the computed block in bytes
-			/// </summary>
-			internal byte[] Block
-			{
-				get
-				{
-					return this.maIV;
-				}
-			}
-
-			/// <summary>
-			/// Returns null
-			/// </summary>
-			/// <param name="a">A string</param>
-			/// <returns>Null</returns>
-			public override string Code(string a)
-			{
-				return null;
-			}
-
-			/// <summary>
-			/// Returns null
-			/// </summary>
-			/// <param name="b">A string</param>
-			/// <returns>Null</returns>
-			public override string Decode(string b)
-			{
-				return null;
-			}
-
-			private void CheckKeySizes(SymmetricAlgorithm sa)
-			{
-
-				bool sizeOk = false;
-				bool blockOk = false;
-
-				short keyLen = (short)(this.keySize*8);
-				short ivLen = (short)(this.blockSize*8);
-
-				// Check key size
-				KeySizes[] ks = sa.LegalKeySizes;
-				foreach (KeySizes k in ks)
-				{
-					if ((keyLen>=k.MinSize)&&(keyLen<=k.MaxSize))
-					{
-						sizeOk = true;
-						break;
-					}
-				}
-
-				// Check block size
-				KeySizes[] bs = sa.LegalBlockSizes;
-				foreach (KeySizes b in bs)
-				{
-					if ((ivLen>=b.MinSize)&&(ivLen<=b.MaxSize))
-					{
-						blockOk = true;
-						break;
-					}
-				}
-
-				if (!sizeOk)
-				{
-					throw new LLCryptoLibException("Key Size for choosen Algorithm not correct!");
-				}
-
-				if (!blockOk)
-				{
-					throw new LLCryptoLibException("Block Size for choosen Algorithm not correct!");
-				}
-
-			}
-		}
-
-		/// <summary>
-		/// The size of the buffer when reading and writing files.
-		/// </summary>
-		public const short CACHESIZE = 4096;
-
-		private KeyFactory keys;
-		private SymmetricAlgorithm symmetricAlgo;
-		private short keySize;
-		private short blockSize;
+        private KeyFactory keys;
+        private short keySize;
 
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="T:StreamCrypter"/> class.
+        ///     Initializes a new instance of the <see cref="T:StreamCrypter" /> class.
         /// </summary>
         /// <param name="algo">an encryption algorithm</param>
-		public StreamCrypter(IStreamAlgorithm algo)
-		{
-			this.SetEncryption(algo);
-		}
-
-        /// <summary>
-        /// Gets the wrapped symmetric algorithm.
-        /// </summary>
-        /// <value>the encryption algorithm of this Stream Crypter</value>
-        public SymmetricAlgorithm Algorithm
+        public StreamCrypter(IStreamAlgorithm algo)
         {
-            get
-            {
-                return this.symmetricAlgo;
-            }
+            this.SetEncryption(algo);
         }
 
-		/// <summary>
-		/// Generate keys starting from a string password. This method transforms a normal string into a strong password
-		/// by applying hash trasformation on that. The strong password is
-		/// then used to create the key vector and the block vector to
-		/// run the algorithm.
-		/// </summary>
-		/// <param name="password">a given password</param>
-        /// <example><code>
+        /// <summary>
+        ///     Gets the wrapped symmetric algorithm.
+        /// </summary>
+        /// <value>the encryption algorithm of this Stream Crypter</value>
+        public SymmetricAlgorithm Algorithm { get; private set; }
+
+        /// <summary>
+        ///     Generate keys starting from a string password. This method transforms a normal string into a strong password
+        ///     by applying hash trasformation on that. The strong password is
+        ///     then used to create the key vector and the block vector to
+        ///     run the algorithm.
+        /// </summary>
+        /// <param name="password">a given password</param>
+        /// <example>
+        ///     <code>
         /// 
         /// // 1. Set algorithm
         /// IStreamAlgorithm cryptoAlgo = StreamAlgorithmFactory.Create(SupportedStreamAlgorithms.BLOWFISH);
@@ -230,15 +80,16 @@ namespace LLCryptoLib.Crypto
         /// crypter.EncryptDecrypt(encryptedFile, decryptedFile, false, null);
         /// Console.WriteLine("File decrypted into " + decryptedFile);
         /// 
-        /// </code></example>
-		public void GenerateKeys(string password)
-		{
-			this.keys = new KeyFactory(this.symmetricAlgo, this.keySize, this.blockSize);
-			this.keys.GenerateKeys(password);
-		}
+        /// </code>
+        /// </example>
+        public void GenerateKeys(string password)
+        {
+            this.keys = new KeyFactory(this.Algorithm, this.keySize, this.blockSize);
+            this.keys.GenerateKeys(password);
+        }
 
         /// <summary>
-        /// Encrypt or decrypt a file into a MemoryStream
+        ///     Encrypt or decrypt a file into a MemoryStream
         /// </summary>
         /// <param name="inputFile">Path to input file</param>
         /// <param name="isCrypting">True if encryption, False if decryption</param>
@@ -247,7 +98,6 @@ namespace LLCryptoLib.Crypto
         /// <exception cref="LLCryptoLibException" />
         public byte[] MemoryEncryptDecrypt(string inputFile, bool isCrypting, CallbackPoint cbp)
         {
-
             if (this.keys == null)
             {
                 throw new LLCryptoLibException("Key is null. Set a password before encrypting data.");
@@ -297,39 +147,39 @@ namespace LLCryptoLib.Crypto
             }
 
             return memBytes;
-
         }
 
-		/// <summary>
-		/// Encrypt or decrypt a file.
-		/// </summary>
-		/// <param name="inputFile">File to read. If isCrypting, clear file else encrypted file.</param>
-		/// <param name="outputFile">File to write. if isCrypting, encrypted file.</param>
-		/// <param name="isCrypting">True if encryption, false if decryption.</param>
-		/// <param name="cbp">The feedback will be filled with 1 point each CACHE_SIZE wrote.</param>
-        /// <example><code>
+        /// <summary>
+        ///     Encrypt or decrypt a file.
+        /// </summary>
+        /// <param name="inputFile">File to read. If isCrypting, clear file else encrypted file.</param>
+        /// <param name="outputFile">File to write. if isCrypting, encrypted file.</param>
+        /// <param name="isCrypting">True if encryption, false if decryption.</param>
+        /// <param name="cbp">The feedback will be filled with 1 point each CACHE_SIZE wrote.</param>
+        /// <example>
+        ///     <code>
+        ///  
+        ///  // 1. Set algorithm
+        ///  IStreamAlgorithm cryptoAlgo = StreamAlgorithmFactory.Create(SupportedStreamAlgorithms.BLOWFISH);
         /// 
-        /// // 1. Set algorithm
-        /// IStreamAlgorithm cryptoAlgo = StreamAlgorithmFactory.Create(SupportedStreamAlgorithms.BLOWFISH);
-        ///
-        /// // 2. Encrypt 
-        /// StreamCrypter crypter = new StreamCrypter(cryptoAlgo);
-        /// crypter.GenerateKeys("littlelitesoftware");
-        /// crypter.EncryptDecrypt(rndFile.FullName, encryptedFile, true, null);
-        /// Console.WriteLine("File encrypted into " + encryptedFile);
-        ///
-        /// // 3. Decrypt
-        /// StreamCrypter decrypter = new StreamCrypter(cryptoAlgo);
-        /// crypter.GenerateKeys("littlelitesoftware");
-        /// crypter.EncryptDecrypt(encryptedFile, decryptedFile, false, null);
-        /// Console.WriteLine("File decrypted into " + decryptedFile);
+        ///  // 2. Encrypt 
+        ///  StreamCrypter crypter = new StreamCrypter(cryptoAlgo);
+        ///  crypter.GenerateKeys("littlelitesoftware");
+        ///  crypter.EncryptDecrypt(rndFile.FullName, encryptedFile, true, null);
+        ///  Console.WriteLine("File encrypted into " + encryptedFile);
         /// 
-        /// </code></example>
+        ///  // 3. Decrypt
+        ///  StreamCrypter decrypter = new StreamCrypter(cryptoAlgo);
+        ///  crypter.GenerateKeys("littlelitesoftware");
+        ///  crypter.EncryptDecrypt(encryptedFile, decryptedFile, false, null);
+        ///  Console.WriteLine("File decrypted into " + decryptedFile);
+        ///  
+        ///  </code>
+        /// </example>
         /// <exception cref="LLCryptoLibException" />
         /// <exception cref="ArgumentNullException" />
-		public void EncryptDecrypt(string inputFile, string outputFile, bool isCrypting, CallbackPoint cbp)
-		{
-
+        public void EncryptDecrypt(string inputFile, string outputFile, bool isCrypting, CallbackPoint cbp)
+        {
             if (inputFile == null)
             {
                 throw new ArgumentNullException("inputFile");
@@ -340,60 +190,61 @@ namespace LLCryptoLib.Crypto
                 throw new ArgumentNullException("outputFile");
             }
 
-    		FileStream fin = null;
-			FileStream fout = null;
+            FileStream fin = null;
+            FileStream fout = null;
 
-			try
-			{
-				fin = new FileStream(inputFile, FileMode.Open, FileAccess.Read);
-				fout = new FileStream(outputFile, FileMode.Create, FileAccess.Write);
+            try
+            {
+                fin = new FileStream(inputFile, FileMode.Open, FileAccess.Read);
+                fout = new FileStream(outputFile, FileMode.Create, FileAccess.Write);
                 this.EncryptDecrypt(fin, fout, isCrypting, cbp);
-
-			}
-			catch (IOException exc)
-			{
+            }
+            catch (IOException exc)
+            {
                 System.Diagnostics.Debug.WriteLine(">>> StreamCrypter.EncryptDecrypt(string,string) EXCEPTION:");
                 System.Diagnostics.Debug.WriteLine(exc.Message);
                 System.Diagnostics.Debug.WriteLine(exc.StackTrace);
-			}
-			finally
-			{
-				if (fout != null)
-				{
-					fout.Close();
-				}
-				if (fin != null)
-				{
-					fin.Close();                   
-				}
-			}
-		}
+            }
+            finally
+            {
+                if (fout != null)
+                {
+                    fout.Close();
+                }
+                if (fin != null)
+                {
+                    fin.Close();
+                }
+            }
+        }
 
         /// <summary>
-        /// Encrypt or decrypt a file stream.
+        ///     Encrypt or decrypt a file stream.
         /// </summary>
         /// <param name="inStream">File stream to read from. If isCrypting, clear file stream else a encrypted file stream.</param>
         /// <param name="outStream">File stream to write to. if isCrypting, a encrypted file stream.</param>
         /// <param name="isCrypting">True if encryption, false if decryption.</param>
         /// <param name="cbp">The feedback will be filled with 1 point each CACHE_SIZE wrote.</param>
-        /// <example><code>
+        /// <example>
+        ///     <code>
+        ///  
+        ///  // 1. Set algorithm
+        ///  IStreamAlgorithm cryptoAlgo = StreamAlgorithmFactory.Create(SupportedStreamAlgorithms.BLOWFISH);
         /// 
-        /// // 1. Set algorithm
-        /// IStreamAlgorithm cryptoAlgo = StreamAlgorithmFactory.Create(SupportedStreamAlgorithms.BLOWFISH);
-        ///
-        /// // 2. Encrypt 
-        /// StreamCrypter crypter = new StreamCrypter(cryptoAlgo);
-        /// crypter.GenerateKeys("littlelitesoftware");
-        /// crypter.EncryptDecrypt(rndFile.FullName, encryptedFile, true, null);
-        /// Console.WriteLine("File encrypted into " + encryptedFile);
-        ///
-        /// // 3. Decrypt
-        /// StreamCrypter decrypter = new StreamCrypter(cryptoAlgo);
-        /// crypter.GenerateKeys("littlelitesoftware");
-        /// crypter.EncryptDecrypt(encryptedFile, decryptedFile, false, null);
-        /// Console.WriteLine("File decrypted into " + decryptedFile);
+        ///  // 2. Encrypt 
+        ///  StreamCrypter crypter = new StreamCrypter(cryptoAlgo);
+        ///  crypter.GenerateKeys("littlelitesoftware");
+        ///  crypter.EncryptDecrypt(rndFile.FullName, encryptedFile, true, null);
+        ///  Console.WriteLine("File encrypted into " + encryptedFile);
         /// 
-        /// </code></example>
+        ///  // 3. Decrypt
+        ///  StreamCrypter decrypter = new StreamCrypter(cryptoAlgo);
+        ///  crypter.GenerateKeys("littlelitesoftware");
+        ///  crypter.EncryptDecrypt(encryptedFile, decryptedFile, false, null);
+        ///  Console.WriteLine("File decrypted into " + decryptedFile);
+        ///  
+        ///  </code>
+        /// </example>
         /// <exception cref="LLCryptoLibException" />
         /// <exception cref="ArgumentNullException" />
         public void EncryptDecrypt(FileStream inStream, FileStream outStream, bool isCrypting, CallbackPoint cbp)
@@ -437,7 +288,6 @@ namespace LLCryptoLib.Crypto
                 System.Diagnostics.Debug.WriteLine(exc.Message);
                 System.Diagnostics.Debug.WriteLine(exc.StackTrace);
             }
-
         }
 
         private byte[] MemoryEncryptStream(MemoryStream fout, FileStream fin, CallbackPoint cbp)
@@ -448,10 +298,10 @@ namespace LLCryptoLib.Crypto
             long rdlen = 0;
             long totlen = fin.Length;
 
-            System.Diagnostics.Debug.WriteLine("Memory decryption using " + this.symmetricAlgo.ToString());
+            System.Diagnostics.Debug.WriteLine("Memory decryption using " + this.Algorithm);
 
             CryptoStream encStream = new CryptoStream(fout,
-                this.symmetricAlgo.CreateEncryptor(this.keys.Key, this.keys.Block),
+                this.Algorithm.CreateEncryptor(this.keys.Key, this.keys.Block),
                 CryptoStreamMode.Write);
             try
             {
@@ -462,7 +312,7 @@ namespace LLCryptoLib.Crypto
                     rdlen += len;
                     if (cbp != null)
                     {
-                        cbp((int)(rdlen / CACHESIZE), null);
+                        cbp((int) (rdlen/CACHESIZE), null);
                     }
                 }
             }
@@ -480,75 +330,75 @@ namespace LLCryptoLib.Crypto
         }
 
 
-		private void EncryptStream(FileStream fout, FileStream fin, CallbackPoint cbp)
-		{
-			byte[] bin = new byte[CACHESIZE];    
-			int len = 1;      
+        private void EncryptStream(FileStream fout, FileStream fin, CallbackPoint cbp)
+        {
+            byte[] bin = new byte[CACHESIZE];
+            int len = 1;
 
-			long rdlen = 0;             
-			long totlen = fin.Length; 
+            long rdlen = 0;
+            long totlen = fin.Length;
 
-			CryptoStream encStream = new CryptoStream(fout, 
-				this.symmetricAlgo.CreateEncryptor(this.keys.Key, this.keys.Block), 
-				CryptoStreamMode.Write);
+            CryptoStream encStream = new CryptoStream(fout,
+                this.Algorithm.CreateEncryptor(this.keys.Key, this.keys.Block),
+                CryptoStreamMode.Write);
 
-			try
-			{
-				while (rdlen < totlen)
-				{
-					len = fin.Read(bin, 0, CACHESIZE);
-					encStream.Write(bin, 0, len);
-					rdlen += len;
-					if (cbp != null)
-					{
-						cbp((int)(rdlen/CACHESIZE), null);
-					}
-				}
-			}
-			catch (Exception ex)
-			{
-				System.Diagnostics.Debug.WriteLine("*** Error while encrypting archive: "+ex.Message);
-				System.Diagnostics.Debug.WriteLine("*** "+ex.StackTrace);
-			}
-			finally
-			{
+            try
+            {
+                while (rdlen < totlen)
+                {
+                    len = fin.Read(bin, 0, CACHESIZE);
+                    encStream.Write(bin, 0, len);
+                    rdlen += len;
+                    if (cbp != null)
+                    {
+                        cbp((int) (rdlen/CACHESIZE), null);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("*** Error while encrypting archive: " + ex.Message);
+                System.Diagnostics.Debug.WriteLine("*** " + ex.StackTrace);
+            }
+            finally
+            {
                 if (encStream != null)
                 {
                     encStream.Dispose();
                 }
-			}
-		}
+            }
+        }
 
         private void SetEncryption(IStreamAlgorithm ea)
         {
             this.keySize = ea.KeyLen;
             this.blockSize = ea.BlockLen;
-            this.symmetricAlgo = ea.Algorithm;
+            this.Algorithm = ea.Algorithm;
         }
 
-		private void DecryptStream(FileStream fout, FileStream fin, CallbackPoint cbp)
-		{
+        private void DecryptStream(FileStream fout, FileStream fin, CallbackPoint cbp)
+        {
+            byte[] bin = new byte[CACHESIZE];
+            int len = 0;
 
-			byte[] bin = new byte[CACHESIZE];    
-			int len = 0; 
+            CryptoStream encStream = new CryptoStream(fin,
+                this.Algorithm.CreateDecryptor(this.keys.Key, this.keys.Block),
+                CryptoStreamMode.Read);
 
-			CryptoStream encStream = new CryptoStream(fin,this.symmetricAlgo.CreateDecryptor(this.keys.Key,this.keys.Block),
-				CryptoStreamMode.Read);
-
-			long finLen = fin.Length;
-			long counter = 0;
+            long finLen = fin.Length;
+            long counter = 0;
 
             try
             {
                 while (counter < finLen)
                 {
                     len = encStream.Read(bin, 0, CACHESIZE);
-                    if (len == 0) break;  // ugly but necessary...
+                    if (len == 0) break; // ugly but necessary...
                     fout.Write(bin, 0, len);
                     counter += len;
                     if (cbp != null)
                     {
-                        cbp((int)(counter / CACHESIZE), null);
+                        cbp((int) (counter/CACHESIZE), null);
                     }
                 }
             }
@@ -559,20 +409,19 @@ namespace LLCryptoLib.Crypto
                 System.Diagnostics.Debug.WriteLine(aex.Message);
                 System.Diagnostics.Debug.WriteLine(aex.StackTrace);
             }
-			finally
-			{
-				encStream.Close();
-			}
-
-		}
+            finally
+            {
+                encStream.Close();
+            }
+        }
 
         private byte[] MemoryDecryptStream(MemoryStream fout, FileStream fin, CallbackPoint cbp)
         {
-
             byte[] bin = new byte[CACHESIZE];
             int len = 0;
 
-            CryptoStream encStream = new CryptoStream(fin, this.symmetricAlgo.CreateDecryptor(this.keys.Key, this.keys.Block),
+            CryptoStream encStream = new CryptoStream(fin,
+                this.Algorithm.CreateDecryptor(this.keys.Key, this.keys.Block),
                 CryptoStreamMode.Read);
 
             long finLen = fin.Length;
@@ -580,7 +429,6 @@ namespace LLCryptoLib.Crypto
 
             try
             {
-
                 while (counter < finLen)
                 {
                     len = encStream.Read(bin, 0, CACHESIZE);
@@ -590,7 +438,7 @@ namespace LLCryptoLib.Crypto
                     counter += len;
                     if (cbp != null)
                     {
-                        cbp((int)(counter / CACHESIZE), null);
+                        cbp((int) (counter/CACHESIZE), null);
                     }
                 }
             }
@@ -600,11 +448,118 @@ namespace LLCryptoLib.Crypto
             }
 
             return fout.ToArray();
-
         }
 
+        /// <summary>
+        ///     The KeyFactory class generates symmetric algorithm keys
+        ///     according to the choosen algorithm
+        /// </summary>
+        private class KeyFactory : TextAlgorithm
+        {
+            private readonly short blockSize;
+            private readonly short keySize;
 
-	}
+            /// <summary>
+            ///     KeyFactory constructor.
+            /// </summary>
+            /// <param name="sa">Encryption algorithm</param>
+            /// <param name="keyLen">Length in bits of the key</param>
+            /// <param name="blockLen">Length in bits of the block</param>
+            internal KeyFactory(SymmetricAlgorithm sa, short keyLen, short blockLen) : base(TextAlgorithmType.BINARY)
+            {
+                this.keySize = keyLen;
+                this.blockSize = blockLen;
+                this.CheckKeySizes(sa);
+            }
 
+            /// <summary>
+            ///     Get the computed key in bytes
+            /// </summary>
+            internal byte[] Key
+            {
+                get { return this.maKey; }
+            }
 
+            /// <summary>
+            ///     Get the computed block in bytes
+            /// </summary>
+            internal byte[] Block
+            {
+                get { return this.maIV; }
+            }
+
+            /// <summary>
+            ///     This method transforms a normal string into a strong password
+            ///     by applying hash trasformation on that. The strong password is
+            ///     then used to create the key vector and the block vector to
+            ///     run the algorithm.
+            /// </summary>
+            /// <param name="password"></param>
+            internal void GenerateKeys(string password)
+            {
+                this.GenerateKey(password, this.keySize, this.blockSize);
+            }
+
+            /// <summary>
+            ///     Returns null
+            /// </summary>
+            /// <param name="a">A string</param>
+            /// <returns>Null</returns>
+            public override string Code(string a)
+            {
+                return null;
+            }
+
+            /// <summary>
+            ///     Returns null
+            /// </summary>
+            /// <param name="b">A string</param>
+            /// <returns>Null</returns>
+            public override string Decode(string b)
+            {
+                return null;
+            }
+
+            private void CheckKeySizes(SymmetricAlgorithm sa)
+            {
+                bool sizeOk = false;
+                bool blockOk = false;
+
+                short keyLen = (short) (this.keySize*8);
+                short ivLen = (short) (this.blockSize*8);
+
+                // Check key size
+                KeySizes[] ks = sa.LegalKeySizes;
+                foreach (KeySizes k in ks)
+                {
+                    if ((keyLen >= k.MinSize) && (keyLen <= k.MaxSize))
+                    {
+                        sizeOk = true;
+                        break;
+                    }
+                }
+
+                // Check block size
+                KeySizes[] bs = sa.LegalBlockSizes;
+                foreach (KeySizes b in bs)
+                {
+                    if ((ivLen >= b.MinSize) && (ivLen <= b.MaxSize))
+                    {
+                        blockOk = true;
+                        break;
+                    }
+                }
+
+                if (!sizeOk)
+                {
+                    throw new LLCryptoLibException("Key Size for choosen Algorithm not correct!");
+                }
+
+                if (!blockOk)
+                {
+                    throw new LLCryptoLibException("Block Size for choosen Algorithm not correct!");
+                }
+            }
+        }
+    }
 }

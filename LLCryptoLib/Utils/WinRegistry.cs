@@ -1,41 +1,15 @@
-/*
- * LLCryptoLib - Advanced .NET Encryption and Hashing Library
- * v.$id$
- * 
- * The contents of this file are subject to the license distributed with
- * the package (the License). This file cannot be distributed without the 
- * original LittleLite Software license file. The distribution of this
- * file is subject to the agreement between the licensee and LittleLite
- * Software.
- * 
- * Customer that has purchased Source Code License may alter this
- * file and distribute the modified binary redistributables with applications. 
- * Except as expressly authorized in the License, customer shall not rent,
- * lease, distribute, sell, make available for download of this file. 
- * 
- * This software is not Open Source, nor Free. Its usage must adhere
- * with the License obtained from LittleLite Software.
- * 
- * The source code in this file may be derived, all or in part, from existing
- * other source code, where the original license permit to do so.
- * 
- * Copyright (C) 2003-2014 LittleLite Software
- * 
- */
-
 using System;
 using Microsoft.Win32;
 
 namespace LLCryptoLib.Utils
 {
     /// <summary>
-    /// WinRegistry class Writes/Read data from registry.
+    ///     WinRegistry class Writes/Read data from registry.
     /// </summary>
     public static class WinRegistry
     {
-
         /// <summary>
-        /// Check if HKLM key exist
+        ///     Check if HKLM key exist
         /// </summary>
         /// <param name="key">The key.</param>
         /// <returns></returns>
@@ -50,13 +24,15 @@ namespace LLCryptoLib.Utils
                     exist = true;
                 }
             }
-            catch { }
+            catch
+            {
+            }
 
             return exist;
         }
 
         /// <summary>
-        /// Check if HKCU key exists.
+        ///     Check if HKCU key exists.
         /// </summary>
         /// <param name="key">The key.</param>
         /// <returns></returns>
@@ -71,13 +47,15 @@ namespace LLCryptoLib.Utils
                     exist = true;
                 }
             }
-            catch { }
+            catch
+            {
+            }
 
             return exist;
         }
 
         /// <summary>
-        /// Create an HKCR key. Does not produce errors if the key exists.
+        ///     Create an HKCR key. Does not produce errors if the key exists.
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
@@ -96,7 +74,7 @@ namespace LLCryptoLib.Utils
         }
 
         /// <summary>
-        /// Delete HKLM key and all of its subkeys
+        ///     Delete HKLM key and all of its subkeys
         /// </summary>
         /// <param name="key">Example: SOFTWARE\LittleLite Software\NCrypt</param>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
@@ -109,13 +87,14 @@ namespace LLCryptoLib.Utils
             }
             catch (Exception exc)
             {
-                Console.WriteLine("AxsUtils.WinRegistry.DeleteHKLMKeyAll -> Can't delete key: " + key + " -> " + exc.Message);
+                Console.WriteLine("AxsUtils.WinRegistry.DeleteHKLMKeyAll -> Can't delete key: " + key + " -> " +
+                                  exc.Message);
             }
         }
 
 
         /// <summary>
-        /// Delete HKLM key without deleting key's subkeys
+        ///     Delete HKLM key without deleting key's subkeys
         /// </summary>
         /// <param name="key">Example: SOFTWARE\LittleLite Software\NCrypt</param>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
@@ -132,7 +111,6 @@ namespace LLCryptoLib.Utils
                 {
                     System.Diagnostics.Debug.WriteLine("Can't delete key " + key + ": it does not exist.");
                 }
-
             }
             catch (Exception exc)
             {
@@ -141,7 +119,7 @@ namespace LLCryptoLib.Utils
         }
 
         /// <summary>
-        ///  Delete an HKLM value
+        ///     Delete an HKLM value
         /// </summary>
         /// <param name="keypath">Key name, Example: SOFTWARE\LittleLite Software\NCrypt</param>
         /// <param name="keyValue">Key value: Example: Size</param>
@@ -170,7 +148,7 @@ namespace LLCryptoLib.Utils
         }
 
         /// <summary>
-        ///  Delete an HKLM value
+        ///     Delete an HKLM value
         /// </summary>
         /// <param name="keypath">Key name, Example: SOFTWARE\LittleLite Software\NCrypt</param>
         /// <param name="keyValue">Key value: Example: Size</param>
@@ -199,7 +177,7 @@ namespace LLCryptoLib.Utils
         }
 
         /// <summary>
-        /// Deletes a key in HKCR
+        ///     Deletes a key in HKCR
         /// </summary>
         /// <param name="key">Example: SOFTWARE\LittleLite Software\NCrypt</param>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
@@ -214,12 +192,11 @@ namespace LLCryptoLib.Utils
             {
                 Console.WriteLine("AxsUtils.WinRegistry.DeleteHKCRKey -> " + exc.Message);
             }
-
         }
 
 
         /// <summary>
-        /// Deletes a key in HKCU
+        ///     Deletes a key in HKCU
         /// </summary>
         /// <param name="key">Example: SOFTWARE\LittleLite Software\NCrypt</param>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
@@ -237,9 +214,7 @@ namespace LLCryptoLib.Utils
         }
 
 
-
         /// <summary>
-        /// 
         /// </summary>
         /// <param name="keypath"></param>
         /// <returns></returns>
@@ -266,7 +241,6 @@ namespace LLCryptoLib.Utils
         }
 
         /// <summary>
-        /// 
         /// </summary>
         /// <param name="keypath"></param>
         /// <returns></returns>
@@ -294,7 +268,6 @@ namespace LLCryptoLib.Utils
 
 
         /// <summary>
-        /// 
         /// </summary>
         /// <param name="keypath"></param>
         /// <returns></returns>
@@ -321,9 +294,7 @@ namespace LLCryptoLib.Utils
         }
 
 
-
         /// <summary>
-        /// 
         /// </summary>
         /// <param name="keypath"></param>
         /// <returns></returns>
@@ -350,7 +321,7 @@ namespace LLCryptoLib.Utils
         }
 
         /// <summary>
-        /// Get the value of a key in a registry HKCR (classes) subkey
+        ///     Get the value of a key in a registry HKCR (classes) subkey
         /// </summary>
         /// <param name="keypath">Path of subkey, ie: Folder</param>
         /// <param name="keyname">Name of the key</param>
@@ -394,7 +365,7 @@ namespace LLCryptoLib.Utils
         }
 
         /// <summary>
-        /// Gets the HKCU BLOB.
+        ///     Gets the HKCU BLOB.
         /// </summary>
         /// <param name="keyname">The keyname.</param>
         /// <param name="name">The name.</param>
@@ -415,7 +386,7 @@ namespace LLCryptoLib.Utils
                         object tmpVal = downkey.GetValue(name);
                         if (tmpVal != null)
                         {
-                            retval = (byte[])tmpVal;
+                            retval = (byte[]) tmpVal;
                             System.Diagnostics.Debug.WriteLine(downkey.Name + ": " + name + " bytes retrieved.");
                         }
 #if DEBUG
@@ -439,11 +410,10 @@ namespace LLCryptoLib.Utils
             }
 
             return retval;
-
         }
 
         /// <summary>
-        /// Gets the HKLM BLOB.
+        ///     Gets the HKLM BLOB.
         /// </summary>
         /// <param name="keyname">The keyname.</param>
         /// <param name="name">The name.</param>
@@ -464,7 +434,7 @@ namespace LLCryptoLib.Utils
                         object tmpVal = downkey.GetValue(name);
                         if (tmpVal != null)
                         {
-                            retval = (byte[])tmpVal;
+                            retval = (byte[]) tmpVal;
                             System.Diagnostics.Debug.WriteLine(downkey.Name + ": " + name + " bytes retrieved.");
                         }
 #if DEBUG
@@ -488,11 +458,10 @@ namespace LLCryptoLib.Utils
             }
 
             return retval;
-
         }
 
         /// <summary>
-        /// Get the value of a key in a registry HKLM\Software subkey
+        ///     Get the value of a key in a registry HKLM\Software subkey
         /// </summary>
         /// <param name="keyname">Name of the key</param>
         /// <param name="name">Name of the value</param>
@@ -541,7 +510,7 @@ namespace LLCryptoLib.Utils
         }
 
         /// <summary>
-        /// Get the value of a key in a registry "HKCU (Current User)\Software" subkey
+        ///     Get the value of a key in a registry "HKCU (Current User)\Software" subkey
         /// </summary>
         /// <param name="keyname">Name of the key</param>
         /// <param name="name">Name of the value</param>
@@ -584,7 +553,7 @@ namespace LLCryptoLib.Utils
         }
 
         /// <summary>
-        /// Get the value of a key in a registry "HKCU (Current User)\Software" subkey
+        ///     Get the value of a key in a registry "HKCU (Current User)\Software" subkey
         /// </summary>
         /// <param name="keyname">Name of the key</param>
         /// <param name="name">Name of the value</param>
@@ -592,7 +561,7 @@ namespace LLCryptoLib.Utils
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
         public static int GetHKCUDWORDValue(string keyname, string name)
         {
-            int retval = Int32.MinValue;
+            int retval = int.MinValue;
             string retStrVal;
 
             try
@@ -601,12 +570,11 @@ namespace LLCryptoLib.Utils
                 System.Diagnostics.Debug.WriteLine("Reading key " + key.Name);
                 if (key != null)
                 {
-
                     RegistryKey downkey = key.OpenSubKey(keyname, false);
                     if (downkey != null)
                     {
                         retStrVal = downkey.GetValue(name).ToString();
-                        retval = Int32.Parse(retStrVal);
+                        retval = int.Parse(retStrVal);
                         System.Diagnostics.Debug.WriteLine(downkey.Name + ": " + name + " = " + retval);
                     }
 #if DEBUG
@@ -616,7 +584,6 @@ namespace LLCryptoLib.Utils
                     }
 #endif
                 }
-
             }
             catch (Exception exc)
             {
@@ -627,8 +594,8 @@ namespace LLCryptoLib.Utils
         }
 
         /// <summary>
-        /// Adds a keypair to an existing key under the HKCR branch.
-        /// If any error (ie: key does not exist) return false.
+        ///     Adds a keypair to an existing key under the HKCR branch.
+        ///     If any error (ie: key does not exist) return false.
         /// </summary>
         /// <param name="keypath">Path of an EXISTING key: ie: Folder</param>
         /// <param name="keyname">Name of the key </param>
@@ -644,7 +611,7 @@ namespace LLCryptoLib.Utils
             {
                 // Open existring key under HKEY_CLASSES_ROOT\Software 
                 RegistryKey key = Registry.ClassesRoot.OpenSubKey(keypath, true);
-                System.Diagnostics.Debug.WriteLine("Opening key " + key.ToString());
+                System.Diagnostics.Debug.WriteLine("Opening key " + key);
                 if (key != null)
                 {
                     // Add one more sub key 
@@ -673,7 +640,7 @@ namespace LLCryptoLib.Utils
         }
 
         /// <summary>
-        /// Sets the HKLM BLOB.
+        ///     Sets the HKLM BLOB.
         /// </summary>
         /// <param name="keyname">The keyname.</param>
         /// <param name="name">The name.</param>
@@ -687,7 +654,7 @@ namespace LLCryptoLib.Utils
             {
                 // Open existring key under HKEY_LOCAL_MACHINE\Software 
                 RegistryKey key = Registry.LocalMachine.OpenSubKey("SOFTWARE", true);
-                System.Diagnostics.Debug.WriteLine("Writing to key " + key.ToString());
+                System.Diagnostics.Debug.WriteLine("Writing to key " + key);
                 if (key != null)
                 {
                     // Add one more sub key 
@@ -709,11 +676,10 @@ namespace LLCryptoLib.Utils
             }
 
             return okok;
-
         }
 
         /// <summary>
-        /// Sets the HKCU BLOB.
+        ///     Sets the HKCU BLOB.
         /// </summary>
         /// <param name="keyname">The keyname.</param>
         /// <param name="name">The name.</param>
@@ -727,7 +693,7 @@ namespace LLCryptoLib.Utils
             {
                 // Open existring key under HKEY_LOCAL_MACHINE\Software 
                 RegistryKey key = Registry.CurrentUser.OpenSubKey("SOFTWARE", true);
-                System.Diagnostics.Debug.WriteLine("Writing to key " + key.ToString());
+                System.Diagnostics.Debug.WriteLine("Writing to key " + key);
                 if (key != null)
                 {
                     // Add one more sub key 
@@ -749,12 +715,11 @@ namespace LLCryptoLib.Utils
             }
 
             return okok;
-
         }
 
         /// <summary>
-        /// Adds a keypair to an existing key under the HKLM\Software branch.
-        /// If any error (ie: key does not exist) return false.
+        ///     Adds a keypair to an existing key under the HKLM\Software branch.
+        ///     If any error (ie: key does not exist) return false.
         /// </summary>
         /// <param name="keyname">Name of an existing key</param>
         /// <param name="name">Name of the key value</param>
@@ -769,7 +734,7 @@ namespace LLCryptoLib.Utils
             {
                 // Open existring key under HKEY_LOCAL_MACHINE\Software 
                 RegistryKey key = Registry.LocalMachine.OpenSubKey("SOFTWARE", true);
-                System.Diagnostics.Debug.WriteLine("Writing to key " + key.ToString());
+                System.Diagnostics.Debug.WriteLine("Writing to key " + key);
                 if (key != null)
                 {
                     // Add one more sub key 
@@ -794,9 +759,9 @@ namespace LLCryptoLib.Utils
         }
 
         /// <summary>
-        /// Adds a keypair to an existing key under the HKCU (Current User)\Software branch.
-        /// If any error return false.
-        /// If key does not exist, it will be created.
+        ///     Adds a keypair to an existing key under the HKCU (Current User)\Software branch.
+        ///     If any error return false.
+        ///     If key does not exist, it will be created.
         /// </summary>
         /// <param name="keyname">Name of an existing key</param>
         /// <param name="name">Name of key-value pair</param>
@@ -810,7 +775,7 @@ namespace LLCryptoLib.Utils
             {
                 // Open existring key under HKEY_CURRENT_USER\Software 
                 RegistryKey key = Registry.CurrentUser.OpenSubKey("SOFTWARE", true);
-                System.Diagnostics.Debug.WriteLine("Writing to key " + key.ToString());
+                System.Diagnostics.Debug.WriteLine("Writing to key " + key);
                 if (key != null)
                 {
                     // Add one more sub key 
@@ -835,9 +800,9 @@ namespace LLCryptoLib.Utils
         }
 
         /// <summary>
-        /// Adds a keypair to an existing key under the HKCU (Current User)\Software branch.
-        /// If any error return false.
-        /// If key does not exist, it will be created.
+        ///     Adds a keypair to an existing key under the HKCU (Current User)\Software branch.
+        ///     If any error return false.
+        ///     If key does not exist, it will be created.
         /// </summary>
         /// <param name="keyname">Name of an existing key</param>
         /// <param name="name">Name of key-value pair</param>
@@ -851,7 +816,7 @@ namespace LLCryptoLib.Utils
             {
                 // Open existring key under HKEY_CURRENT_USER\Software 
                 RegistryKey key = Registry.CurrentUser.OpenSubKey("SOFTWARE", true);
-                System.Diagnostics.Debug.WriteLine("Writing to key " + key.ToString());
+                System.Diagnostics.Debug.WriteLine("Writing to key " + key);
                 if (key != null)
                 {
                     // Add one more sub key 
@@ -876,7 +841,7 @@ namespace LLCryptoLib.Utils
         }
 
         /// <summary>
-        /// Get the human-readable file type of this extension
+        ///     Get the human-readable file type of this extension
         /// </summary>
         /// <param name="fileExtension"></param>
         /// <returns></returns>
@@ -900,18 +865,17 @@ namespace LLCryptoLib.Utils
                 }
                 //  Open registry areas containing launching app details
                 objExtReg = objExtReg.OpenSubKey(fileExtension.Trim());
-                strExtValue = System.Convert.ToString(objExtReg.GetValue(""));
+                strExtValue = Convert.ToString(objExtReg.GetValue(""));
                 return objAppReg.OpenSubKey(strExtValue).GetValue("").ToString();
             }
             catch
             {
                 return "";
             }
-
         }
 
         /// <summary>
-        /// Get the associated program
+        ///     Get the associated program
         /// </summary>
         /// <param name="fileExtension">File extension (ie: .doc)</param>
         /// <returns></returns>
@@ -935,25 +899,21 @@ namespace LLCryptoLib.Utils
                 }
                 //  Open registry areas containing launching app details
                 objExtReg = objExtReg.OpenSubKey(fileExtension.Trim());
-                strExtValue = System.Convert.ToString(objExtReg.GetValue(""));
+                strExtValue = Convert.ToString(objExtReg.GetValue(""));
                 objAppReg = objAppReg.OpenSubKey(strExtValue + @"\shell\open\command");
                 //  Parse out, tidy up and return result
-                string app = System.Convert.ToString(objAppReg.GetValue(null));
+                string app = Convert.ToString(objAppReg.GetValue(null));
                 string[] SplitArray = app.Split('"');
                 if (SplitArray[0].Trim().Length > 0)
                 {
                     return SplitArray[0].Replace("%1", "");
                 }
-                else
-                {
-                    return SplitArray[1].Replace("%1", "");
-                }
+                return SplitArray[1].Replace("%1", "");
             }
             catch
             {
                 return "Unknown";
             }
         }
-
-   }
+    }
 }

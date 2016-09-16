@@ -1,30 +1,3 @@
-/*
- * LLCryptoLib - Advanced .NET Encryption and Hashing Library
- * v.$id$
- * 
- * The contents of this file are subject to the license distributed with
- * the package (the License). This file cannot be distributed without the 
- * original LittleLite Software license file. The distribution of this
- * file is subject to the agreement between the licensee and LittleLite
- * Software.
- * 
- * Customer that has purchased Source Code License may alter this
- * file and distribute the modified binary redistributables with applications. 
- * Except as expressly authorized in the License, customer shall not rent,
- * lease, distribute, sell, make available for download of this file. 
- * 
- * This software is not Open Source, nor Free. Its usage must adhere
- * with the License obtained from LittleLite Software.
- * 
- * The source code in this file may be derived, all or in part, from existing
- * other source code, where the original license permit to do so.
- * 
- * 
- * Copyright (C) 2003-2014 LittleLite Software
- * 
- */
-
-
 using System;
 
 namespace LLCryptoLib.Hash
@@ -33,56 +6,6 @@ namespace LLCryptoLib.Hash
     public class CRCParameters : HashAlgorithmParameters
     {
         private int order;
-        private long polynomial;
-        private long initial;
-        private long finalXOR;
-        private bool reflectIn;
-
-
-        /// <summary>Gets or sets the order of the CRC (e.g., how many bits).</summary>
-        public int Order
-        {
-            get { return order; }
-            set
-            {
-                if (((value % 8) != 0) || (value < 8) || (value > 64))
-                {
-                    throw new ArgumentOutOfRangeException("Order", value, "CRC Order must represent full bytes and be between 8 and 64.");
-                }
-                else
-                {
-                    order = value;
-                }
-            }
-        }
-
-        /// <summary>Gets or sets the polynomial to use in the CRC calculations.</summary>
-        public long Polynomial
-        {
-            get { return polynomial; }
-            set { polynomial = value; }
-        }
-
-        /// <summary>Gets or sets the initial value of the CRC.</summary>
-        public long InitialValue
-        {
-            get { return initial; }
-            set { initial = value; }
-        }
-
-        /// <summary>Gets or sets the final value to XOR with the CRC.</summary>
-        public long FinalXORValue
-        {
-            get { return finalXOR; }
-            set { finalXOR = value; }
-        }
-
-        /// <summary>Gets or sets the value dictating whether or not to reflect the incoming data before calculating. (UART)</summary>
-        public bool ReflectInput
-        {
-            get { return reflectIn; }
-            set { reflectIn = value; }
-        }
 
 
         /// <summary>Initializes a new instance of the CRCParamters class.</summary>
@@ -101,11 +24,42 @@ namespace LLCryptoLib.Hash
         }
 
 
-        /// <summary>Serves as a hash function for a particular type, suitable for use in hashing algorithms and data structures like a hash table.</summary>
+        /// <summary>Gets or sets the order of the CRC (e.g., how many bits).</summary>
+        public int Order
+        {
+            get { return this.order; }
+            set
+            {
+                if ((value%8 != 0) || (value < 8) || (value > 64))
+                {
+                    throw new ArgumentOutOfRangeException("Order", value,
+                        "CRC Order must represent full bytes and be between 8 and 64.");
+                }
+                this.order = value;
+            }
+        }
+
+        /// <summary>Gets or sets the polynomial to use in the CRC calculations.</summary>
+        public long Polynomial { get; set; }
+
+        /// <summary>Gets or sets the initial value of the CRC.</summary>
+        public long InitialValue { get; set; }
+
+        /// <summary>Gets or sets the final value to XOR with the CRC.</summary>
+        public long FinalXORValue { get; set; }
+
+        /// <summary>Gets or sets the value dictating whether or not to reflect the incoming data before calculating. (UART)</summary>
+        public bool ReflectInput { get; set; }
+
+
+        /// <summary>
+        ///     Serves as a hash function for a particular type, suitable for use in hashing algorithms and data structures
+        ///     like a hash table.
+        /// </summary>
         /// <returns>A hash code for the current Object.</returns>
         public override int GetHashCode()
         {
-            string temp = Polynomial.ToString() + Order.ToString() + ReflectInput.ToString();
+            string temp = this.Polynomial + this.Order.ToString() + this.ReflectInput;
             return temp.GetHashCode();
         }
 

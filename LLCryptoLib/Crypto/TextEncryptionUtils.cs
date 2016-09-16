@@ -1,45 +1,19 @@
-/*
- * LLCryptoLib - Advanced .NET Encryption and Hashing Library
- * v.$id$
- * 
- * The contents of this file are subject to the license distributed with
- * the package (the License). This file cannot be distributed without the 
- * original LittleLite Software license file. The distribution of this
- * file is subject to the agreement between the licensee and LittleLite
- * Software.
- * 
- * Customer that has purchased Source Code License may alter this
- * file and distribute the modified binary redistributables with applications. 
- * Except as expressly authorized in the License, customer shall not rent,
- * lease, distribute, sell, make available for download of this file. 
- * 
- * This software is not Open Source, nor Free. Its usage must adhere
- * with the License obtained from LittleLite Software.
- * 
- * The source code in this file may be derived, all or in part, from existing
- * other source code, where the original license permit to do so.
- * 
- * 
- * Copyright (C) 2003-2014 LittleLite Software
- * 
- */
-
-
 using System;
 using System.IO;
 
 namespace LLCryptoLib.Crypto
 {
     /// <summary>
-    /// Utility for text encryption
+    ///     Utility for text encryption
     /// </summary>
     public sealed class TextEncryptionUtils
     {
-
-		private TextEncryptionUtils() {}
+        private TextEncryptionUtils()
+        {
+        }
 
         /// <summary>
-        /// Convert a MemoryStream to a Base64 representation of bytes
+        ///     Convert a MemoryStream to a Base64 representation of bytes
         /// </summary>
         /// <param name="instream">Memory Stream containing bytes</param>
         /// <returns>Base 64 representation of bytes</returns>
@@ -54,75 +28,74 @@ namespace LLCryptoLib.Crypto
             return Convert.ToBase64String(instream.ToArray());
         }
 
-		/// <summary>
-		/// Returns true if the input string CAN BE a Base64 string.
-		/// Since there is not an exact way to determine if a string is a Base64 string
-		/// and not simple text, this method returns true if the string is 'compliant'
-		/// with Base64, and so it can be a result of a Base64 encoding.
-		/// </summary>
+        /// <summary>
+        ///     Returns true if the input string CAN BE a Base64 string.
+        ///     Since there is not an exact way to determine if a string is a Base64 string
+        ///     and not simple text, this method returns true if the string is 'compliant'
+        ///     with Base64, and so it can be a result of a Base64 encoding.
+        /// </summary>
         /// <param name="toCheck">A string to check for Base64</param>
-		/// <returns>Returns true if the input string CAN BE a Base64 string</returns>
+        /// <returns>Returns true if the input string CAN BE a Base64 string</returns>
         /// <exception cref="ArgumentNullException" />
-		public static bool IsBase64(string toCheck)
-		{
+        public static bool IsBase64(string toCheck)
+        {
             if (toCheck == null)
             {
                 throw new ArgumentNullException("toCheck");
             }
 
-			const string b64chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-			
-			// check to see if the string is a well-formed Base64 string
+            const string b64chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
-			string legalString = b64chars + "=";
+            // check to see if the string is a well-formed Base64 string
 
-			// check for bad string length (must be a multiple of 4)
-			if (toCheck.Length % 4 > 0)
-			{
-				return false;
-			}
-	
-			// check for illegal characters
-			for (int j=0; j<toCheck.Length; j++)
-			{
-				if (legalString.IndexOf(toCheck[j]) < 0)
-				{
-					return false;
-				}
-			}
-												   
-			// make sure any '=' are only at the end
+            string legalString = b64chars + "=";
 
-			int whereIsEqual = toCheck.IndexOf('=');
+            // check for bad string length (must be a multiple of 4)
+            if (toCheck.Length%4 > 0)
+            {
+                return false;
+            }
 
-			if (whereIsEqual == -1)
-			{
-				// ok
-			}
-			else if (whereIsEqual == toCheck.Length)
-			{
-				// ok
-			}
-			else if (whereIsEqual < toCheck.Length)
-			{
-				// NOT OK
-				return false;
-			}
-			else
-			{
-				// NOT OK if the last is not equal, but equals are found inside
-				if (toCheck[toCheck.Length]!='=')
-				{
-					return false;
-				}
-			}
+            // check for illegal characters
+            for (int j = 0; j < toCheck.Length; j++)
+            {
+                if (legalString.IndexOf(toCheck[j]) < 0)
+                {
+                    return false;
+                }
+            }
 
-			return true;
-			
-		}
+            // make sure any '=' are only at the end
+
+            int whereIsEqual = toCheck.IndexOf('=');
+
+            if (whereIsEqual == -1)
+            {
+                // ok
+            }
+            else if (whereIsEqual == toCheck.Length)
+            {
+                // ok
+            }
+            else if (whereIsEqual < toCheck.Length)
+            {
+                // NOT OK
+                return false;
+            }
+            else
+            {
+                // NOT OK if the last is not equal, but equals are found inside
+                if (toCheck[toCheck.Length] != '=')
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
 
         /// <summary>
-        /// Convert a MemoryStream to a clear text string
+        ///     Convert a MemoryStream to a clear text string
         /// </summary>
         /// <param name="instream">Memory Stream containing text</param>
         /// <returns>Clear text</returns>
@@ -134,11 +107,11 @@ namespace LLCryptoLib.Crypto
                 throw new ArgumentNullException("instream");
             }
 
-            return TextEncryptionUtils.BytesToString(instream.ToArray());
+            return BytesToString(instream.ToArray());
         }
 
         /// <summary>
-        /// Convert a Base64 string to its bytes
+        ///     Convert a Base64 string to its bytes
         /// </summary>
         /// <param name="inBase">Base64 inputString</param>
         /// <returns>Bytes in Base64 string</returns>
@@ -148,7 +121,7 @@ namespace LLCryptoLib.Crypto
         }
 
         /// <summary>
-        /// Convert an array of bytes to a Base64 representation of bytes
+        ///     Convert an array of bytes to a Base64 representation of bytes
         /// </summary>
         /// <param name="inBytes">Input array of bytes</param>
         /// <returns>Base 64 representation of bytes</returns>
@@ -158,7 +131,7 @@ namespace LLCryptoLib.Crypto
         }
 
         /// <summary>
-        /// Convert a string into an array of bytes
+        ///     Convert a string into an array of bytes
         /// </summary>
         /// <param name="instr">String to convert</param>
         /// <returns>Array of bytes</returns>
@@ -168,7 +141,7 @@ namespace LLCryptoLib.Crypto
         }
 
         /// <summary>
-        /// Convert an array of bytes into an hexadecimal string
+        ///     Convert an array of bytes into an hexadecimal string
         /// </summary>
         /// <param name="arrBytes">Array of bytes to convert</param>
         /// <returns>Hexadecimal String</returns>

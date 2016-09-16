@@ -1,64 +1,46 @@
-/*
- * LLCryptoLib - Advanced .NET Encryption and Hashing Library
- * v.$id$
- * 
- * The contents of this file are subject to the license distributed with
- * the package (the License). This file cannot be distributed without the 
- * original LittleLite Software license file. The distribution of this
- * file is subject to the agreement between the licensee and LittleLite
- * Software.
- * 
- * Customer that has purchased Source Code License may alter this
- * file and distribute the modified binary redistributables with applications. 
- * Except as expressly authorized in the License, customer shall not rent,
- * lease, distribute, sell, make available for download of this file. 
- * 
- * This software is not Open Source, nor Free. Its usage must adhere
- * with the License obtained from LittleLite Software.
- * 
- * The source code in this file may be derived, all or in part, from existing
- * other source code, where the original license permit to do so.
- * 
- * Copyright (C) 2003-2014 LittleLite Software
- * 
- */
-
 using System;
 using System.IO;
-using System.Text;
 using System.Security.Cryptography;
+using System.Text;
 using LLCryptoLib.Security.Resources;
 
 namespace LLCryptoLib.Security.Cryptography
 {
     /// <summary>
-    /// Defines a number of easy-to-use methods to perform string-based encryption.
+    ///     Defines a number of easy-to-use methods to perform string-based encryption.
     /// </summary>
     public sealed class StringEncryption
     {
+        private SymmetricAlgorithm m_BulkCipher;
+        private HashAlgorithm m_Hash;
+        private byte[] m_IV;
+        private byte[] m_Key;
+
         /// <summary>
-        /// Initializes a new StringEncryption instance.
+        ///     Initializes a new StringEncryption instance.
         /// </summary>
         /// <remarks>The default bulk cipher algorithm is Rijndael and the default hash algorithm is RIPEMD-160.</remarks>
         public StringEncryption()
         {
-            Init(Rijndael.Create(), RIPEMD160.Create());
+            this.Init(Rijndael.Create(), RIPEMD160.Create());
         }
+
         /// <summary>
-        /// Initializes a new StringEncryption instance.
+        ///     Initializes a new StringEncryption instance.
         /// </summary>
         /// <param name="bulkCipher">The name of the bulk cipher algorithm to use.</param>
         /// <param name="hash">The name of the hash algorithm to use.</param>
         public StringEncryption(string bulkCipher, string hash)
         {
-            if (bulkCipher == null || bulkCipher.Length == 0)
+            if ((bulkCipher == null) || (bulkCipher.Length == 0))
                 bulkCipher = "Rijndael";
-            if (hash == null || hash.Length == 0)
+            if ((hash == null) || (hash.Length == 0))
                 hash = "RIPEMD160";
-            Init(SymmetricAlgorithm.Create(bulkCipher), HashAlgorithm.Create(hash));
+            this.Init(SymmetricAlgorithm.Create(bulkCipher), HashAlgorithm.Create(hash));
         }
+
         /// <summary>
-        /// Initializes a new StringEncryption instance.
+        ///     Initializes a new StringEncryption instance.
         /// </summary>
         /// <param name="bulkCipher">The bulk cipher algorithm to use.</param>
         /// <param name="hash">The hash algorithm to use.</param>
@@ -69,19 +51,57 @@ namespace LLCryptoLib.Security.Cryptography
                 throw new ArgumentNullException("bulkCipher", ResourceController.GetString("Error_ParamNull"));
             if (hash == null)
                 throw new ArgumentNullException("hash", ResourceController.GetString("Error_ParamNull"));
-            Init(bulkCipher, hash);
+            this.Init(bulkCipher, hash);
+        }
+
+        /// <summary>
+        ///     Gets or sets the key of the bulk cipher algorithm.
+        /// </summary>
+        /// <value>An array of bytes that contains the key of the bulk cipher algorithm.</value>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance",
+             "CA1819:PropertiesShouldNotReturnArrays")]
+        public byte[] Key
+        {
+            get { return this.m_Key; }
+            set
+            {
+                if (value == null)
+                    throw new ArgumentNullException("value", ResourceController.GetString("Error_ParamNull"));
+                if (!this.m_BulkCipher.ValidKeySize(value.Length*8))
+                    throw new CryptographicException(ResourceController.GetString("Error_InvalidKeySize"));
+                this.m_Key = (byte[]) value.Clone();
+            }
+        }
+
+        /// <summary>
+        ///     Gets or sets the initialization vector of the bulk cipher algorithm.
+        /// </summary>
+        /// <value>An array of bytes that contains the initialization vector of the bulk cipher algorithm.</value>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance",
+             "CA1819:PropertiesShouldNotReturnArrays")]
+        public byte[] IV
+        {
+            get { return this.m_IV; }
+            set
+            {
+                if (value == null)
+                    throw new ArgumentNullException("value", ResourceController.GetString("Error_ParamNull"));
+                if (value.Length != this.m_BulkCipher.BlockSize/8)
+                    throw new CryptographicException(ResourceController.GetString("Error_InvalidIVSize"));
+                this.m_IV = (byte[]) value.Clone();
+            }
         }
 
         private void Init(SymmetricAlgorithm bulkCipher, HashAlgorithm hash)
         {
-            m_BulkCipher = bulkCipher;
-            m_Hash = hash;
-            m_Key = m_BulkCipher.Key;
-            m_IV = m_BulkCipher.IV;
+            this.m_BulkCipher = bulkCipher;
+            this.m_Hash = hash;
+            this.m_Key = this.m_BulkCipher.Key;
+            this.m_IV = this.m_BulkCipher.IV;
         }
 
         /// <summary>
-        /// Encrypts a given byte array.
+        ///     Encrypts a given byte array.
         /// </summary>
         /// <param name="input">The array of bytes to encrypt.</param>
         /// <returns>A string representation of the encrypted data.</returns>
@@ -91,14 +111,16 @@ namespace LLCryptoLib.Security.Cryptography
             if (input == null)
                 throw new ArgumentNullException("input", ResourceController.GetString("Error_ParamNull"));
             MemoryStream ms = new MemoryStream();
-            CryptoStream cs = new CryptoStream(ms, m_BulkCipher.CreateEncryptor(m_Key, m_IV), CryptoStreamMode.Write);
+            CryptoStream cs = new CryptoStream(ms, this.m_BulkCipher.CreateEncryptor(this.m_Key, this.m_IV),
+                CryptoStreamMode.Write);
             cs.Write(input, 0, input.Length);
-            cs.Write(m_Hash.ComputeHash(input, 0, input.Length), 0, m_Hash.HashSize / 8);
+            cs.Write(this.m_Hash.ComputeHash(input, 0, input.Length), 0, this.m_Hash.HashSize/8);
             cs.FlushFinalBlock();
             return Convert.ToBase64String(ms.ToArray());
         }
+
         /// <summary>
-        /// Encrypts a given string.
+        ///     Encrypts a given string.
         /// </summary>
         /// <param name="input">The string to encrypt.</param>
         /// <returns>A string representation of the encrypted data.</returns>
@@ -106,10 +128,11 @@ namespace LLCryptoLib.Security.Cryptography
         /// <exception cref="ArgumentNullException"><i>input</i> is a null reference.</exception>
         public string Encrypt(string input)
         {
-            return Encrypt(input, Encoding.UTF8);
+            return this.Encrypt(input, Encoding.UTF8);
         }
+
         /// <summary>
-        /// Encrypts a given string.
+        ///     Encrypts a given string.
         /// </summary>
         /// <param name="input">The string to encrypt.</param>
         /// <param name="encoding">The encoding to use to convert the string to an array of bytes.</param>
@@ -121,10 +144,11 @@ namespace LLCryptoLib.Security.Cryptography
                 throw new ArgumentNullException("encoding", ResourceController.GetString("Error_ParamNull"));
             if (input == null)
                 throw new ArgumentNullException("input", ResourceController.GetString("Error_ParamNull"));
-            return Encrypt(encoding.GetBytes(input));
+            return this.Encrypt(encoding.GetBytes(input));
         }
+
         /// <summary>
-        /// Decrypts a given string.
+        ///     Decrypts a given string.
         /// </summary>
         /// <param name="input">The string to decrypt.</param>
         /// <returns>An array of bytes, containing the unencrypted data.</returns>
@@ -137,22 +161,24 @@ namespace LLCryptoLib.Security.Cryptography
             if (input == null)
                 throw new ArgumentNullException("input", ResourceController.GetString("Error_ParamNull"));
             byte[] buffer = Convert.FromBase64String(input); // throws FormatException
-            buffer = m_BulkCipher.CreateDecryptor(m_Key, m_IV).TransformFinalBlock(buffer, 0, buffer.Length); // throws CryptographicException
-            if (buffer.Length < m_Hash.HashSize / 8)
+            buffer = this.m_BulkCipher.CreateDecryptor(this.m_Key, this.m_IV)
+                .TransformFinalBlock(buffer, 0, buffer.Length); // throws CryptographicException
+            if (buffer.Length < this.m_Hash.HashSize/8)
                 throw new ArgumentException(ResourceController.GetString("Error_ParamInvalid"), "input");
-            byte[] hash = m_Hash.ComputeHash(buffer, 0, buffer.Length - m_Hash.HashSize / 8);
-            int offset = buffer.Length - m_Hash.HashSize / 8;
+            byte[] hash = this.m_Hash.ComputeHash(buffer, 0, buffer.Length - this.m_Hash.HashSize/8);
+            int offset = buffer.Length - this.m_Hash.HashSize/8;
             for (int i = 0; i < hash.Length; i++)
             {
                 if (hash[i] != buffer[offset + i])
                     throw new CryptographicException(ResourceController.GetString("Error_InvalidHash"));
             }
-            byte[] ret = new byte[buffer.Length - m_Hash.HashSize / 8];
+            byte[] ret = new byte[buffer.Length - this.m_Hash.HashSize/8];
             Buffer.BlockCopy(buffer, 0, ret, 0, ret.Length);
             return ret;
         }
+
         /// <summary>
-        /// Decrypts a given string.
+        ///     Decrypts a given string.
         /// </summary>
         /// <param name="input">The string to decrypt.</param>
         /// <param name="encoding">The encoding to use to convert the string to an array of bytes.</param>
@@ -167,10 +193,11 @@ namespace LLCryptoLib.Security.Cryptography
                 throw new ArgumentNullException("encoding", ResourceController.GetString("Error_ParamNull"));
             if (input == null)
                 throw new ArgumentNullException("input", ResourceController.GetString("Error_ParamNull"));
-            return encoding.GetString(Decrypt(input));
+            return encoding.GetString(this.Decrypt(input));
         }
+
         /// <summary>
-        /// Decrypts a given string.
+        ///     Decrypts a given string.
         /// </summary>
         /// <param name="input">The string to decrypt.</param>
         /// <returns>A string containing the unencrypted data.</returns>
@@ -181,52 +208,7 @@ namespace LLCryptoLib.Security.Cryptography
         /// <exception cref="CryptographicException">An error occurs during the decryption or integrity verification.</exception>
         public string DecryptString(string input)
         {
-            return DecryptString(input, Encoding.UTF8);
+            return this.DecryptString(input, Encoding.UTF8);
         }
-        /// <summary>
-        /// Gets or sets the key of the bulk cipher algorithm.
-        /// </summary>
-        /// <value>An array of bytes that contains the key of the bulk cipher algorithm.</value>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1819:PropertiesShouldNotReturnArrays")]
-        public byte[] Key
-        {
-            get
-            {
-                return m_Key;
-            }
-            set
-            {
-                if (value == null)
-                    throw new ArgumentNullException("value", ResourceController.GetString("Error_ParamNull"));
-                if (!m_BulkCipher.ValidKeySize(value.Length * 8))
-                    throw new CryptographicException(ResourceController.GetString("Error_InvalidKeySize"));
-                m_Key = (byte[])value.Clone();
-            }
-        }
-        /// <summary>
-        /// Gets or sets the initialization vector of the bulk cipher algorithm.
-        /// </summary>
-        /// <value>An array of bytes that contains the initialization vector of the bulk cipher algorithm.</value>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1819:PropertiesShouldNotReturnArrays")]
-        public byte[] IV
-        {
-            get
-            {
-                return m_IV;
-            }
-            set
-            {
-                if (value == null)
-                    throw new ArgumentNullException("value", ResourceController.GetString("Error_ParamNull"));
-                if (value.Length != m_BulkCipher.BlockSize / 8)
-                    throw new CryptographicException(ResourceController.GetString("Error_InvalidIVSize"));
-                m_IV = (byte[])value.Clone();
-            }
-        }
-
-        private SymmetricAlgorithm m_BulkCipher;
-        private HashAlgorithm m_Hash;
-        private byte[] m_Key;
-        private byte[] m_IV;
     }
 }
