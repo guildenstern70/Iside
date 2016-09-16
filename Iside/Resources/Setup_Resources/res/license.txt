@@ -1,0 +1,32 @@
+END USER LICENSE AGREEMENT (EULA)
+
+*** Please read this entire agreement ***
+
+
+LICENSE:
+
+* This Limited Use Software License Agreement (the "Agreement") is a legal agreement between you ("Licensee"), the end-user, and LittleLite Software ("LittleLite") for the use of the "Iside" software product ("Software"). By using this software or storing this program on a computer hard drive (or other media), you are agreeing to be bound by the terms of this Agreement. If you do not agree to the terms of this Agreement delete the software from all storage media. 
+
+* You may install this program to test and evaluate if it suits your needs and you wish to purchase it. The evaluation period will last for 30 (thirty) days starting from the installation date of the product. After that period, the functionalities of the Software will cease to work.
+
+* The Software is licensed, not sold. Subject to the condition that you are in compliance with the terms of this EULA: (a) you may install and use one copy of the Software, or any prior version for the same operating system, on a single computer for use by a single simultaneous operator; and (b) you may install a single copy of the Software Product, strictly for your own personal use, on one portable computer owned by you. No other use, copying or distribution of the Software is permitted. You may not rent the Software Product, nor may you offer use of it to others through a service bureau or application service provider. 
+
+* This software may be distributed freely on online services, bulletin boards, or other electronic media as long as the files are distributed in their entirety. This software may not be distributed on CD-ROM, disk, or other physical media for a fee without the permission of LittleLite Software.
+
+* You may not alter this software in any way, including changing or removing any messages or windows.
+ 
+* You may not decompile, reverse engineer, disassemble or otherwise reduce this software to a human perceivable form. You may not modify, rent or resell for profit this software, or create derivative works based upon this software. You may not publicize or distribute any registration code algorithms, information, or registration codes used by this software without permission of LittleLite Software. You may not use any registration codes for the Software that have not been purchased from LittleLite or an authorized representative of LittleLite.
+
+* You accept responsibility for any network usage costs or any other costs incurred by using this software.
+
+---------------------------------
+NO WARRANTIES. - LittleLite EXPRESSLY DISCLAIMS ANY WARRANTY for the SOFTWARE. The SOFTWARE and any related documentation is provided "as is" without warranty of any kind, either express or implied, including, without limitation, the implied warranties or merchantability, fitness for a particular purpose, or noninfringement. 
+The entire risk arising out of use or performance of the SOFTWARE remains with you.
+
+THIS SOFTWARE IS NOT FAULT TOLERANT AND SHOULD NOT BE USED IN ANY ENVIRONMENT WHICH REQUIRES THIS.
+
+NO LIABILITY FOR DAMAGES. In no event shall LittleLite or its suppliers be liable for any damages whatsoever (including, without limitation, damages for loss of business profits, business interruption, loss of business information, or any other pecuniary loss) arising out of the use of or inability to use this SOFTWARE.
+---------------------------------
+COPYRIGHT:
+* Iside is Copyright LittleLite Software. You must treat the Software like any other copyrighted material.
+

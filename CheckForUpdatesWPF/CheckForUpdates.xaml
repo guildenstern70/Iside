@@ -1,0 +1,60 @@
+﻿<Window x:Class="CheckForUpdatesWPF.CheckForUpdates"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Check for a newer version..." 
+        Height="143" Width="435" ResizeMode="NoResize" 
+        ShowInTaskbar="False" WindowStartupLocation="CenterOwner" WindowStyle="ToolWindow">
+    <Window.Resources>
+        <Style x:Key="LinkButton" TargetType="Button">
+            <Setter
+            Property="Template">
+                <Setter.Value>
+                    <ControlTemplate
+                    TargetType="Button">
+                        <TextBlock TextDecorations="None">
+                    <ContentPresenter /></TextBlock>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Setter
+            Property="Foreground"
+            Value="Blue" />
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="true">
+                    <Setter Property="FontWeight" Value="Bold" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+    <DockPanel>
+
+        <Grid DockPanel.Dock="Top" Height="0" />
+            <StatusBar DockPanel.Dock="Bottom" Height="21">
+            <StatusBarItem x:Name="statusBar" Content="Ready" />
+        </StatusBar>
+        <Grid DockPanel.Dock="Left" Width="0" />
+        <Grid DockPanel.Dock="Right" Width="0" />
+
+        <!-- MAIN CONTENT -->
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <!-- Progress Bar -->
+                <RowDefinition Height="40" />
+                <!-- Controls -->
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="80" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="120" />
+                <ColumnDefinition Width="80" />
+            </Grid.ColumnDefinitions>
+            <ProgressBar x:Name="progressBar" Grid.ColumnSpan="4" Grid.Row="0" Margin="6,14,5,14" />
+            <Button x:Name="btnSetProxy" Grid.Column="0" Grid.Row="1" Style="{StaticResource LinkButton}" Content="Set Proxy..." Margin="7,10,5,10" Click="btnSetProxy_Click" />
+            <Button x:Name="lnkMoreInfo" Grid.Column="1" Grid.Row="1" Style="{StaticResource LinkButton}" Content="Info" Margin="5,10" Click="lnkMoreInfo_Click" />
+            <Button x:Name="btnCheck" Grid.Column="2" Grid.Row="1" Content="Check now" Margin="4,4,4,12" IsDefault="True" Click="btnCheck_Click" />
+            <Button x:Name="btnCancel" Grid.Column="3" Grid.Row="1" Content="Cancel"  Margin="4,4,6,12" IsCancel="True"  />
+        </Grid>
+        
+    </DockPanel>
+</Window>

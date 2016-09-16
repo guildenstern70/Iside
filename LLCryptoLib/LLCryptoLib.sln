@@ -1,0 +1,58 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30501.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{582E3C9A-5F4F-432E-805E-4951D4F8163A}"
+	ProjectSection(SolutionItems) = preProject
+		changelog.txt = changelog.txt
+		LLCryptoLib_Tests.vsmdi = LLCryptoLib_Tests.vsmdi
+		nant_build_release.build = nant_build_release.build
+		todo.txt = todo.txt
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LLCryptoLib", "LLCryptoLib.csproj", "{38A6A3AB-7A3F-48C3-A8FF-662D6307C07C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LLCryptoLibExamples", "..\LLCryptoLibExamples\LLCryptoLibExamples.csproj", "{9DBC029B-8C60-48E0-8B1B-DA04B1B6AD91}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LLCryptoLibTests", "..\LLCryptoLibTests\LLCryptoLibTests.csproj", "{A1B92AB3-43F2-43BF-A53D-E989F3092BCD}"
+EndProject
+Global
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 4
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = https://alessiosaltarin.visualstudio.com/defaultcollection
+		SccProjectUniqueName0 = LLCryptoLib.csproj
+		SccLocalPath0 = .
+		SccLocalPath1 = .
+		SccProjectUniqueName2 = ..\\LLCryptoLibExamples\\LLCryptoLibExamples.csproj
+		SccProjectName2 = ../LLCryptoLibExamples
+		SccLocalPath2 = ..\\LLCryptoLibExamples
+		SccProjectUniqueName3 = ..\\LLCryptoLibTests\\LLCryptoLibTests.csproj
+		SccProjectName3 = ../LLCryptoLibTests
+		SccLocalPath3 = ..\\LLCryptoLibTests
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{38A6A3AB-7A3F-48C3-A8FF-662D6307C07C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{38A6A3AB-7A3F-48C3-A8FF-662D6307C07C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{38A6A3AB-7A3F-48C3-A8FF-662D6307C07C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{38A6A3AB-7A3F-48C3-A8FF-662D6307C07C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9DBC029B-8C60-48E0-8B1B-DA04B1B6AD91}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9DBC029B-8C60-48E0-8B1B-DA04B1B6AD91}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9DBC029B-8C60-48E0-8B1B-DA04B1B6AD91}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9DBC029B-8C60-48E0-8B1B-DA04B1B6AD91}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A1B92AB3-43F2-43BF-A53D-E989F3092BCD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1B92AB3-43F2-43BF-A53D-E989F3092BCD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1B92AB3-43F2-43BF-A53D-E989F3092BCD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1B92AB3-43F2-43BF-A53D-E989F3092BCD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(TestCaseManagementSettings) = postSolution
+		CategoryFile = LLCryptoLib_Tests.vsmdi
+	EndGlobalSection
+EndGlobal

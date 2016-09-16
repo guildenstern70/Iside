@@ -1,0 +1,597 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <ProjectType>Local</ProjectType>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{38A6A3AB-7A3F-48C3-A8FF-662D6307C07C}</ProjectGuid>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ApplicationIcon>
+    </ApplicationIcon>
+    <AssemblyKeyContainerName>
+    </AssemblyKeyContainerName>
+    <AssemblyName>LLCryptoLib</AssemblyName>
+    <AssemblyOriginatorKeyFile>LLCryptoLib.snk</AssemblyOriginatorKeyFile>
+    <DefaultClientScript>JScript</DefaultClientScript>
+    <DefaultHTMLPageLayout>Grid</DefaultHTMLPageLayout>
+    <DefaultTargetSchema>IE50</DefaultTargetSchema>
+    <DelaySign>false</DelaySign>
+    <OutputType>Library</OutputType>
+    <RootNamespace>LLCryptoLib</RootNamespace>
+    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+    <StartupObject>
+    </StartupObject>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <SignAssembly>true</SignAssembly>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+    <TargetFrameworkProfile />
+    <SccProjectName>
+    </SccProjectName>
+    <SccLocalPath>
+    </SccLocalPath>
+    <SccAuxPath>
+    </SccAuxPath>
+    <SccProvider>
+    </SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <OutputPath>bin\Debug\</OutputPath>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <BaseAddress>285212672</BaseAddress>
+    <CheckForOverflowUnderflow>false</CheckForOverflowUnderflow>
+    <ConfigurationOverrideFile>
+    </ConfigurationOverrideFile>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DocumentationFile>LLCryptoLib.xml</DocumentationFile>
+    <DebugSymbols>true</DebugSymbols>
+    <FileAlignment>4096</FileAlignment>
+    <NoStdLib>false</NoStdLib>
+    <NoWarn>
+    </NoWarn>
+    <Optimize>false</Optimize>
+    <RegisterForComInterop>false</RegisterForComInterop>
+    <RemoveIntegerChecks>false</RemoveIntegerChecks>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <WarningLevel>4</WarningLevel>
+    <DebugType>full</DebugType>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRules>
+    </CodeAnalysisRules>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <CodeAnalysisRuleSet>..\FolderCrypt\FolderCrypt\AXS_NonGlobalize_Ruleset.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <OutputPath>bin\Release\</OutputPath>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <BaseAddress>285212672</BaseAddress>
+    <CheckForOverflowUnderflow>false</CheckForOverflowUnderflow>
+    <ConfigurationOverrideFile>
+    </ConfigurationOverrideFile>
+    <DefineConstants>TRACE</DefineConstants>
+    <DocumentationFile>bin\Release\LLCryptoLib.XML</DocumentationFile>
+    <DebugSymbols>false</DebugSymbols>
+    <FileAlignment>4096</FileAlignment>
+    <NoStdLib>false</NoStdLib>
+    <NoWarn>
+    </NoWarn>
+    <Optimize>true</Optimize>
+    <RegisterForComInterop>true</RegisterForComInterop>
+    <RemoveIntegerChecks>false</RemoveIntegerChecks>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <WarningLevel>4</WarningLevel>
+    <DebugType>none</DebugType>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRules>
+    </CodeAnalysisRules>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
+    <CodeAnalysisRuleSet>..\FolderCrypt\FolderCrypt\AXS_NonGlobalize_Ruleset.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Distribution|AnyCPU' ">
+    <OutputPath>bin\Distribution\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <BaseAddress>285212672</BaseAddress>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DocumentationFile>LLCryptoLib.xml</DocumentationFile>
+    <Optimize>true</Optimize>
+    <RegisterForComInterop>true</RegisterForComInterop>
+    <DebugType>
+    </DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release64|AnyCPU' ">
+    <OutputPath>bin\Release64\</OutputPath>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <BaseAddress>285212672</BaseAddress>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DocumentationFile>
+    </DocumentationFile>
+    <FileAlignment>4096</FileAlignment>
+    <RegisterForComInterop>true</RegisterForComInterop>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <CodeAnalysisRules>
+    </CodeAnalysisRules>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <BaseAddress>285212672</BaseAddress>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Optimize>true</Optimize>
+    <FileAlignment>4096</FileAlignment>
+    <RegisterForComInterop>true</RegisterForComInterop>
+    <PlatformTarget>x64</PlatformTarget>
+    <CodeAnalysisRules>
+    </CodeAnalysisRules>
+    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Distribution|x64' ">
+    <OutputPath>bin\x64\Distribution\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <BaseAddress>285212672</BaseAddress>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DocumentationFile>LLCryptoLib.xml</DocumentationFile>
+    <Optimize>true</Optimize>
+    <RegisterForComInterop>true</RegisterForComInterop>
+    <DebugType>
+    </DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release64|x64' ">
+    <OutputPath>bin\x64\Release64\</OutputPath>
+    <PlatformTarget>x64</PlatformTarget>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <BaseAddress>285212672</BaseAddress>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DocumentationFile>LLCryptoLib.xml</DocumentationFile>
+    <FileAlignment>4096</FileAlignment>
+    <RegisterForComInterop>true</RegisterForComInterop>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>..\FolderCrypt\FolderCrypt\AXS_NonGlobalize_Ruleset.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <BaseAddress>285212672</BaseAddress>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DocumentationFile>bin\Release\LLCryptoLib.XML</DocumentationFile>
+    <Optimize>true</Optimize>
+    <FileAlignment>4096</FileAlignment>
+    <RegisterForComInterop>true</RegisterForComInterop>
+    <PlatformTarget>x86</PlatformTarget>
+    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>..\FolderCrypt\FolderCrypt\AXS_NonGlobalize_Ruleset.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Distribution|x86'">
+    <OutputPath>bin\x86\Distribution\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <BaseAddress>285212672</BaseAddress>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DocumentationFile>LLCryptoLib.xml</DocumentationFile>
+    <Optimize>true</Optimize>
+    <RegisterForComInterop>true</RegisterForComInterop>
+    <DebugType />
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release64|x86'">
+    <OutputPath>bin\x86\Release64\</OutputPath>
+    <PlatformTarget>x86</PlatformTarget>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System">
+      <Name>System</Name>
+    </Reference>
+    <Reference Include="System.Data">
+      <Name>System.Data</Name>
+    </Reference>
+    <Reference Include="System.Security">
+      <Name>System.Security</Name>
+    </Reference>
+    <Reference Include="System.Windows.Forms">
+      <Name>System.Windows.Forms</Name>
+    </Reference>
+    <Reference Include="System.Xml">
+      <Name>System.XML</Name>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Crypto\StreamThreeFish.cs" />
+    <Compile Include="Crypto\Threefish.cs" />
+    <Compile Include="Crypto\Threefish1024.cs" />
+    <Compile Include="Crypto\Threefish256.cs" />
+    <Compile Include="Crypto\Threefish512.cs" />
+    <Compile Include="Crypto\ThreefishCipher.cs" />
+    <Compile Include="Crypto\ThreefishTransform.cs" />
+    <Compile Include="Hash\Skein.cs" />
+    <Compile Include="Hash\SkeinConfig.cs" />
+    <Compile Include="Hash\SkeinTesting.cs" />
+    <Compile Include="Hash\UBITweak.cs" />
+    <Compile Include="Utils\Alpha.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="CallbackEntry.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="CallbackPoint.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Config.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Crypto\AsymmetricCrypter.cs" />
+    <Compile Include="Crypto\BlowfishManaged.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Crypto\Cast5Managed.cs" />
+    <Compile Include="Crypto\IStreamAlgorithm.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Crypto\StreamAES.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Crypto\StreamAlgorithm.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Crypto\StreamAlgorithmFactory.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Crypto\StreamARC4.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Crypto\StreamBlowfish.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Crypto\StreamCast.cs" />
+    <Compile Include="Crypto\StreamCrypter.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Crypto\StreamDES.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Crypto\SupportedStreamAlgorithms.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Crypto\SupportedTextAlgorithms.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Crypto\TextAlgorithm.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Crypto\TextAlgorithmParameters.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Crypto\TextAlgorithmType.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Crypto\TextCryptEngine.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Crypto\TextCrypter.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Crypto\TextCrypterFactory.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Crypto\TextDES.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Crypto\TextEncryptionUtils.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Crypto\TextFormat.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Crypto\TextPlayfair.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Crypto\TextPseudoDes.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Crypto\TextRijndael.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Crypto\TextROT13.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Crypto\TextTripleDES.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Crypto\TextVigenere.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Crypto\XORManaged.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="Hash\Adler32.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Hash\AvailableHash.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Hash\BlockHashAlgorithm.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Hash\Cksum.cs" />
+    <Compile Include="Hash\CRC.cs" />
+    <Compile Include="Hash\CRC32.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Hash\CRCParameters.cs" />
+    <Compile Include="Hash\CRCStandard.cs" />
+    <Compile Include="Hash\ElfHash.cs" />
+    <Compile Include="Hash\EndianType.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Hash\FCS16.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Hash\FCS32.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Hash\FNV.cs" />
+    <Compile Include="Hash\FNVAlgorithmType.cs" />
+    <Compile Include="Hash\FNVParameters.cs" />
+    <Compile Include="Hash\FNVStandard.cs" />
+    <Compile Include="Hash\GHash.cs" />
+    <Compile Include="Hash\GHashParameters.cs" />
+    <Compile Include="Hash\GHashStandard.cs" />
+    <Compile Include="Hash\GOSTHash.cs" />
+    <Compile Include="Hash\Hash.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Hash\HashAlgorithmParameters.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Hash\HAVAL.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Hash\HAVALParameters.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Hash\HAVALStandard.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Hash\IHash.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Hash\JHash.cs" />
+    <Compile Include="Hash\MD2.cs" />
+    <Compile Include="Hash\MD4.cs" />
+    <Compile Include="Hash\MD5.cs" />
+    <Compile Include="Hash\ParallelHash.cs" />
+    <Compile Include="Hash\RIPEMD128.cs" />
+    <Compile Include="Hash\RIPEMD160.cs" />
+    <Compile Include="Hash\RIPEMD256.cs" />
+    <Compile Include="Hash\RIPEMD320.cs" />
+    <Compile Include="Hash\SHA0.cs" />
+    <Compile Include="Hash\SHA1.cs" />
+    <Compile Include="Hash\SHA224.cs" />
+    <Compile Include="Hash\SHA256.cs" />
+    <Compile Include="Hash\SHA384.cs" />
+    <Compile Include="Hash\SHA512.cs" />
+    <Compile Include="Hash\Snefru2.cs" />
+    <Compile Include="Hash\Snefru2Parameters.cs" />
+    <Compile Include="Hash\Snefru2Standard.cs" />
+    <Compile Include="Hash\SumBSD.cs" />
+    <Compile Include="Hash\SumSysV.cs" />
+    <Compile Include="Hash\SupportedHashAlgo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Hash\SupportedHashAlgoFactory.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Hash\SupportedHashAlgorithms.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Hash\Tiger.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Hash\Utilities.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Hash\Whirlpool.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Hash\XUM32.cs" />
+    <Compile Include="Utils\Hexer.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Utils\HexEnum.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Utils\HexStyler.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LLCryptoLibException.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Utils\PasswordComplexityIndex.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Security\Certificates\Certificate.cs" />
+    <Compile Include="Security\Certificates\CertificateChain.cs" />
+    <Compile Include="Security\Certificates\CertificateException.cs" />
+    <Compile Include="Security\Certificates\CertificateFormat.cs" />
+    <Compile Include="Security\Certificates\CertificateStore.cs" />
+    <Compile Include="Security\Certificates\CertificateStoreCollection.cs" />
+    <Compile Include="Security\Certificates\CertificateStructures.cs" />
+    <Compile Include="Security\Certificates\CertificateVerificationResult.cs" />
+    <Compile Include="Security\Certificates\DistinguishedName.cs" />
+    <Compile Include="Security\Certificates\DistinguishedNameCollection.cs" />
+    <Compile Include="Security\Certificates\LLCertificate.cs" />
+    <Compile Include="Security\Certificates\LLCertificateStore.cs" />
+    <Compile Include="Security\Certificates\Oid.cs" />
+    <Compile Include="Security\Certificates\RevocationItem.cs" />
+    <Compile Include="Security\Certificates\RevocationList.cs" />
+    <Compile Include="Security\Cryptography\ARCFourManaged.cs" />
+    <Compile Include="Security\Cryptography\ARCFourManagedTransform.cs" />
+    <Compile Include="Security\Cryptography\CryptographyStructures.cs" />
+    <Compile Include="Security\Cryptography\CryptoHandle.cs" />
+    <Compile Include="Security\Cryptography\HMAC.cs" />
+    <Compile Include="Security\Cryptography\MD2.cs" />
+    <Compile Include="Security\Cryptography\MD2CryptoServiceProvider.cs" />
+    <Compile Include="Security\Cryptography\MD4.cs" />
+    <Compile Include="Security\Cryptography\MD4CryptoServiceProvider.cs" />
+    <Compile Include="Security\Cryptography\RC4.cs" />
+    <Compile Include="Security\Cryptography\RC4CryptoServiceProvider.cs" />
+    <Compile Include="Security\Cryptography\RC4UnmanagedTransform.cs" />
+    <Compile Include="Security\Cryptography\RijndaelCryptoServiceProvider.cs" />
+    <Compile Include="Security\Cryptography\RijndaelUnmanagedTransform.cs" />
+    <Compile Include="Security\Cryptography\StringEncryption.cs" />
+    <Compile Include="Security\Cryptography\SymmetricKey.cs" />
+    <Compile Include="Security\Win32\NativeMethods.cs" />
+    <Compile Include="Security\Resources\ResourceController.cs" />
+    <Compile Include="Security\Resources\SecurityServicesMessages.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SecurityServicesMessages.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Security\SecurityConstants.cs" />
+    <Compile Include="Security\SecurityException.cs" />
+    <Compile Include="Security\SecurityStructures.cs" />
+    <Compile Include="Security\SspiProvider.cs" />
+    <Compile Include="Security\Win32\Platform.cs" />
+    <Compile Include="Shred\AvailableShred.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Shred\ShredGermanVSITR.cs" />
+    <Compile Include="Shred\ShredHmgEnh.cs" />
+    <Compile Include="Shred\IShredMethod.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Shred\ShredBase.cs" />
+    <Compile Include="Shred\ShredComplex.cs" />
+    <Compile Include="Shred\Shredder.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Shred\ShredDOD.cs" />
+    <Compile Include="Shred\ShredGutmann.cs" />
+    <Compile Include="Shred\ShredMethods.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Shred\ShredNothing.cs" />
+    <Compile Include="Shred\ShredRandom.cs" />
+    <Compile Include="Shred\ShredSimple.cs" />
+    <Compile Include="Strings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Strings.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Utils\ClipboardUtils.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Utils\DirectoryElements.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Utils\FileManager.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Utils\OS.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Utils\RandomString.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Utils\TempFile.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Utils\WinRegistry.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <None Include="app.config" />
+    <None Include="LLCryptoLib.snk" />
+    <None Include="nant_build_release.build" />
+    <EmbeddedResource Include="Security\Resources\SecurityServicesMessages.resx">
+      <SubType>Designer</SubType>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>SecurityServicesMessages.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Strings.it-IT.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Strings.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Strings.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
+</Project>

@@ -1,0 +1,248 @@
+<?xml version="1.0"?>
+<project name="LLCryptoLib" default="build">
+
+  <!-- BUILD NUMBER (1.8.1024 -> 18_1024) -->
+  <property name="build.number" value="19_2012"/>
+  <!-- BUILD NAME -->
+  <property name="build.name" value="LLCryptoLib"/>
+  <!-- SOURCE DIRECTORY -->
+  <property name="source.path" value="..\LLCryptoLibRelease\ReleaseTemplate"/>
+  <!-- RELEASE DIRECTORY -->
+  <property name="release.path" value="..\LLCryptoLibRelease\${build.number}"/>
+  <!-- LICENSES DIRECTORY -->
+  <property name="licenses.path" value="${source.path}\LICENSES"/>
+  <!-- RELEASE TYPES -->
+  <property name="academy" value="${build.name}_${build.number}_Academy"/>
+  <property name="developer" value="${build.name}_${build.number}_Developer"/>
+  <property name="enterprise" value="${build.name}_${build.number}_Enterprise"/>
+  <property name="sourcecode" value="${build.name}_${build.number}_Enterprise_SourceCode"/>
+  <property name="server" value="${build.name}_${build.number}_Server"/>
+  <!-- COMMON DIRS -->
+  <property name="docs.dir" value="Docs"/>
+  <property name="examples.dir" value="Examples"/>
+  <property name="tutorials.dir" value="Tutorials"/>
+  <property name="library.dir" value="Library"/>
+  <!-- COMMON FILES -->
+  <patternset id="common_files">
+    <include name="changelog.txt"/>
+    <include name="Installation.txt"/>
+    <include name="Documentation.chm"/>
+    <include name="Documentation.html"/>
+    <include name="ReadMe.html"/>
+    <include name="ReadMe.txt"/>
+    <include name="Licensing.rtf"/>
+  </patternset>
+  <!-- LICENSES -->
+  <patternset id="licenses">
+    <include name="eula.txt"/>
+    <include name="License.rtf"/> 
+  </patternset>
+
+  <target name="clean" description="Remove all release files">
+    <delete dir="${release.path}\${academy}" />
+    <delete dir="${release.path}\${developer}" />
+    <delete dir="${release.path}\${enterprise}" />
+    <delete dir="${release.path}\${sourcecode}" />
+    <delete dir="${release.path}\${server}" />
+  </target>
+
+  <target name="prepare">
+    <mkdir dir="${release.path}"/>
+  </target>
+
+  <target name="build_academy" depends="prepare">
+    <!-- ACADEMY -->
+    <echo message="Building Academy Release"/>
+    <mkdir dir="${release.path}\${academy}"/>
+    <mkdir dir="${release.path}\${academy}\${docs.dir}"/>
+    <copy todir="${release.path}\${academy}\${docs.dir}">
+      <fileset basedir="${source.path}\${docs.dir}">
+        <include name="**" />
+      </fileset>
+    </copy>
+    <mkdir dir="${release.path}\${academy}\${examples.dir}"/>
+    <copy todir="${release.path}\${academy}\${examples.dir}">
+      <fileset basedir="${source.path}\${examples.dir}">
+        <include name="**" />
+      </fileset>
+    </copy>
+    <mkdir dir="${release.path}\${academy}\${tutorials.dir}"/>
+    <copy todir="${release.path}\${academy}\${tutorials.dir}">
+      <fileset basedir="${source.path}\${tutorials.dir}">
+        <include name="*" />
+      </fileset>
+    </copy>
+    <mkdir dir="${release.path}\${academy}\${library.dir}"/>
+    <copy todir="${release.path}\${academy}\${library.dir}">
+      <fileset basedir="${source.path}\${library.dir}">
+        <include name="**" />
+      </fileset>
+    </copy>
+    
+    <copy todir="${release.path}\${academy}">
+      <fileset basedir="${source.path}">
+        <patternset refid="common_files"/>
+      </fileset>
+    </copy>
+
+    <copy todir="${release.path}\${academy}">
+      <fileset basedir="${licenses.path}\Academy">
+        <patternset refid="licenses"/>
+      </fileset>
+    </copy>
+    
+  </target>
+
+  <target name="build_developer" depends="prepare">
+    <!-- DEVELOPER -->
+    <echo message="Building Developer Release"/>
+    <mkdir dir="${release.path}\${developer}"/>
+    <mkdir dir="${release.path}\${developer}\${docs.dir}"/>
+    <copy todir="${release.path}\${developer}\${docs.dir}">
+      <fileset basedir="${source.path}\${docs.dir}">
+        <include name="**" />
+      </fileset>
+    </copy>
+    <mkdir dir="${release.path}\${developer}\${examples.dir}"/>
+    <copy todir="${release.path}\${developer}\${examples.dir}">
+      <fileset basedir="${source.path}\${examples.dir}">
+        <include name="**" />
+      </fileset>
+    </copy>
+    <mkdir dir="${release.path}\${developer}\${tutorials.dir}"/>
+    <copy todir="${release.path}\${developer}\${tutorials.dir}">
+      <fileset basedir="${source.path}\${tutorials.dir}">
+        <include name="*" />
+      </fileset>
+    </copy>
+    <mkdir dir="${release.path}\${developer}\${library.dir}"/>
+    <copy todir="${release.path}\${developer}\${library.dir}">
+      <fileset basedir="${source.path}\${library.dir}">
+        <include name="**" />
+      </fileset>
+    </copy>
+    <copy todir="${release.path}\${developer}">
+      <fileset basedir="${source.path}">
+        <patternset refid="common_files"/>
+      </fileset>
+    </copy>
+    <copy todir="${release.path}\${developer}">
+      <fileset basedir="${licenses.path}\Developer">
+        <patternset refid="licenses"/>
+      </fileset>
+    </copy>
+  </target>
+
+  <target name="build_enterprise" depends="prepare">
+    <!-- ENTERPRISE -->
+    <echo message="Building Enterprise Release"/>
+    <mkdir dir="${release.path}\${enterprise}"/>
+    <mkdir dir="${release.path}\${enterprise}\${docs.dir}"/>
+    <copy todir="${release.path}\${enterprise}\${docs.dir}">
+      <fileset basedir="${source.path}\${docs.dir}">
+        <include name="**" />
+      </fileset>
+    </copy>
+    <mkdir dir="${release.path}\${enterprise}\${examples.dir}"/>
+    <copy todir="${release.path}\${enterprise}\${examples.dir}">
+      <fileset basedir="${source.path}\${examples.dir}">
+        <include name="**" />
+      </fileset>
+    </copy>
+    <mkdir dir="${release.path}\${enterprise}\${tutorials.dir}"/>
+    <copy todir="${release.path}\${enterprise}\${tutorials.dir}">
+      <fileset basedir="${source.path}\${tutorials.dir}">
+        <include name="*" />
+      </fileset>
+    </copy>
+    <mkdir dir="${release.path}\${enterprise}\${library.dir}"/>
+    <copy todir="${release.path}\${enterprise}\${library.dir}">
+      <fileset basedir="${source.path}\${library.dir}">
+        <include name="**" />
+      </fileset>
+    </copy>
+    <copy todir="${release.path}\${enterprise}">
+      <fileset basedir="${source.path}">
+        <patternset refid="common_files"/>
+      </fileset>
+    </copy>
+    <copy todir="${release.path}\${enterprise}">
+      <fileset basedir="${licenses.path}\Enterprise">
+        <patternset refid="licenses"/>
+      </fileset>
+    </copy>
+  </target>
+
+  <target name="build_sourcecode" depends="prepare">
+    <!-- ENTERPRISE SOURCE CODE -->
+    <echo message="Building Enterprise Source Code Release"/>
+    <mkdir dir="${release.path}\${sourcecode}"/>
+    <mkdir dir="${release.path}\${sourcecode}\${docs.dir}"/>
+    <copy todir="${release.path}\${sourcecode}\${docs.dir}">
+      <fileset basedir="${source.path}\${docs.dir}">
+        <include name="**" />
+      </fileset>
+    </copy>
+    <mkdir dir="${release.path}\${sourcecode}\${examples.dir}"/>
+    <copy todir="${release.path}\${sourcecode}\${examples.dir}">
+      <fileset basedir="${source.path}\${examples.dir}">
+        <include name="**" />
+      </fileset>
+    </copy>
+    <mkdir dir="${release.path}\${sourcecode}\${tutorials.dir}"/>
+    <copy todir="${release.path}\${sourcecode}\${tutorials.dir}">
+      <fileset basedir="${source.path}\${tutorials.dir}">
+        <include name="*" />
+      </fileset>
+    </copy>
+    <mkdir dir="${release.path}\${sourcecode}\${library.dir}"/>
+    <copy todir="${release.path}\${sourcecode}\${library.dir}">
+      <fileset basedir="${source.path}\${library.dir}">
+        <include name="**" />
+      </fileset>
+    </copy>
+    <copy todir="${release.path}\${sourcecode}">
+      <fileset basedir="${source.path}">
+        <patternset refid="common_files"/>
+      </fileset>
+    </copy>
+    <copy todir="${release.path}\${sourcecode}">
+      <fileset basedir="${licenses.path}\Enterprise_SourceCode">
+        <patternset refid="licenses"/>
+      </fileset>
+    </copy>
+  </target>
+
+  <target name="build_server" depends="prepare">
+    <!-- SERVER -->
+    <echo message="Building Server Release"/>
+    <mkdir dir="${release.path}\${server}"/>
+    <mkdir dir="${release.path}\${server}\${docs.dir}"/>
+    <copy todir="${release.path}\${server}\${docs.dir}">
+      <fileset basedir="${source.path}\${docs.dir}">
+        <include name="**" />
+      </fileset>
+    </copy>
+    <mkdir dir="${release.path}\${server}\${library.dir}"/>
+    <copy todir="${release.path}\${server}\${library.dir}">
+      <fileset basedir="${source.path}\${library.dir}">
+        <include name="**" />
+      </fileset>
+    </copy>
+    <copy todir="${release.path}\${server}">
+      <fileset basedir="${source.path}">
+        <patternset refid="common_files"/>
+      </fileset>
+    </copy>
+    <copy todir="${release.path}\${server}">
+      <fileset basedir="${licenses.path}\Server">
+        <patternset refid="licenses"/>
+      </fileset>
+    </copy>
+  </target>
+
+  <target depends="build_academy, build_developer, build_enterprise, build_sourcecode, build_server" name="build" description="Create the release/distribution directory">
+  </target>
+
+</project>
+

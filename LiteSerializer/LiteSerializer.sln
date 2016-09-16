@@ -1,0 +1,31 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LiteSerializer", "LiteSerializer.csproj", "{C6E36965-1B46-4943-9280-7FCABB2D667D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LiteSerializerTest", "..\LiteSerializerTest\LiteSerializerTest.csproj", "{C2049BE8-04B1-41BE-8520-0C5DED588A8F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AxsUtils", "..\AxsUtils\AxsUtils.csproj", "{DA8CBD6F-8CA0-4F68-8676-B3E05BC2D32E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C6E36965-1B46-4943-9280-7FCABB2D667D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C6E36965-1B46-4943-9280-7FCABB2D667D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C6E36965-1B46-4943-9280-7FCABB2D667D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C6E36965-1B46-4943-9280-7FCABB2D667D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C2049BE8-04B1-41BE-8520-0C5DED588A8F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C2049BE8-04B1-41BE-8520-0C5DED588A8F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C2049BE8-04B1-41BE-8520-0C5DED588A8F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C2049BE8-04B1-41BE-8520-0C5DED588A8F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DA8CBD6F-8CA0-4F68-8676-B3E05BC2D32E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DA8CBD6F-8CA0-4F68-8676-B3E05BC2D32E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DA8CBD6F-8CA0-4F68-8676-B3E05BC2D32E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DA8CBD6F-8CA0-4F68-8676-B3E05BC2D32E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

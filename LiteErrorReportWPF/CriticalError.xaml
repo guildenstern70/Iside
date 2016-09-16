@@ -1,0 +1,13 @@
+﻿<Window x:Name="CriticalErrorWnd" x:Class="LiteErrorReportWPF.CriticalError"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Critical Error" Height="246" Width="411" ResizeMode="NoResize" Topmost="True" WindowStartupLocation="CenterScreen" Loaded="CriticalErrorWnd_Loaded" Icon="Resources/18122009519_11954453151817762013.png">
+    <Grid>
+        <Image HorizontalAlignment="Left" Height="80" Margin="309,10,0,0" VerticalAlignment="Top" Width="86" RenderTransformOrigin="0.41,0.4" Source="Resources/18122009519_11954453151817762013.png"/>
+        <TextBlock x:Name="labelError" HorizontalAlignment="Left" Margin="12,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="283" Height="97"><Run Text="xxx has encountered an error and needs to close."/><LineBreak/><Run/><LineBreak/><Run Text="We have created an error report that you can send to help us improve xxx. The report is anonymous and does not contain any private information."/><LineBreak/><Run/><LineBreak/><Run/></TextBlock>
+        <Button x:Name="btnSend" Content="Send Error Report" HorizontalAlignment="Left" Margin="249,162,0,0" VerticalAlignment="Top" Width="142" Height="35" IsDefault="True" Click="btnSend_Click"/>
+        <Button x:Name="btnCancel" Content="Cancel" HorizontalAlignment="Left" Margin="159,162,0,0" VerticalAlignment="Top" Width="75" RenderTransformOrigin="0.12,0.545" Height="35" IsCancel="True" Click="btnCancel_Click"/>
+        <ProgressBar x:Name="progressBar" HorizontalAlignment="Left" Height="18" Margin="101,123,0,0" VerticalAlignment="Top" Width="290" RenderTransformOrigin="0.46,2.1" IsIndeterminate="True"/>
+
+    </Grid>
+</Window>

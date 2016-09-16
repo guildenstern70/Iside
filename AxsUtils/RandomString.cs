@@ -1,0 +1,184 @@
+/**
+ * AXS C# Utils
+ * Copyright © 2004-2013 LittleLite Software
+ * 
+ * All Rights Reserved
+ * 
+ * AxsUtils.RandomString.cs
+ * 
+ */
+
+using System;
+using System.Text;
+
+namespace AxsUtils
+{
+	/// <summary>
+	/// This class generates random strings in various formats.
+	/// </summary>
+	public static class RandomString
+	{
+
+		private static Random seed = new Random();
+		private const string ALPHA = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+        private const string ALPHA_SPACE = "abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ 1234567890";
+        private const string EXTENDED_ALPHA = "abcdefghijklmnopqrstuvwxyz!@#$%^&*()Ë+Ú‡Ï˘Á©°£ø\r\nABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890,.;':[]{}_=";
+		private const string EXTENDED_ALPHA_SPACE = "abcdefghijklmnopqrstuvwxyz !@#$%^&*()Ë+Ú‡Ï˘Á©°£ø\r\nABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890,.;':[]{}_=";
+
+        /// <summary>
+        /// Get a random string made of 10 alphanumeric characters, both uppercase and lowercase, with numbers.
+        /// </summary>
+        /// <returns>A random string of 10 alphanumeric characters.</returns>
+		public static string Get()
+		{
+			return RandomString.Get(10);
+		}
+
+        /// <summary>
+        /// Get a random string made of 10 alphanumeric characters, both uppercase and lowercase,
+        /// with symbols and numbers.
+        /// </summary>
+        /// <returns>A random string 10 alphanumeric characters, both uppercase and lowercase, with symbols and numbers.</returns>
+		public static string GetEx()
+		{
+			return RandomString.GetEx(10);
+		}
+
+        /// <summary>
+        /// Get a random string made of 'len' alphanumeric characters, both uppercase and lowercase, with numbers.
+        /// </summary>
+        /// <param name="len">The length of the random generated string.</param>
+        /// <returns>A random string made of 'len' alphanumeric characters, both uppercase and lowercase, with numbers.</returns>
+        public static string Get(int len)
+        {
+            return RandomString.Get(len, false);
+        }
+
+        /// <summary>
+        /// Gets a random string with a random length betwenn minLength and maxLength alphanumeric characters, both uppercase and lowercase, with numbers.
+        /// </summary>
+        /// <param name="minLength">Minimum length of the random string.</param>
+        /// <param name="maxLength">Maximum length of the random string.</param>
+        /// <returns></returns>
+        public static string Get(int minLength, int maxLength)
+        {
+            int length = seed.Next(minLength, maxLength);
+            return RandomString.Get(length);
+        }
+
+        /// <summary>
+        /// Gets a random string with a random length betwenn minLength and maxLength alphanumeric characters, both uppercase and lowercase, with symbol and numbers.
+        /// </summary>
+        /// <param name="minLength">Minimum length of the random string.</param>
+        /// <param name="maxLength">Maximum length of the random string.</param>
+        /// <returns></returns>
+        public static string GetEx(int minLength, int maxLength)
+        {
+            int length = seed.Next(minLength, maxLength);
+            return RandomString.GetEx(length);
+        }
+
+        /// <summary>
+        /// Get a random string made of 'len' alphanumeric characters, both uppercase and lowercase,
+        /// with symbols and numbers.
+        /// </summary>
+        /// <param name="len">A random string made of 'len' alphanumeric characters, both uppercase and lowercase, with numbers and symbols.</param>
+        /// <returns></returns>
+        public static string GetEx(int len)
+        {
+            return RandomString.GetEx(len, true);
+        }
+
+        /// <summary>
+        /// Determines whether the character c between alphanumeric characters, both uppercase and lowercase,
+        /// with numbers.
+        /// </summary>
+        /// <param name="c">The character to be found</param>
+        /// <returns>
+        /// 	<c>true</c> if c in the specified character set; otherwise, <c>false</c>.
+        /// </returns>
+		public static bool IsInAlpha(char c)
+		{
+			bool found = false;
+
+			if (ALPHA.IndexOf(c)>0)
+			{
+				found = true;
+			}
+
+			return found;
+		}
+
+        /// <summary>
+        /// Determines whether the character c between alphanumeric characters, both uppercase and lowercase,
+        /// with numbers.
+        /// </summary>
+        /// <param name="c">The character to be found</param>
+        /// <returns>
+        /// 	<c>true</c> if c in the specified character set; otherwise, <c>false</c>.
+        /// </returns>
+		public static bool IsInAlphaEx(char c)
+		{
+			bool found = false;
+
+			if (EXTENDED_ALPHA.IndexOf(c)>0)
+			{
+				found = true;
+			}
+
+			return found;
+		}
+
+        /// <summary>
+        /// Get a random string made of 'len' alphanumeric characters, both uppercase and lowercase, with numbers.
+        /// If 'withSpaces' then the resulting string may contain one or more spaces.
+        /// </summary>
+        /// <param name="len">The length of the random generated string.</param>
+        /// <param name="withSpaces">if set to <c>true</c> the generated string will contain one or more spaces.</param>
+        /// <returns>A random generated string.</returns>
+		public static string Get(int len, bool withSpaces)
+		{
+			
+			StringBuilder sb = new StringBuilder(len);
+            string setOfChars = ALPHA;
+            if (withSpaces)
+            {
+                setOfChars = ALPHA_SPACE;
+            }
+			
+			for (int j=0; j<len; j++)
+			{
+                char c = setOfChars[seed.Next(setOfChars.Length)];
+				sb.Append(c);
+			}
+
+			return sb.ToString();
+		}
+
+        /// <summary>
+        /// Get a random string made of 'len' alphanumeric characters, both uppercase and lowercase, with numbers and symbols.
+        /// If 'withSpaces' then the resulting string may contain one or more spaces.
+        /// </summary>
+        /// <param name="len">The length of the random generated string.</param>
+        /// <param name="withSpaces">if set to <c>true</c> the generated string will contain one or more spaces.</param>
+        /// <returns>A random generated string.</returns>
+        public static string GetEx(int len, bool withSpaces)
+		{
+			
+			StringBuilder sb = new StringBuilder(len);
+            string setOfChars = EXTENDED_ALPHA_SPACE;
+            if (!withSpaces)
+            {
+                setOfChars = EXTENDED_ALPHA;
+            }
+			
+			for (int j=0; j<len; j++)
+			{
+                char c = setOfChars[seed.Next(setOfChars.Length)];
+				sb.Append(c);
+			}
+
+			return sb.ToString();
+		}
+	}
+}

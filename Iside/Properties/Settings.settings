@@ -1,0 +1,36 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="Iside.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="FolderLocation" Type="System.Drawing.Point" Scope="User">
+      <Value Profile="(Default)">0, 0</Value>
+    </Setting>
+    <Setting Name="DefaultHash" Type="LLCryptoLib.Hash.AvailableHash" Scope="User">
+      <Value Profile="(Default)">MD5</Value>
+    </Setting>
+    <Setting Name="AlternativeHash" Type="LLCryptoLib.Hash.AvailableHash" Scope="User">
+      <Value Profile="(Default)">SHA1</Value>
+    </Setting>
+    <Setting Name="PrimaryHash" Type="LLCryptoLib.Hash.AvailableHash" Scope="User">
+      <Value Profile="(Default)">MD5</Value>
+    </Setting>
+    <Setting Name="HashStyle" Type="LLCryptoLib.Utils.HexEnum" Scope="User">
+      <Value Profile="(Default)">UNIX</Value>
+    </Setting>
+    <Setting Name="LeftColor" Type="System.Drawing.Color" Scope="User">
+      <Value Profile="(Default)">Black</Value>
+    </Setting>
+    <Setting Name="RightColor" Type="System.Drawing.Color" Scope="User">
+      <Value Profile="(Default)">Black</Value>
+    </Setting>
+    <Setting Name="IsideWinLeft" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">-1</Value>
+    </Setting>
+    <Setting Name="IsideWinTop" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">-1</Value>
+    </Setting>
+    <Setting Name="SizeForm" Type="IsideLogic.FormWidth" Scope="User">
+      <Value Profile="(Default)">DOUBLE</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

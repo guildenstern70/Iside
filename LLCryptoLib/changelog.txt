@@ -1,0 +1,31 @@
+v. 2.0
+- Added SKEIN (Skein224, Skein256, Skein384, Skein512, Skein1024) hash algorithms
+- Added Fowler/Noll/Vo FNV (FNV32, FNV64, FNV1A32, FNV1A64) fast hash algorithms, based on FNV-1 and FNV-1a algorithms
+- Added ThreeFish symmetric encryption algorithm
+- Certificate and LLCertificate classes method names have been redesigned
+
+v. 1.9
+
+- Fixed Whirlpool algorithm
+- Text hash functions now support Encoding as a parameter
+- DirectoryElements now may skip hidden, system or archive files
+- DirectoryElements refactored (scanning does not happen in constructor anymore)
+- Some classes where added to Utils namespace (Alpha, HexEnum, Hexer, HexStyler, PasswordComplexityIndex)
+- Documentation has been enhanced
+- Minor bug fixing
+
+
+v. 1.8
+
+- Added CAST5 (aka CAST-128) encryption algorithm
+- Added ManagedCast5 class 
+- Added a Shred example
+- New shred method: HMG Infosec Standard 5 Enhanced
+- New shred method: German VSITR5 Enhanced
+- New shred method: Navso P-5329-26 (replaces the old "complex" method)
+- LLCryptoLib.Security has a new namespace organization
+- Fixed ZEROES padding mode in ManagedBlowfish class
+- Fixed erratic behaviour in some shredding methods
+- Some refactoring (Alfa is now Alpha, HexStyle is now HexEnum)
+
+

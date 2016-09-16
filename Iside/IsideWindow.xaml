@@ -1,0 +1,371 @@
+﻿<Window x:Name="Iside" x:Class="Iside.IsideWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:commands="clr-namespace:Iside.Logic"
+        Height="400" Width="732.679" Background="#f5f6f7"
+        Title="Iside" Icon="Resources/iside.ico" Margin="0" ResizeMode="NoResize" 
+        Closing="Iside_Closing" Activated="Iside_Activated" Loaded="Iside_Loaded" Closed="Iside_Closed">
+    <Window.CommandBindings>
+        <CommandBinding Command="commands:Commands.NewHash" CanExecute="NewHashCanExecute" Executed="NewHashExecuted"/>
+        <CommandBinding Command="commands:Commands.OpenLeft" CanExecute="OpenLeftCanExecute" Executed="OpenLeftExecuted"/>
+        <CommandBinding Command="commands:Commands.OpenRight" CanExecute="OpenRightCanExecute" Executed="OpenRightExecuted"/>
+        <CommandBinding Command="commands:Commands.SaveAs" CanExecute="SaveAsCanExecute" Executed="SaveAsExecuted"/>
+        <CommandBinding Command="commands:Commands.ExportReport" CanExecute="ExportReportCanExecute" Executed="ExportReportExecuted"/>
+        <CommandBinding Command="ApplicationCommands.PrintPreview" CanExecute="ReportPreviewCanExecute" Executed="ReportPreviewExecuted"/>
+        <CommandBinding Command="ApplicationCommands.Print" CanExecute="PrintReportCanExecute" Executed="PrintReportExecuted"/>
+        <CommandBinding Command="commands:Commands.Options" CanExecute="OptionsCanExecute" Executed="OptionsExecuted"/>
+        <CommandBinding Command="commands:Commands.Exit" CanExecute="ExitCanExecute" Executed="ExitExecuted"/>
+        <CommandBinding Command="commands:Commands.HashNow" CanExecute="HashNowCanExecute" Executed="HashNowExecuted"/>
+        <CommandBinding Command="commands:Commands.CompareNow" CanExecute="CompareNowCanExecute" Executed="CompareNowExecuted"/>
+        <CommandBinding Command="commands:Commands.Folders" CanExecute="FoldersCanExecute" Executed="FoldersExecuted"/>
+        <CommandBinding Command="commands:Commands.MultiFile" CanExecute="MultiFileCanExecute" Executed="MultiFileExecuted"/>
+        <CommandBinding Command="commands:Commands.CdDvd" CanExecute="CdDvdCanExecute" Executed="CdDvdExecuted"/>
+        <CommandBinding Command="commands:Commands.Md5Gen" CanExecute="Md5GenCanExecute" Executed="Md5GenExecuted"/>
+        <CommandBinding Command="commands:Commands.Md5Verify" CanExecute="Md5VerifyCanExecute" Executed="Md5VerifyExecuted"/>
+        <CommandBinding Command="commands:Commands.SfvGen" CanExecute="SfvGenCanExecute" Executed="SfvGenExecuted"/>
+        <CommandBinding Command="commands:Commands.SfvVerify" CanExecute="SfvVerifyCanExecute" Executed="SfvVerifyExecuted"/>
+        <CommandBinding Command="commands:Commands.CdDvd" CanExecute="CdDvdCanExecute" Executed="CdDvdExecuted"/>
+        <CommandBinding Command="ApplicationCommands.Help" CanExecute="HelpCanExecute" Executed="HelpExecuted"/>
+        <CommandBinding Command="commands:Commands.CheckForUpdates" CanExecute="ChekForUpdatesCanExecute" Executed="ChekForUpdatesExecuted"/>
+        <CommandBinding Command="commands:Commands.IsideWeb" CanExecute="IsideWebCanExecute" Executed="IsideWebExecuted"/>
+        <CommandBinding Command="commands:Commands.LittleLiteWeb" CanExecute="LittleLiteWebCanExecute" Executed="LittleLiteWebExecuted"/>
+        <CommandBinding Command="commands:Commands.About" CanExecute="AboutCanExecute" Executed="AboutExecuted"/>
+    </Window.CommandBindings>
+    <DockPanel>
+        <Grid DockPanel.Dock="Top" Background="WhiteSmoke">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <!-- Menu -->
+                <RowDefinition/>
+                <!-- Toolbar -->
+            </Grid.RowDefinitions>
+            <Menu Grid.Row="0" x:Name="MenuBar" Height="22" Margin="5,5,0,5" Background="WhiteSmoke">
+                <MenuItem Header="_File" LostFocus="Menu_Exit" >
+                    <MenuItem Header="_New" MouseMove="MenuHelper_StatusBar" Command="commands:Commands.NewHash"></MenuItem>
+                    <MenuItem Header="Open _Left File..." MouseMove="MenuHelper_StatusBar" Command="commands:Commands.OpenLeft">
+                        <MenuItem.Icon>
+                            <Image Source="/Iside;component/Resources/folder-open_left_32.png" Width="16" Height="16" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="Open _Right File..." MouseMove="MenuHelper_StatusBar" Command="commands:Commands.OpenRight">
+                        <MenuItem.Icon>
+                            <Image Source="/Iside;component/Resources/folder-open_right_32.png" Width="16" Height="16" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="_Save As..." MouseMove="MenuHelper_StatusBar" Command="commands:Commands.SaveAs">
+                        <MenuItem.Icon>
+                            <Image Source="/Iside;component/Resources/save_24.png" Width="16" Height="16" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <Separator />
+                    <MenuItem Header="_Export Report..." MouseMove="MenuHelper_StatusBar" Command="commands:Commands.ExportReport" />
+                    <MenuItem Header="Print Previe_w Report" MouseMove="MenuHelper_StatusBar" Command="ApplicationCommands.PrintPreview" />
+                    <MenuItem Header="_Print Report..." MouseMove="MenuHelper_StatusBar" Command="ApplicationCommands.Print" />
+                    <Separator />
+                    <MenuItem Header="_Options..." MouseMove="MenuHelper_StatusBar" Command="commands:Commands.Options">
+                        <MenuItem.Icon>
+                            <Image Source="/Iside;component/Resources/applications_24.png" Width="16" Height="16" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <Separator />
+                    <MenuItem Header="E_xit" MouseMove="MenuHelper_StatusBar" Command="commands:Commands.Exit" />
+                </MenuItem>
+                <MenuItem Header="_Tools" LostFocus="Menu_Exit" >
+                    <MenuItem Header="_Hash Now" MouseMove="MenuHelper_StatusBar" Command="commands:Commands.HashNow">
+                        <MenuItem.Icon>
+                            <Image Source="/Iside;component/Resources/redo_24.png" Width="16" Height="16" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="_Compare Now" MouseMove="MenuHelper_StatusBar" Command="commands:Commands.CompareNow" />
+                    <MenuItem Header="Compare _Folders" MouseMove="MenuHelper_StatusBar" Command="commands:Commands.Folders">
+                        <MenuItem.Icon>
+                            <Image Source="/Iside;component/Resources/computer_24.png" Width="16" Height="16" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <Separator />
+                    <MenuItem Header="_Multifile Hash" MouseMove="MenuHelper_StatusBar" Command="commands:Commands.MultiFile" />
+                    <MenuItem Header="CD/_DVD Hash" MouseMove="MenuHelper_StatusBar" Command="commands:Commands.CdDvd">
+                        <MenuItem.Icon>
+                            <Image Source="/Iside;component/Resources/disc-media_24.png" Width="16" Height="16" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <Separator />
+                    <MenuItem Header="Md_5Sum">
+                        <MenuItem Header="_Generate" MouseMove="MenuHelper_StatusBar" Command="commands:Commands.Md5Gen" />
+                        <MenuItem Header="_Verify" MouseMove="MenuHelper_StatusBar" Command="commands:Commands.Md5Verify" />
+                    </MenuItem>
+                    <MenuItem Header="_SFV">
+                        <MenuItem Header="_Generate" MouseMove="MenuHelper_StatusBar" Command="commands:Commands.SfvGen"/>
+                        <MenuItem Header="_Verify" MouseMove="MenuHelper_StatusBar" Command="commands:Commands.SfvVerify" />
+                    </MenuItem>
+                </MenuItem>
+                <MenuItem Header="_Help" LostFocus="Menu_Exit" >
+                    <MenuItem Header="_Help" MouseMove="MenuHelper_StatusBar" Command="ApplicationCommands.Help" />
+                    <MenuItem Header="_Check for updates" MouseMove="MenuHelper_StatusBar" Command="commands:Commands.CheckForUpdates" />
+                    <Separator x:Name="sepOrders" />
+                    <Separator />
+                    <MenuItem Header="_Iside Web Site" MouseMove="MenuHelper_StatusBar" Command="commands:Commands.IsideWeb">
+                        <MenuItem.Icon>
+                            <Image Source="/Iside;component/Resources/home_24.png" Width="16" Height="16" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="_LittleLite Web Site" MouseMove="MenuHelper_StatusBar" Command="commands:Commands.LittleLiteWeb" />
+                    <Separator />
+                    <MenuItem Header="_About" MouseMove="MenuHelper_StatusBar" Command="commands:Commands.About" />
+                </MenuItem>
+            </Menu>
+            <ToolBarTray Grid.Row="1" Height="42">
+                <ToolBar>
+                    <Button ToolTip="Open File on Left Panel" Command="commands:Commands.OpenLeft">
+                        <Image Height="32" Width="32" Source="/Iside;component/Resources/folder-open_left_32.png" />
+                    </Button>
+                    <Button ToolTip="Open File on Right Panel" Command="commands:Commands.OpenRight">
+                        <Image Height="32" Width="32" Source="/Iside;component/Resources/folder-open_right_32.png" />
+                    </Button>
+                    <Button ToolTip="Save current hash" Command="commands:Commands.SaveAs">
+                        <Image Height="32" Width="32" Source="/Iside;component/Resources/save_32.png" />
+                    </Button>
+                    <Separator />
+                    <Button ToolTip="Re-hash now" Command="commands:Commands.HashNow">
+                        <Image Height="32" Width="32" Source="/Iside;component/Resources/redo_32.png" />
+                    </Button>
+                    <Button ToolTip="CD/DVD Hash" Command="commands:Commands.CdDvd">
+                        <Image Height="32" Width="32" Source="/Iside;component/Resources/disc-media_32.png" />
+                    </Button>
+                    <Button ToolTip="Iside Folders" Command="commands:Commands.Folders">
+                        <Image Height="32" Width="32" Source="/Iside;component/Resources/computer_32.png" />
+                    </Button>
+                    <Separator />
+                    <Button ToolTip="Options" Command="commands:Commands.Options">
+                        <Image Height="32" Width="32" Source="/Iside;component/Resources/applications_32.png" />
+                    </Button>
+                    <Button ToolTip="Iside Home" Command="commands:Commands.IsideWeb">
+                        <Image Height="32" Width="32" Source="/Iside;component/Resources/home_32.png" />
+                    </Button>
+                </ToolBar>
+            </ToolBarTray>
+        </Grid>
+        <StatusBar DockPanel.Dock="Bottom" Height="24" Background="WhiteSmoke">
+            <StatusBarItem x:Name="statusBar" Content="Ready" Margin="5,0,0,0" />
+        </StatusBar>
+        <Grid DockPanel.Dock="Left" Width="0" />
+        <Grid DockPanel.Dock="Right" Width="0" />
+
+        <!-- Main content goes here -->
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="32" />
+            </Grid.RowDefinitions>
+            <StackPanel Grid.Row="0" Orientation="Horizontal">
+                <!-- Left Panel -->
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="30" />
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="310" />
+                        <ColumnDefinition Width="40" />
+                    </Grid.ColumnDefinitions>
+                    <TextBox Name="txtFileName" Grid.Row="0" Grid.Column="0" Margin="10,6,5,3"
+                            AllowDrop="True" 
+                            PreviewDragEnter="txtFileName_DragEnter"
+                            PreviewDragOver="txtFileName_DragEnter"
+                            PreviewDrop="txtFileName_Drop">
+                        <TextBox.ToolTip>
+                            <ToolTip>
+                                <StackPanel>
+                                    <TextBlock Name="txtFileNameTip">Complete path to the file to be hashed.</TextBlock>
+                                </StackPanel>
+                            </ToolTip>
+                        </TextBox.ToolTip>
+                    </TextBox>
+                    <Button x:Name="btnSelectFileLeft" Grid.Row="0" Grid.Column="1" Content="..." Margin="3,6,10,3" Command="commands:Commands.OpenLeft" />
+                    <TabControl Name="tabControl1" Grid.Row="1" Grid.ColumnSpan="2" Margin="10,10.113,9.585,0.094">
+                        <TabItem Name="tabHashLeft" Header="Hash">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="24" />
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="24" />
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="100" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <ComboBox Grid.Row="0" Grid.Column="0" Name="cboSelHashLeft1" Margin="1,2,2,2" FontSize="10.667" SelectionChanged="cboSelHashLeft1_SelectionChanged">
+                                </ComboBox>
+                                <TextBox Grid.Row="1" Grid.ColumnSpan="2" Name="txtHash1Left" IsReadOnly="True"
+                                         TextWrapping="Wrap"
+                                         AllowDrop="True" 
+                                         PreviewDragEnter="txtFileName_DragEnter"
+                                         PreviewDragOver="txtFileName_DragEnter"
+                                         PreviewDrop="txtFileName_Drop"></TextBox>
+                                <ComboBox Grid.Row="2" Grid.Column="0" Name="cboSelHashLeft2" Margin="1,2,2,2" FontSize="10.667" SelectionChanged="cboSelHashLeft2_SelectionChanged">
+                                </ComboBox>
+                                <TextBox Grid.Row="3" Grid.ColumnSpan="2" Name="txtHash2Left" IsReadOnly="True"
+                                         TextWrapping="Wrap"
+                                         AllowDrop="True" 
+                                         PreviewDragEnter="txtFileName_DragEnter"
+                                         PreviewDragOver="txtFileName_DragEnter"
+                                         PreviewDrop="txtFileName_Drop"></TextBox>
+                            </Grid>
+                        </TabItem>
+                        <TabItem Name="tabDetailsLeft" Header="Details">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="5" />
+                                    <RowDefinition Height="30" />
+                                    <RowDefinition Height="30" />
+                                    <RowDefinition Height="30" />
+                                    <RowDefinition Height="30" />
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="120" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Label Grid.Row="1" Grid.Column="0" Height="24" Content="File Size:" />
+                                <Label Grid.Row="2" Grid.Column="0" Height="24" Content="Last Modified Date:" />
+                                <Label Grid.Row="3" Grid.Column="0" Height="24" Content="Creation Date:" />
+                                <Label Grid.Row="4" Grid.Column="0" Height="24" Content="Last Access Date:" />
+                                <Label Grid.Row="5" Grid.Column="0" Height="24" Content="Attributes:" />
+                                <TextBox Grid.Row="1" Grid.Column="1" Margin="5,4,54,4" Height="22" Padding="2" Name="txtFileSize" IsReadOnly="True" />
+                                <TextBox Grid.Row="2" Grid.Column="1" Margin="4" Height="22" Padding="2" Name="txtLastModified" IsReadOnly="True" />
+                                <TextBox Grid.Row="3" Grid.Column="1" Margin="4" Height="22" Padding="2" Name="txtCreationDate" IsReadOnly="True" />
+                                <TextBox Grid.Row="4" Grid.Column="1" Margin="4" Height="22" Padding="2" Name="txtLastAccess" IsReadOnly="True" />
+                                <StackPanel Orientation="Horizontal" Grid.Row="5" Grid.Column="1" Margin="4" Height="24">
+                                    <CheckBox Name="chkReadonly" Content="Read Only" FontSize="10" Margin="3,7,3,-1" />
+                                    <CheckBox Name="chkHidden" Content="Hidden" FontSize="10" Margin="3,7,3,-1" />
+                                    <CheckBox Name="chkArchive" Content="Archive" FontSize="10" Margin="3,7,3,-1" />
+                                </StackPanel>
+                            </Grid>
+                        </TabItem>
+                    </TabControl>
+                </Grid>
+                <!-- Right Panel -->
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="30" />
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="310" />
+                        <ColumnDefinition Width="40" />
+                    </Grid.ColumnDefinitions>
+                    <TextBox Name="txtFileNameVS" Grid.Row="0" Grid.Column="0" Margin="10,6,5,3"
+                             LostFocus="txtFileNameVS_LostFocus"
+                             AllowDrop="True" 
+                             PreviewDragEnter="txtFileNameVS_DragEnter"
+                             PreviewDragOver="txtFileNameVS_DragEnter"
+                             PreviewDrop="txtFileNameVS_Drop">
+                        <TextBox.ToolTip>
+                            <ToolTip>
+                                <StackPanel>
+                                    <TextBlock Name="txtFileNameVSTip">Complete path to the file to be hashed.</TextBlock>
+                                </StackPanel>
+                            </ToolTip>
+                        </TextBox.ToolTip>
+                    </TextBox>
+                    <Button x:Name="btnSelectFileRight" Grid.Row="0" Grid.Column="1" Content="..." Margin="3,6,10,3" Command="commands:Commands.OpenRight" />
+                    <TabControl Name="tabControl2" Grid.Row="1" Grid.ColumnSpan="2" Margin="10,10.113,9.585,0.094" >
+                        <TabItem Name="tabHashRight" Header="Hash">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="24" />
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="24" />
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="90" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <ComboBox Grid.Row="0" Grid.Column="0" Name="cboSelHashRight1" Margin="1,2,2,2" FontSize="10.667" SelectionChanged="cboSelHashRight1_SelectionChanged">
+                                </ComboBox>
+                                <TextBox Grid.Row="1" Grid.ColumnSpan="2" Name="txtHash1Right" IsReadOnly="True"
+                                         TextWrapping="Wrap"
+                                         AllowDrop="True" 
+                                         PreviewDragEnter="txtFileNameVS_DragEnter"
+                                         PreviewDragOver="txtFileNameVS_DragEnter"
+                                         PreviewDrop="txtFileNameVS_Drop"></TextBox>
+                                <ComboBox Grid.Row="2" Grid.Column="0" Name="cboSelHashRight2" Margin="1,2,2,2" FontSize="10.667" SelectionChanged="cboSelHashRight2_SelectionChanged">
+                                </ComboBox>
+                                <TextBox Grid.Row="3" Grid.ColumnSpan="2" Name="txtHash2Right" IsReadOnly="True"
+                                         TextWrapping="Wrap"
+                                         AllowDrop="True" 
+                                         PreviewDragEnter="txtFileNameVS_DragEnter"
+                                         PreviewDragOver="txtFileNameVS_DragEnter"
+                                         PreviewDrop="txtFileNameVS_Drop"></TextBox>
+                            </Grid>
+                        </TabItem>
+                        <TabItem Name="tabDetailsRight" Header="Details">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="5" />
+                                    <RowDefinition Height="30" />
+                                    <RowDefinition Height="30" />
+                                    <RowDefinition Height="30" />
+                                    <RowDefinition Height="30" />
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="120" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Label Grid.Row="1" Grid.Column="0" Height="24" Content="File Size:" />
+                                <Label Grid.Row="2" Grid.Column="0" Height="24" Content="Last Modified Date:" />
+                                <Label Grid.Row="3" Grid.Column="0" Height="24" Content="Creation Date:" />
+                                <Label Grid.Row="4" Grid.Column="0" Height="24" Content="Last Access Date:" />
+                                <Label Grid.Row="5" Grid.Column="0" Height="24" Content="Attributes:" />
+                                <TextBox Grid.Row="1" Grid.Column="1" Margin="5,4,54,4" Height="22" Padding="2" Name="txtFileSizeVS" IsReadOnly="True" />
+                                <TextBox Grid.Row="2" Grid.Column="1" Margin="4" Height="22" Padding="2" Name="txtLastModifiedVS" IsReadOnly="True" />
+                                <TextBox Grid.Row="3" Grid.Column="1" Margin="4" Height="22" Padding="2" Name="txtCreationDateVS" IsReadOnly="True" />
+                                <TextBox Grid.Row="4" Grid.Column="1" Margin="4" Height="22" Padding="2" Name="txtLastAccessVS" IsReadOnly="True" />
+                                <StackPanel Orientation="Horizontal" Grid.Row="5" Grid.Column="1" Margin="4" Height="24">
+                                    <CheckBox Name="chkReadonlyVS" Content="Read Only" FontSize="10" Margin="3,7,3,-1" />
+                                    <CheckBox Name="chkHiddenVS" Content="Hidden" FontSize="10" Margin="3,7,3,-1" />
+                                    <CheckBox Name="chkArchiveVS" Content="Archive" FontSize="10" Margin="3,7,3,-1" />
+                                </StackPanel>
+                            </Grid>
+                        </TabItem>
+                    </TabControl>
+                </Grid>
+            </StackPanel>
+            <!-- Main ProgressBar -->
+            <Grid Grid.Row="1" >
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="34" />
+                    <ColumnDefinition Width="34" />
+                </Grid.ColumnDefinitions>
+
+                <ProgressBar Name="progressBar" Grid.Column="0" Margin="10,6,4.83,2.698" Grid.ColumnSpan="2" Visibility="Hidden"></ProgressBar>
+
+                <Button Background="Transparent" Grid.Column="1" BorderThickness="0"  
+                        Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+						HorizontalAlignment="Center" 
+						VerticalAlignment="Top" Margin="0" Visibility="Hidden" x:Name="btnCancel" Click="btnCancel_Click" >
+                    <Image Source="/Iside;component/Resources/delete_24.png" 
+									   Width="21" 
+									   Height="21" Margin="0,2,0,0" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <Image.Style>
+                            <Style TargetType="Image">
+                                <Style.Triggers>
+                                    <Trigger Property="IsEnabled" Value="False">
+                                        <Setter Property="Opacity" Value="0.7" />
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Image.Style>
+                    </Image>
+                </Button>
+
+                <Expander x:Name="expSize" Grid.Column="1" ExpandDirection="Right" Margin="32.585,7,7.245,-1.302" VerticalAlignment="Top" Expanded="Expander_Expanded_1" Collapsed="Expander_Collapsed_1" IsExpanded="True" Grid.ColumnSpan="2" />
+
+            </Grid>
+        </Grid>
+    </DockPanel>
+</Window>

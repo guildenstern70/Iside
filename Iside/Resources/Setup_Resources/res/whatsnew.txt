@@ -1,0 +1,246 @@
+CHANGELOG HISTORY
+
+Version 4.1
+===========
+* Fully compatible with Windows 8
+* New setup program
+* No more saves log, print preview and other files to the program directory. Instead it uses AppData/Roaming
+
+Version 4.0
+===========
+* Iside, Iside Folder: Completely re-designed user interface
+* Iside: Runs the hash computation on an isolated thread
+* Iside Folder: Now on a different assembly and runs in its own process
+* Iside Folder: Logs now report the type of comparison run (name, size or hash)
+FIXED: SFV Verification no more fails in case of paths with spaces.
+FIXED: FNV32 and FNV64 can now be correctly selected in interface
+
+Version 3.2
+===========
+* New hash algorithms: Skein family at 224, 256, 384 and 512 bits
+* New fast hash algorithms: FNV at 32 and 64 bits
+* Iside: print report of hashes
+* Iside: export report of hashes
+* FIXED: Iside Shell Extension not working properly on certain 64 bit OS
+
+Version 3.1
+===========
+* Iside Folder background tasks optimizations
+* Enhanced Iside Folder UI functionality 
+* Iside Folder now saves window location
+* Iside Folder: Empty directories can no longer be compared
+* Changed (glorious) Iside icon
+* Changed Iside Folder icon
+* FIXED: BackgroundWorker busy critical error on Iside Folder comparison
+* FIXED: LittleLite Link on About form produced crash on PC non connected to Internet
+
+Version 3.0
+===========
+* Iside and Iside Folder are now fully Windows 7 compatible
+* Iside and Iside Folder: Win7 Taskbar enabled
+* Iside Folder: Win7 Jump Lists enabled
+* Iside: hashes are now performed different threads
+* Iside: added attributes display
+* Iside: DVD/CD hashing performance significantly improved
+* Iside Folder: Comparison now happens on background task
+* Iside Folder: Significant performance enhancement
+
+Version 2.9
+===========
+* Iside: Whirlpool algorithm has been fixed
+* Iside: string hash calculator
+* Iside: drag and drop enhanced
+* Iside: Enhanced User Interface
+* Iside: Md5Sum verification tool now tries to infer the algorithm from the MD5SUM file
+* Iside Folder: user may exclude "archive", "system" and "hidden" files from comparison
+* Iside Folder: Added "Refresh" icon in the toolbar
+* Iside Folder: Enhanced Interface. Now supports drag and drop of directories and ISRL files.
+* FIXED: Critical error when comparing files with path name longer than 255 characters
+* FIXED: Deleting a file before hash does not produce a critical error anymore
+
+Version 2.8
+===========
+* Improved compatibility for 64bit platforms
+* Native 64bit Shell Extension for 64 bit OS
+* Added some security checks
+
+Version 2.7
+===========
+* Two new, fast 32 bits hash functions: GHash-32-3 and GHash-32-5
+* Iside Folder: a wider choice of algorithms is supported
+* Iside Folder: new UI algorithm selection
+* Iside Folder: .isrl file has now the indication of hash function used
+* Iside Folder: when comparing against a .isrl file, the hash is automatically changed to the one indicated into the .isrl file
+* Iside: minor User Interface adjustments
+* Iside Shell Extension: security checks enabled, using new C++ runtime
+* The code is now DEP disabled on Windows Vista and greater
+* FIXED: Access denied critical error when generating md5sum on protected files
+* FIXED: Zero key length bug on HMAC-SHA1
+
+Version 2.6
+===========
+* Iside Folder: When examining a folder that contain access denied files, a critical exception is raised.
+* Iside Folder: Toolbar has been added
+* Iside: New SFV hash sum support (creation and verification of SFV files)
+* Iside: Toolbar has been added
+* Iside: enhanced feedback on hahsing
+* Iside: new font options layout
+* Iside: new setup procedure based on Microsoft Installer
+* FIXED: Disabling md5sum shell integration does not permit to re-enable it anymore
+* Minor bug fixing
+* Minor enhancements
+
+Version 2.5
+===========
+* New setup procedure with previous versions error recovering
+* Enhanced compatibility for Windows Vista
+* Adjusted layout for Windows Vista
+* Adjusted layout for Windows 2000
+* FIXED: Wrong version on HTML Iside Folder Report
+
+Version 2.4
+===========
+* Iside Folder: Enhanced comparison documents management
+* Iside Folder: New MRU handling
+* Iside Folder: New "Create Results List" feature, to compare directories against future modifications
+* Iside Folder: New interface layout
+* Iside Folder: Opened comparisons (*.iscmp) are now added to Start/Recent Documents
+* Iside Folder: Added a "Refresh" menu option
+* Iside: File Path textbox now displays entire path string via tooltip
+* FIXED: Directories typed in Iside Folder sometimes are not recognized
+* FIXED: When comparing folders, if the number of files changes just before run, an exception lead to a crash.
+
+Version 2.3
+===========
+* Default secondary hash is now SHA1 (was MD5)
+* Changing hash algorithm with comboboxes no more causes complete re-hash of remaining text boxes.
+* User may now run md5sum verification in the same directory where md5sum file is stored. The md5sum file can be ignored if found.
+* Menu style has been changed
+* Other minor enhancements
+* Activation form feedback has been enhanced
+* FIXED: Activate menu item is no more shown when product is registered.
+* FIXED: Uninstall did not remove Interop dll and en directory
+* FIXED: Minor bug fixing
+
+Version 2.2
+===========
+* Changed UI layout
+* When hash matches, background color changes
+* User may now choose font color for hash textboxes
+* Md5sum now can be produced without recursing subdirectories
+* FIXED: Text fore colors always green after successful hash match
+* FIXED: Incorrect UI display on non-US, non-english culture settings.
+
+Version 2.1
+===========
+* Added GOST hash sum
+* Added SHA224 hash sum
+* Iside: Saves windows location and size on exit
+* IsideFolder: Added GOST hash sum
+* IsideFolder: User may now select another hash algorithm and re-run comparison
+* IsideFolder: HTML view of comparison has more info
+* FIXED: When user opens Iside Folder from Iside, Iside is not shown upon Iside Folder exit.
+* FIXED: Null Pointer Exception when using *.isrl files
+
+Version 2.0
+===========
+* Iside is now a full .NET Framework v.2.0 product
+* Iside and IsideFolder were compacted into a single assembly
+
+Version 1.8
+===========
+* Iside and IsideFolder now support CLR (.NET Framework) v2.0  
+* Iside: User can now choose digest algorithms from main form instead of going into Options form
+* Iside: User can now drag/drop files to compute Multi File Hash
+* Fixed: When choosing the same algorithm for upper and lower textboxes, alert is shown.
+* Fixed: Multi File Hash now correctly resizes
+* Fixed: MD5 verification fails when filenames contain non-ASCII characters
+
+Version 1.7
+===========
+* Iside: Added Adler32, FCS16, FCS32, Haval and Whirlpool digest algorithms
+* Iside: Hash codes can be saved as plain text files.
+* Iside: Menu redesign
+* IsideFolder: Unattended Execution, it may be run in Windows Scheduled Task 
+* IsideFolder: Added machine name to summary logs
+* IsideFolder: Added user info to summery logs
+* IsideFolder: Added Whirlpool, Haval and Ripemd160 digest algorithms
+* IsideFolder: Menu redesign
+* Fixed: when opening a recent folder comparison the progress bar is not reset
+* Fixed: in md5sum mode, a zero-bytes file is now properly recognized
+
+Version 1.6
+===========
+* Iside: user can now choose hash algorithm from Windows menu for fast, single file, hash check
+* Iside: hash computing can be interrupted ('x' button)
+* Iside: improved user interface
+* Iside: improved exception handling
+* Iside: user can now specify key while generating md5sum with HMAC-SHA1 keyed hash 
+* Fixed: now you can persist the "No hash algorithm" choice (was erroneously defaulted to SHA1)
+
+Version 1.5
+===========
+* IsideShell: You can now choose CRC32 as shell integration algorithm
+* Added HMAC-SHA1 keyed hash algorithm: this hash supports keys
+* Added Tiger Hash algorithm
+* Iside: Increased I/O performance
+* Iside: Compute CDROM hash
+* Iside: Added a brief description of hash function when choosing them in the Options form
+* Iside: Md5Sum file can be viewed with default text editor
+* Iside: Multi Hash Form now send feedback on every file processed
+* Iside: Multi Hash Form now can add entire directories or drives content
+* IsideFolder: Logs now contain hash function used
+
+Version 1.4
+===========
+* Iside: Shell integration (context menus) can be turned off (Options)
+* Iside: Directories can be verified agains md5sum files
+* Iside: Can save .md5 (md5sum) files
+* Iside: The hash code can be computed for more than one file (files' bytes will be computed as contiguous)
+* Iside: User can now set hash fonts (Options)
+* IsideFolder: Comparisons can be saved/restored
+* IsideFolder: Last 4 comparisons fast load (recent comparisons menu item)
+* IsideFolder: New .iscmp document (Iside Folder Comparison). By double clicking opens the saved comparison.
+* IsideFolder: Detailed log of results
+* IsideFolder: Export results as .csv file (can be viewed with MS Excel or any other spreadsheet)
+* IsideFolder: Export results as .html file
+* IsideFolder: Enhanced HTML view results 
+* IsideFolder: Comparison results can be saved (results list file .isrl)
+* IsideFolder: A folder can be compared against a comparison results list file (.isrl)
+* IsideFolder: Exit on first difference is no longer default choice
+* Bug: "IsideShow.exe" missing from links has been fixed
+* Bug: Fixed Internet Proxy setting not persistent 
+* IsideFolder: tooltip on textboxes now show entire paths
+
+Version 1.3
+===========
+* New: The Iside Verify dialog has been redesigned and now contains hash info
+* New: You can now drag and drop file(s) into Iside to show their hash code(s)
+* New: Progress bar provides feedback during operations with files larger than 2Mb
+* Added: MD2, MD4 file and folder hash algorithms
+* Added: RIPEMD160 file hash algorithm
+* Added: Single size for single hash file displaying
+* Added: New hexadecimal style: Netscape ("0A:FF:1B...")
+* Added: Hash algorithm selection in Folder Compare is now persistent
+* Bug: Fixed empty file exception.
+* Added: Support for Internet Proxy that requires basic authentication
+
+Version 1.2
+===========
+* Added: CRC32 algorithm
+* Added: SHA384 algorithm
+* Added: SHA512 algorithm
+* Added: user can select Windows Integration algorithm
+* Added: new hexadecimal style: classic ("0AFF1B...")
+* Iside Files: improved User Interface
+* Iside Folders: improved User Interface
+* Iside Folders: user can now confront each file, even if differences are found
+* Fixed: Iside Folders now correctly compares subfolders
+
+Version 1.1
+===========
+* Improved performance with very large files (>100Mb)
+* You can now choose your primary and secondary hash algorithm
+* You can select one or two hash codes for each file
+* Hash code output can be viewed in the original style ("1A 2B 3C ...") or the new Unix style ("1a2b3c...")
+* XP Style when run on Windows XP systems

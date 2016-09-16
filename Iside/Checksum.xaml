@@ -1,0 +1,25 @@
+﻿<Window
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="d" x:Class="Iside.Checksum"
+        Title="Iside - Md5Sum Generator" Background="#FFE8E8E8" Height="280.774" Width="430.057" ResizeMode="NoResize" 
+        Icon="Resources/iside.ico" WindowStartupLocation="CenterOwner" ShowInTaskbar="False" Loaded="Window_Loaded_1">
+    <Grid Margin="0,0,-0.302,1">
+        <TextBlock Text="Hash Algorithm:" HorizontalAlignment="Left" Margin="195,13,0,0" VerticalAlignment="Top" Width="93" FontSize="11"/>
+        <ComboBox x:Name="cboHash" HorizontalAlignment="Left" Margin="285,10,0,0" VerticalAlignment="Top" Width="120" FontSize="11"/>
+        <TextBox x:Name="txtFolder" HorizontalAlignment="Left" Margin="10,68,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="355" RenderTransformOrigin="0.475,2.182" Height="22"/>
+        <Button x:Name="btnSelectFolder" Content="..." HorizontalAlignment="Left" Margin="370,68,0,0" VerticalAlignment="Top" Width="35" Click="btnSelectFolder_Click" Height="22"/>
+        <TextBlock Text="Select Folder:" HorizontalAlignment="Left" Margin="10,47,0,0" VerticalAlignment="Top" FontStyle="Italic" Width="65"/>
+        <CheckBox x:Name="chkSubdirs" Content="Include Subfolders" HorizontalAlignment="Left" Margin="10,97,0,0" VerticalAlignment="Top"/>
+        <ProgressBar x:Name="progressBar" HorizontalAlignment="Left" Height="22" Margin="10,140,0,0" VerticalAlignment="Top" Width="395">
+            <ProgressBar.Foreground>
+                <LinearGradientBrush MappingMode="RelativeToBoundingBox" StartPoint="0,0.5" EndPoint="1,0.5">
+                    <GradientStop Color="#FFC4D9D2" Offset="1"/>
+                    <GradientStop Color="#FF54B494"/>
+                </LinearGradientBrush>
+            </ProgressBar.Foreground>
+        </ProgressBar>
+        <Button x:Name="btnGenerate" Content="Generate..." HorizontalAlignment="Left" Margin="202,197,0,0" VerticalAlignment="Top" Width="123" IsDefault="True" Height="31" Click="btnGenerate_Click"/>
+        <Button x:Name="btnCancel" Content="Cancel" HorizontalAlignment="Left" Margin="330,197,0,0" VerticalAlignment="Top" Width="75" IsCancel="True" Height="31" Click="btnCancel_Click"/>
+    </Grid>
+</Window>

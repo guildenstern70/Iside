@@ -1,0 +1,18 @@
+Copyright=Copyright LittleLite Software. Send feedback on this topic to <a href="http://www.littlelite.net/support.html">LittleLite</a>
+ProductName=LittleLite LLCryptoLib
+AssemblyDir=C:\Users\zzasa88\Documents\Codice\VisualStudio2008\LLCryptoLib\bin\Release
+OutputDir=C:\Users\zzasa88\Documents\Codice\Siti\LittleLite\llcryptolib\docs
+DocDir=
+Namespaces=LLCryptoLib;LLCryptoLib.Crypto;LLCryptoLib.Hash;LLCryptoLib.Security;LLCryptoLib.Security.Certificates;LLCryptoLib.Security.Cryptography;LLCryptoLib.Shred;LLCryptoLib.Utils
+Logo=C:\Users\zzasa88\Documents\Codice\Siti\LittleLite\llcryptolib\img\Crypto_Giardia_IFA_small.JPG
+MSDNLinks=false
+OutputType=website;chm
+CodeHighlighting=true
+FriendlyFilenames=true
+Template=vs2005
+Internals=false
+TOC=true
+CSSyntaxDeclaration=true
+VBSyntaxDeclaration=true
+CPPSyntaxDeclaration=true
+JavaScriptSyntaxDeclaration=false
