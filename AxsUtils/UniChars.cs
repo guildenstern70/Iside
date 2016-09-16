@@ -1,34 +1,9 @@
-/**
- * AXS C# Utils
- * Copyright © 2004-2013 LittleLite Software
- * 
- * All Rights Reserved
- * 
- * AxsUtils.Dates.cs
- * 
- */
-
 using System;
 
 namespace AxsUtils
 {
     public static class UniChars
     {
-        /// <summary>
-        /// Gets a Unicode printable char
-        /// </summary>
-        /// <param name="charNum">A number from 0 to 254</param>
-        /// <returns>A printable Unicode char as a string</returns>
-        public static string CharAt(int charNum)
-        {
-            if ((charNum > 255) || (charNum < 0))
-            {
-                throw new ArgumentException("charNum must be between 0 and 255", "charNum");
-            }
-            int printableChar = UniChars.CharInt[charNum];
-            return Char.ConvertFromUtf32(printableChar);
-        }
-
         private static int[] CharInt
         {
             get
@@ -45,6 +20,21 @@ namespace AxsUtils
                 }
                 return ints;
             }
+        }
+
+        /// <summary>
+        ///     Gets a Unicode printable char
+        /// </summary>
+        /// <param name="charNum">A number from 0 to 254</param>
+        /// <returns>A printable Unicode char as a string</returns>
+        public static string CharAt(int charNum)
+        {
+            if ((charNum > 255) || (charNum < 0))
+            {
+                throw new ArgumentException("charNum must be between 0 and 255", "charNum");
+            }
+            int printableChar = CharInt[charNum];
+            return char.ConvertFromUtf32(printableChar);
         }
     }
 }

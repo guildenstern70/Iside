@@ -1,24 +1,12 @@
-/**
- * AXS C# Utils
- * Copyright © 2004-2013 LittleLite Software
- * 
- * All Rights Reserved
- * 
- * AxsUtils.Dates.cs
- * 
- */
-
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Runtime.Serialization;
 
 namespace AxsUtils
 {
     /// <summary>
-    /// AxsException.
+    ///     AxsException.
     /// </summary>
-    [Serializable()]
+    [Serializable]
     public class AxsException : Exception
     {
         public AxsException()
@@ -40,6 +28,5 @@ namespace AxsUtils
             : base(info, context)
         {
         }
-
     }
 }

@@ -1,13 +1,3 @@
-/**
- * AXS C# Utils
- * Copyright © 2004-2013 LittleLite Software
- * 
- * All Rights Reserved 
- * 
- * AxsUtils.FileManager.cs
- * 
- */
-
 using System;
 using System.IO;
 using System.Text;
@@ -15,54 +5,69 @@ using System.Text.RegularExpressions;
 
 namespace AxsUtils
 {
-	/// <summary>
-	/// File Manager. 
-	/// </summary>
-	public class FileManager
-	{
+    /// <summary>
+    ///     File Manager.
+    /// </summary>
+    public class FileManager
+    {
+        private static FileManager fRef;
+        private string errMsg;
 
-		private static FileManager fRef;
-		private string errMsg;
-
-		private FileManager()
-		{
-			errMsg = String.Empty;
-		}
-
-		/// <summary>
-		/// Error Message. Every time it's called, reset ErrorMessage to "".
-		/// </summary>
-		public string ErrorMessage
-		{
-			get
-			{
-				string err = this.errMsg;
-                this.errMsg = String.Empty;
-				return err;
-			}
-		}
+        private FileManager()
+        {
+            this.errMsg = string.Empty;
+        }
 
         /// <summary>
-        /// Check if filename is valid (does not contain invalid characters)
+        ///     Error Message. Every time it's called, reset ErrorMessage to "".
+        /// </summary>
+        public string ErrorMessage
+        {
+            get
+            {
+                string err = this.errMsg;
+                this.errMsg = string.Empty;
+                return err;
+            }
+        }
+
+        /// <summary>
+        ///     Get the only instance of this class (singleton).
+        /// </summary>
+        /// <returns>Handle to FileManager object</returns>
+        public static FileManager Reference
+        {
+            get
+            {
+                if (fRef == null)
+                {
+                    fRef = new FileManager();
+                }
+                return fRef;
+            }
+        }
+
+        /// <summary>
+        ///     Check if filename is valid (does not contain invalid characters)
         /// </summary>
         /// <param name="inputFileName">Name of the input file.</param>
         /// <returns>
-        /// 	<c>true</c> if [is filename valid] [the specified input file name]; otherwise, <c>false</c>.
+        ///     <c>true</c> if [is filename valid] [the specified input file name]; otherwise, <c>false</c>.
         /// </returns>
         public static bool IsFilenameValid(string inputFileName)
         {
             Match m = Regex.Match(inputFileName, @"[\\\/\:\*\?\" + Convert.ToChar(34) + @"\<\>\|]");
-            return !(m.Success);
+            return !m.Success;
         }
 
         /// <summary>
-        /// Write a binary file
+        ///     Write a binary file
         /// </summary>
         /// <param name="filePath"></param>
         /// <returns>True if the file was correctly written</returns>
-        /// <remarks>In case this method return false, check <see cref="ErrorMessage"/></remarks>
-		public bool WriteBinaryFile(string filePath, byte[] contents)
-		{
+        /// <remarks>In case this method return false, check <see cref="ErrorMessage" /></remarks>
+        public bool WriteBinaryFile(string filePath, byte[] contents)
+        {
             bool okok = true;
             FileStream fs = null;
 
@@ -95,74 +100,72 @@ namespace AxsUtils
         }
 
 
+        /// <summary>
+        ///     Returns true if the given file is Read only
+        /// </summary>
+        /// <param name="fullName">Full file path</param>
+        /// <returns>True if the given file is Read only</returns>
+        public static bool IsReadOnly(string fullName)
+        {
+            bool isReadOnly = false;
+            FileInfo filePath = new FileInfo(fullName);
 
-		/// <summary>
-		/// Returns true if the given file is Read only
-		/// </summary>
-		/// <param name="fullName">Full file path</param>
-		/// <returns>True if the given file is Read only</returns>
-		public static bool IsReadOnly(string fullName)
-		{
-			bool isReadOnly = false;
-			FileInfo filePath = new FileInfo(fullName);
+            if (filePath.Exists)
+            {
+                if ((filePath.Attributes & FileAttributes.ReadOnly) != 0)
+                {
+                    isReadOnly = true;
+                }
+            }
 
-			if (filePath.Exists)
-			{
-				if ((filePath.Attributes & FileAttributes.ReadOnly) != 0)
-				{
-					isReadOnly = true;
-				}
-			}
-
-			return isReadOnly;
-		}
+            return isReadOnly;
+        }
 
         /// <summary>
-        /// Set the attribute read only of a file
+        ///     Set the attribute read only of a file
         /// </summary>
         /// <param name="fullName">Full path of file</param>
         /// <param name="readOnly">If true, the file will be set readonly. Else will be set writable</param>
-        /// <remarks>In case this method return false, check <see cref="ErrorMessage"/></remarks>
+        /// <remarks>In case this method return false, check <see cref="ErrorMessage" /></remarks>
         /// <returns>True, if the attribute was set</returns>
-		public bool SetReadOnly(string fullName, bool readOnly)
-		{
+        public bool SetReadOnly(string fullName, bool readOnly)
+        {
             bool success = true;
-			FileInfo filePath = new FileInfo(fullName);
+            FileInfo filePath = new FileInfo(fullName);
 
-			try
-			{
-				if (filePath.Exists)
-				{
-					FileAttributes attr;
-					if (readOnly)
-					{
-						attr = (FileAttributes)(filePath.Attributes | FileAttributes.ReadOnly);
-					}
-					else
-					{
-						attr = (FileAttributes)(filePath.Attributes - FileAttributes.ReadOnly);
-					}
-					File.SetAttributes(filePath.FullName, attr);
-				}
-
-			}
-			catch (IOException e)
-			{
-				System.Diagnostics.Debug.WriteLine(e.Source);
-				System.Diagnostics.Debug.WriteLine(e.Message);
-				System.Diagnostics.Debug.WriteLine(e.StackTrace);
-				this.errMsg = "Cannot set read only on "+filePath;
+            try
+            {
+                if (filePath.Exists)
+                {
+                    FileAttributes attr;
+                    if (readOnly)
+                    {
+                        attr = filePath.Attributes | FileAttributes.ReadOnly;
+                    }
+                    else
+                    {
+                        attr = (FileAttributes) (filePath.Attributes - FileAttributes.ReadOnly);
+                    }
+                    File.SetAttributes(filePath.FullName, attr);
+                }
+            }
+            catch (IOException e)
+            {
+                System.Diagnostics.Debug.WriteLine(e.Source);
+                System.Diagnostics.Debug.WriteLine(e.Message);
+                System.Diagnostics.Debug.WriteLine(e.StackTrace);
+                this.errMsg = "Cannot set read only on " + filePath;
                 success = false;
-			}
+            }
 
             return success;
-		}
+        }
 
         /// Set the attribute read only of a file
         /// </summary>
         /// <param name="fullName">Full path of file</param>
         /// <param name="readOnly">If true, the file will be set hidden. Else will be set clear</param>
-        /// <remarks>In case this method return false, check <see cref="ErrorMessage"/></remarks>
+        /// <remarks>In case this method return false, check <see cref="ErrorMessage" /></remarks>
         /// <returns>True, if the attribute was set</returns>
         public bool SetHidden(string fullName, bool hidden)
         {
@@ -176,15 +179,14 @@ namespace AxsUtils
                     FileAttributes attr;
                     if (hidden)
                     {
-                        attr = (FileAttributes)(filePath.Attributes | FileAttributes.Hidden);
+                        attr = filePath.Attributes | FileAttributes.Hidden;
                     }
                     else
                     {
-                        attr = (FileAttributes)(filePath.Attributes - FileAttributes.Hidden);
+                        attr = (FileAttributes) (filePath.Attributes - FileAttributes.Hidden);
                     }
                     File.SetAttributes(filePath.FullName, attr);
                 }
-
             }
             catch (IOException e)
             {
@@ -199,16 +201,17 @@ namespace AxsUtils
         }
 
         /// <summary>
-        /// Read a binary file. This method reads a small binary file.
-        /// Since it does not implement a cache, it is not suitable for large files.
+        ///     Read a binary file. This method reads a small binary file.
+        ///     Since it does not implement a cache, it is not suitable for large files.
         /// </summary>
         /// <param name="filePath">Absolute Path of file to read from.</param>
         /// <example>byte[] myFile = myFileObj.ReadBinaryFile(@"C:\log.txt");</example>
-        /// <remarks>In case this method return false, check <see cref="ErrorMessage"/></remarks>
+        /// <remarks>In case this method return false, check <see cref="ErrorMessage" /></remarks>
         /// <returns>Byte contents of the file.</returns>
         /// <exception cref="LLCryptoLibException">Input file too long</exception>
         /// <exception cref="ArgumentNullException" />
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:DisposeObjectsBeforeLosingScope")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability",
+             "CA2000:DisposeObjectsBeforeLosingScope")]
         public byte[] ReadBinaryFile(string filePath)
         {
             if (filePath == null)
@@ -229,13 +232,13 @@ namespace AxsUtils
                 bs = new BinaryReader(bufs);
                 long lFile = bs.BaseStream.Length;
 
-                if (lFile > Int32.MaxValue) // if file > 2GB
+                if (lFile > int.MaxValue) // if file > 2GB
                 {
                     bs.Close();
                     throw new AxsException("Input file too long");
                 }
 
-                file = bs.ReadBytes((int)lFile);
+                file = bs.ReadBytes((int) lFile);
                 this.errMsg = "";
             }
             catch (IOException e)
@@ -260,10 +263,10 @@ namespace AxsUtils
         }
 
         /// <summary>
-        /// Reads a text file.
+        ///     Reads a text file.
         /// </summary>
         /// <param name="filePath">The file path.</param>
-        /// <remarks>In case this method return 'null', check <see cref="ErrorMessage"/>.</remarks>
+        /// <remarks>In case this method return 'null', check <see cref="ErrorMessage" />.</remarks>
         /// <returns>The content of the read file as a string.</returns>
         public string ReadTextFile(string filePath)
         {
@@ -288,27 +291,28 @@ namespace AxsUtils
         }
 
         /// <summary>
-        /// Reads a text file.
+        ///     Reads a text file.
         /// </summary>
         /// <param name="filePath">The file path.</param>
         /// <param name="enc">The text encoding.</param>
         /// <returns>
-        /// The content of the read file as a string.
+        ///     The content of the read file as a string.
         /// </returns>
-        /// <remarks>In case this method return 'null', check <see cref="ErrorMessage"/>.</remarks>
-		public string ReadTextFile(string filePath, Encoding enc)
-		{
+        /// <remarks>In case this method return 'null', check <see cref="ErrorMessage" />.</remarks>
+        public string ReadTextFile(string filePath, Encoding enc)
+        {
             if (enc == null)
             {
                 enc = Encoding.UTF8;
             }
 
-			FileStream fs = null;
-			string retStr = null;
+            FileStream fs = null;
+            string retStr = null;
 
-			try
-			{
-                fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.None, 8192); //we use the default buffer
+            try
+            {
+                fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.None, 8192);
+                    //we use the default buffer
                 StringBuilder result = new StringBuilder(8192);
                 byte[] buffer = new byte[8192];
                 int count = fs.Read(buffer, 0, 8192); //reading a block from the file
@@ -320,96 +324,95 @@ namespace AxsUtils
                 }
 
                 retStr = result.ToString();
+            }
+            catch (IOException e)
+            {
+                System.Diagnostics.Debug.WriteLine(e.Source);
+                System.Diagnostics.Debug.WriteLine(e.Message);
+                System.Diagnostics.Debug.WriteLine(e.StackTrace);
+                this.errMsg = "Cannot load " + filePath;
+                Console.WriteLine(this.errMsg);
+            }
+            finally
+            {
+                if (fs != null) fs.Close();
+            }
 
-			}
-			catch (IOException e)
-			{
-				System.Diagnostics.Debug.WriteLine(e.Source);
-				System.Diagnostics.Debug.WriteLine(e.Message);
-				System.Diagnostics.Debug.WriteLine(e.StackTrace);
-				this.errMsg = "Cannot load "+filePath;
-				Console.WriteLine(this.errMsg);
-			}
-			finally
-			{
-				if (fs!=null) fs.Close();
-			}
-			
-			return retStr;
-		}
-
-		/// <summary>
-		/// Rename a file
-		/// </summary>
-		/// <param name="pathSource">Complete path of the file to be renamed</param>
-		/// <param name="newname">New name of the file - without path</param>
-		/// <returns>True if operation was successful</returns>
-		public bool RenameFile(string pathSource, string newname)
-		{
-			bool success = true;
-
-			try
-			{
-				string fpath = Path.GetDirectoryName(pathSource);
-				File.Move(pathSource,fpath+Path.DirectorySeparatorChar+newname);
-			}
-			catch (IOException exc)
-			{
-				success = false;
-				this.errMsg = exc.Message;
-			}
-
-			return success;
-		}
-
-		/// <summary>
-		/// Reads a Text File
-		/// </summary>
-		/// <param name="absolutePath">Absolute Path of file to read from</param>
-		/// <returns>Text Contents of the file</returns>
-		public string ReadFile(string absolutePath)
-		{
-			return this.ReadFile(absolutePath, Encoding.Default);
-		}
-
-		/// <summary>
-		/// Reads a Text File
-		/// </summary>
-		/// <param name="absolutePath">Absolute Path of file to read from</param>
-		/// <param name="enc">Encoding of the text file. Use Encoding static members.</param>
-		/// <returns>Text Contents of the file</returns>
-		public string ReadFile(string absolutePath, Encoding enc)
-		{
-			StreamReader objReader=null;
-			StringBuilder sb = new StringBuilder();
-
-			try
-			{
-				objReader = new StreamReader(absolutePath,enc,false,1024);
-				sb.Append(objReader.ReadToEnd());
-				errMsg="";
-			}
-			catch (IOException e)
-			{
-				System.Diagnostics.Debug.WriteLine(e.Source);
-				System.Diagnostics.Debug.WriteLine(e.Message);
-				System.Diagnostics.Debug.WriteLine(e.StackTrace);
-				this.errMsg = "Cannot load "+absolutePath;
-				Console.WriteLine(this.errMsg);
-			}
-			finally
-			{
-				if (objReader!=null)
-				{
-					objReader.Close();
-				}
-			}
-
-			return sb.ToString();
-		}
+            return retStr;
+        }
 
         /// <summary>
-        /// Get the size of a file
+        ///     Rename a file
+        /// </summary>
+        /// <param name="pathSource">Complete path of the file to be renamed</param>
+        /// <param name="newname">New name of the file - without path</param>
+        /// <returns>True if operation was successful</returns>
+        public bool RenameFile(string pathSource, string newname)
+        {
+            bool success = true;
+
+            try
+            {
+                string fpath = Path.GetDirectoryName(pathSource);
+                File.Move(pathSource, fpath + Path.DirectorySeparatorChar + newname);
+            }
+            catch (IOException exc)
+            {
+                success = false;
+                this.errMsg = exc.Message;
+            }
+
+            return success;
+        }
+
+        /// <summary>
+        ///     Reads a Text File
+        /// </summary>
+        /// <param name="absolutePath">Absolute Path of file to read from</param>
+        /// <returns>Text Contents of the file</returns>
+        public string ReadFile(string absolutePath)
+        {
+            return this.ReadFile(absolutePath, Encoding.Default);
+        }
+
+        /// <summary>
+        ///     Reads a Text File
+        /// </summary>
+        /// <param name="absolutePath">Absolute Path of file to read from</param>
+        /// <param name="enc">Encoding of the text file. Use Encoding static members.</param>
+        /// <returns>Text Contents of the file</returns>
+        public string ReadFile(string absolutePath, Encoding enc)
+        {
+            StreamReader objReader = null;
+            StringBuilder sb = new StringBuilder();
+
+            try
+            {
+                objReader = new StreamReader(absolutePath, enc, false, 1024);
+                sb.Append(objReader.ReadToEnd());
+                this.errMsg = "";
+            }
+            catch (IOException e)
+            {
+                System.Diagnostics.Debug.WriteLine(e.Source);
+                System.Diagnostics.Debug.WriteLine(e.Message);
+                System.Diagnostics.Debug.WriteLine(e.StackTrace);
+                this.errMsg = "Cannot load " + absolutePath;
+                Console.WriteLine(this.errMsg);
+            }
+            finally
+            {
+                if (objReader != null)
+                {
+                    objReader.Close();
+                }
+            }
+
+            return sb.ToString();
+        }
+
+        /// <summary>
+        ///     Get the size of a file
         /// </summary>
         /// <param name="fileName">Name of the file.</param>
         /// <returns></returns>
@@ -430,156 +433,153 @@ namespace AxsUtils
             return size;
         }
 
-		/// <summary>
-		/// Returns the number of lines inside a text file
-		/// </summary>
-		/// <param name="path"></param>
-		/// <returns>The number of lines inside a text file</returns>
-		public int FileLines(string absolutePath)
-		{
-			StreamReader objReader=null;
-			int lines = 0;
+        /// <summary>
+        ///     Returns the number of lines inside a text file
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns>The number of lines inside a text file</returns>
+        public int FileLines(string absolutePath)
+        {
+            StreamReader objReader = null;
+            int lines = 0;
 
-			try
-			{
-				objReader = new StreamReader(absolutePath);
+            try
+            {
+                objReader = new StreamReader(absolutePath);
 
-				// Determine lines number
-				while (objReader.ReadLine() != null) 
-				{
-					++lines;
-				}
+                // Determine lines number
+                while (objReader.ReadLine() != null)
+                {
+                    ++lines;
+                }
+            }
+            catch (IOException e)
+            {
+                System.Diagnostics.Debug.WriteLine(e.Source);
+                System.Diagnostics.Debug.WriteLine(e.Message);
+                System.Diagnostics.Debug.WriteLine(e.StackTrace);
+                this.errMsg = "Cannot read " + absolutePath;
+                Console.WriteLine(this.errMsg);
+            }
+            finally
+            {
+                if (objReader != null)
+                {
+                    objReader.Close();
+                }
+            }
 
-			}
-			catch (IOException e)
-			{
-				System.Diagnostics.Debug.WriteLine(e.Source);
-				System.Diagnostics.Debug.WriteLine(e.Message);
-				System.Diagnostics.Debug.WriteLine(e.StackTrace);
-				this.errMsg = "Cannot read "+absolutePath;
-				Console.WriteLine(this.errMsg);
-			}
-			finally
-			{
-				if (objReader!=null)
-				{
-					objReader.Close();
-				}
-			}
+            return lines;
+        }
 
-			return lines;
-
-		}
-
-		/// <summary>
-		/// Reads a Text File Line by Line. Return an array of strings,
-		/// using the default encoding.
-		/// </summary>
-		/// <param name="absolutePath">Absolute Path of file to read from</param>
-		/// <returns>Text Contents of the file (one string per line)</returns>
-		public string[] ReadFileLines(string absolutePath)
-		{
-			return (this.ReadFileLines(absolutePath, Encoding.Default));
-		}
+        /// <summary>
+        ///     Reads a Text File Line by Line. Return an array of strings,
+        ///     using the default encoding.
+        /// </summary>
+        /// <param name="absolutePath">Absolute Path of file to read from</param>
+        /// <returns>Text Contents of the file (one string per line)</returns>
+        public string[] ReadFileLines(string absolutePath)
+        {
+            return this.ReadFileLines(absolutePath, Encoding.Default);
+        }
 
 
-		/// <summary>
-		/// Reads a Text File Line by Line. Return an array of strings.
-		/// </summary>
-		/// <param name="absolutePath">Absolute Path of file to read from</param>
-		/// <param name="enc">Encoding of the text file. Use Encoding static members.</param>
-		/// <returns>Text Contents of the file (one string per line)</returns>
-		public string[] ReadFileLines(string absolutePath, Encoding enc)
-		{
-			StreamReader objReader=null;
-			string[] contents = null;
+        /// <summary>
+        ///     Reads a Text File Line by Line. Return an array of strings.
+        /// </summary>
+        /// <param name="absolutePath">Absolute Path of file to read from</param>
+        /// <param name="enc">Encoding of the text file. Use Encoding static members.</param>
+        /// <returns>Text Contents of the file (one string per line)</returns>
+        public string[] ReadFileLines(string absolutePath, Encoding enc)
+        {
+            StreamReader objReader = null;
+            string[] contents = null;
 
-			try
-			{
-				int lines = this.FileLines(absolutePath);
+            try
+            {
+                int lines = this.FileLines(absolutePath);
 
-				if (lines>0)
-				{
-					objReader = new StreamReader(absolutePath,enc,false,1024);
-					contents = new string[lines];
+                if (lines > 0)
+                {
+                    objReader = new StreamReader(absolutePath, enc, false, 1024);
+                    contents = new string[lines];
 
-					for (int j=0; j<lines; j++) 
-					{
+                    for (int j = 0; j < lines; j++)
+                    {
                         contents[j] = objReader.ReadLine();
-					}
-				}
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                contents = null;
+                System.Diagnostics.Debug.WriteLine(e.Source);
+                System.Diagnostics.Debug.WriteLine(e.Message);
+                System.Diagnostics.Debug.WriteLine(e.StackTrace);
+                this.errMsg = "Cannot read " + absolutePath;
+                Console.WriteLine(this.errMsg);
+            }
+            finally
+            {
+                if (objReader != null)
+                {
+                    objReader.Close();
+                }
+            }
 
-			}
-			catch (IOException e)
-			{
-				contents = null;
-				System.Diagnostics.Debug.WriteLine(e.Source);
-				System.Diagnostics.Debug.WriteLine(e.Message);
-				System.Diagnostics.Debug.WriteLine(e.StackTrace);
-				this.errMsg = "Cannot read "+absolutePath;
-				Console.WriteLine(this.errMsg);
-			}
-			finally
-			{
-				if (objReader!=null)
-				{
-					objReader.Close();
-				}
-			}
+            return contents;
+        }
 
-			return contents;
-		}
+        /// <summary>
+        ///     Delete file
+        /// </summary>
+        /// <param name="absolutePath">Absolute path of file to delete</param>
+        /// <returns>True if file was actually deleted</returns>
+        public bool DeleteFile(string absolutePath)
+        {
+            this.errMsg = "";
 
-		/// <summary>
-		/// Delete file
-		/// </summary>
-		/// <param name="absolutePath">Absolute path of file to delete</param>
-		/// <returns>True if file was actually deleted</returns>
-		public bool DeleteFile(string absolutePath)
-		{
-			this.errMsg="";
+            try
+            {
+                File.Delete(absolutePath);
+            }
+            catch (IOException ioex)
+            {
+                this.errMsg = "Can't delete " + absolutePath + ": " + ioex.Message;
+                return false;
+            }
 
-			try
-			{
-				File.Delete(absolutePath);
-			}
-			catch (IOException ioex)
-			{
-				this.errMsg="Can't delete "+absolutePath+": "+ioex.Message;
-				return false;
-			}
-
-			if (File.Exists(absolutePath))
-			{
-				this.errMsg="Can't delete : "+absolutePath;
-				return false;
-			}
-			return true;
-		}
-
-
-		/// <summary>
-		/// Save File
-		/// </summary>
-		/// <param name="absolutePath">Absolute path of file to save</param>
-		/// <param name="contents">String contents</param>
-		/// <returns>True, if file was correctly saved. If false, read ErrorMessage property to know what happened</returns>
-		public bool SaveFile(string absolutePath, string contents)
-		{
-			return this.SaveFile(absolutePath,contents,false);
-		}
+            if (File.Exists(absolutePath))
+            {
+                this.errMsg = "Can't delete : " + absolutePath;
+                return false;
+            }
+            return true;
+        }
 
 
-		/// <summary>
-		/// Save File as UTF-8 text file
-		/// </summary>
-		/// <param name="absolutePath">Absolute path of file to sav</param>
-		/// <param name="contents">String contents</param>
-		/// <param name="append">If true, contents will be append to absolutePath</param>
-		/// <returns>True, if file was correctly saved. If false, read ErrorMessage property to know what happened</returns>
-		public bool SaveFile(string absolutePath, string contents, bool append)
-		{
-			bool okok = false;
+        /// <summary>
+        ///     Save File
+        /// </summary>
+        /// <param name="absolutePath">Absolute path of file to save</param>
+        /// <param name="contents">String contents</param>
+        /// <returns>True, if file was correctly saved. If false, read ErrorMessage property to know what happened</returns>
+        public bool SaveFile(string absolutePath, string contents)
+        {
+            return this.SaveFile(absolutePath, contents, false);
+        }
+
+
+        /// <summary>
+        ///     Save File as UTF-8 text file
+        /// </summary>
+        /// <param name="absolutePath">Absolute path of file to sav</param>
+        /// <param name="contents">String contents</param>
+        /// <param name="append">If true, contents will be append to absolutePath</param>
+        /// <returns>True, if file was correctly saved. If false, read ErrorMessage property to know what happened</returns>
+        public bool SaveFile(string absolutePath, string contents, bool append)
+        {
+            bool okok = false;
 
             if (absolutePath == null)
             {
@@ -595,7 +595,6 @@ namespace AxsUtils
 
             try
             {
-                
                 if (append)
                 {
                     fSave = File.AppendText(absolutePath);
@@ -607,8 +606,7 @@ namespace AxsUtils
 
                 fSave.WriteLine(contents);
                 okok = true;
-                this.errMsg = String.Empty;
-
+                this.errMsg = string.Empty;
             }
             catch (IOException e)
             {
@@ -627,23 +625,23 @@ namespace AxsUtils
                     fSave.Close();
                 }
             }
-        
-			return okok;
-		}
 
-		/// <summary>
-		/// File Existance
-		/// </summary>
-		/// <param name="absolutePath"></param>
-		/// <returns></returns>
-		public bool ExistFile(string absolutePath)
-		{
-			errMsg="";
-			return File.Exists(absolutePath);
-		}
+            return okok;
+        }
 
         /// <summary>
-        /// Copy entire folder recursively
+        ///     File Existance
+        /// </summary>
+        /// <param name="absolutePath"></param>
+        /// <returns></returns>
+        public bool ExistFile(string absolutePath)
+        {
+            this.errMsg = "";
+            return File.Exists(absolutePath);
+        }
+
+        /// <summary>
+        ///     Copy entire folder recursively
         /// </summary>
         /// <param name="sourceFolderPath">The folder to be copied.</param>
         /// <param name="destinationFolderPath">The folder to where the folder to be copied will be copied.</param>
@@ -652,15 +650,15 @@ namespace AxsUtils
         {
             if (Directory.Exists(sourceFolderPath))
             {
-
-                if (Directory.Exists(destinationFolderPath + "\\" + (new DirectoryInfo(sourceFolderPath).Name)) && (!overwrite))
+                if (Directory.Exists(destinationFolderPath + "\\" + new DirectoryInfo(sourceFolderPath).Name) &&
+                    !overwrite)
                 {
                     this.errMsg = "Folder " + destinationFolderPath + " already exists.";
                     return false;
                 }
-                else if (!Directory.Exists(destinationFolderPath + "\\" + (new DirectoryInfo(sourceFolderPath).Name)))
+                if (!Directory.Exists(destinationFolderPath + "\\" + new DirectoryInfo(sourceFolderPath).Name))
                 {
-                    Directory.CreateDirectory(destinationFolderPath + "\\" + (new DirectoryInfo(sourceFolderPath).Name));
+                    Directory.CreateDirectory(destinationFolderPath + "\\" + new DirectoryInfo(sourceFolderPath).Name);
                 }
 
                 //Copy all the files
@@ -668,7 +666,8 @@ namespace AxsUtils
 
                 foreach (FileInfo fi in fiA)
                 {
-                    string newFileName = destinationFolderPath + "\\" + (new DirectoryInfo(sourceFolderPath).Name) + "\\" + fi.Name;
+                    string newFileName = destinationFolderPath + "\\" + new DirectoryInfo(sourceFolderPath).Name + "\\" +
+                                         fi.Name;
                     if (File.Exists(newFileName))
                     {
                         File.Delete(newFileName);
@@ -677,11 +676,11 @@ namespace AxsUtils
                 }
 
                 //Recursively fill the child directories
-                DirectoryInfo[] diA = new System.IO.DirectoryInfo(sourceFolderPath).GetDirectories();
+                DirectoryInfo[] diA = new DirectoryInfo(sourceFolderPath).GetDirectories();
                 foreach (DirectoryInfo di in diA)
                 {
-                    this.CopyFolder(di.FullName, destinationFolderPath + "\\" + (new DirectoryInfo(sourceFolderPath).Name), overwrite);
-
+                    this.CopyFolder(di.FullName, destinationFolderPath + "\\" + new DirectoryInfo(sourceFolderPath).Name,
+                        overwrite);
                 }
             }
             else
@@ -691,28 +690,27 @@ namespace AxsUtils
             }
 
             return true;
-
         }
 
-		/// <summary>
-		/// Return the path of a file, given its absolute path complete of file name.
-		/// It returns the string without the file name, and without the last "\".
-		/// </summary>
-		/// <param name="completeAbsolutePath">absolute path complete of file name</param>
-		/// <returns>A string representing the path of the file</returns>
-		public static string GetPath(string completeAbsolutePath)
-		{
+        /// <summary>
+        ///     Return the path of a file, given its absolute path complete of file name.
+        ///     It returns the string without the file name, and without the last "\".
+        /// </summary>
+        /// <param name="completeAbsolutePath">absolute path complete of file name</param>
+        /// <returns>A string representing the path of the file</returns>
+        public static string GetPath(string completeAbsolutePath)
+        {
             if (completeAbsolutePath == null)
             {
                 throw new ArgumentNullException("completeAbsolutePath");
             }
 
-			int fileNamePos = completeAbsolutePath.LastIndexOf("\\");
-			return completeAbsolutePath.Substring(0,fileNamePos);
-		}
+            int fileNamePos = completeAbsolutePath.LastIndexOf("\\");
+            return completeAbsolutePath.Substring(0, fileNamePos);
+        }
 
         /// <summary>
-        /// If the given file or directory exists
+        ///     If the given file or directory exists
         /// </summary>
         /// <param name="fileOrDirectoryPath">The file or directory path.</param>
         /// <returns>True if this file or directory exists</returns>
@@ -734,22 +732,5 @@ namespace AxsUtils
 
             return exists;
         }
-
-		/// <summary>
-		/// Get the only instance of this class (singleton).
-		/// </summary>
-		/// <returns>Handle to FileManager object</returns>
-		public static FileManager Reference
-		{
-            get
-            {
-                if (fRef == null)
-                {
-                    fRef = new FileManager();
-                }
-                return fRef;
-            }
-		}
-
-	}
+    }
 }

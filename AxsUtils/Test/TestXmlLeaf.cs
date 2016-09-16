@@ -1,12 +1,3 @@
-/**
- * AXS C# Utils
- * Copyright Copyright (C) 2004-2009 LittleLite Software
- * 
- * All rights reserved
- * 
- * AxsUtils.Tests.TestXmlLeaf.cs
- * 
- */
 
 #if ENABLE_TESTS
 
@@ -89,4 +80,3 @@ namespace AxsUtils.Tests
 }
 
 #endif
-

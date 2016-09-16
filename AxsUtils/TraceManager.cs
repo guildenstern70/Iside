@@ -1,19 +1,8 @@
-﻿/**
- * AXS C# Utils
- * Copyright © 2004-2013 LittleLite Software
- * 
- * All Rights Reserved
- * 
- * AxsUtils.TraceManager.cs
- * 
- */
-
-using System;
+﻿using System;
 using System.Diagnostics;
 
 namespace AxsUtils
 {
-
     public static class TraceManager
     {
         public static void Error(string message, string module)
@@ -39,12 +28,11 @@ namespace AxsUtils
         private static void WriteLine(string message, string type, string module)
         {
             Trace.WriteLine(
-                    string.Format("{0} - {1} - {2} > {3}",
-                                  DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
-                                  type,
-                                  module,
-                                  message));
+                string.Format("{0} - {1} - {2} > {3}",
+                    DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+                    type,
+                    module,
+                    message));
         }
-
     }
 }

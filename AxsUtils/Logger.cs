@@ -1,29 +1,17 @@
-/**
- * AXS C# Utils
- * Copyright © 2004-2013 LittleLite Software
- * 
- * All Rights Reserved
- * 
- * AxsUtils.Logger.cs
- * 
- */
-
 using System;
-using System.Text;
-using System.Globalization;
 using System.Diagnostics;
-using System.IO;
+using System.Globalization;
+using System.Text;
 
 namespace AxsUtils
 {
     /// <summary>
-    /// A logger utility class based on trace .NET
+    ///     A logger utility class based on trace .NET
     /// </summary>
     public class Logger
     {
-    
         /// <summary>
-        /// Logs the specified message.
+        ///     Logs the specified message.
         /// </summary>
         /// <param name="message">The message.</param>
         public static void Log(string message)
@@ -37,15 +25,15 @@ namespace AxsUtils
         }
 
         /// <summary>
-        /// Adds an empty line.
+        ///     Adds an empty line.
         /// </summary>
         public static void AddEmptyLine()
         {
-            Trace.WriteLine(String.Empty);
+            Trace.WriteLine(string.Empty);
         }
 
         /// <summary>
-        /// Logs the specified message as an error.
+        ///     Logs the specified message as an error.
         /// </summary>
         /// <param name="message">The message.</param>
         public static void LogError(string message)
@@ -57,6 +45,5 @@ namespace AxsUtils
             sb.Append(message.TrimEnd());
             Trace.WriteLine(sb.ToString());
         }
-
     }
 }

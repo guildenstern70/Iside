@@ -1,58 +1,51 @@
-using System;
-using System.Text;
 using System.Collections.Specialized;
 using System.Text.RegularExpressions;
 
 namespace AxsUtils
 {
     /// <summary>
-    /// Arguments class.
-    /// <example>
-    ///  // Command line parsing
-    ///  ArgumentsParser CommandLine=new ArgumentsParser(Args);
-    ///
-    ///   // Look for specific arguments values and display 
-    ///   // them if they exist (return null if they don't)
-    ///  if(CommandLine["param1"] != null) 
-    ///    Console.WriteLine("Param1 value: " + 
-    ///        CommandLine["param1"]);
-    ///  else
-    ///    Console.WriteLine("Param1 not defined !");
-    ///
-    ///  if(CommandLine["height"] != null) 
-    ///    Console.WriteLine("Height value: " + 
-    ///        CommandLine["height"]);
-    ///  else 
-    ///    Console.WriteLine("Height not defined !");
-    ///
-    ///  if(CommandLine["width"] != null) 
-    ///    Console.WriteLine("Width value: " + 
-    ///        CommandLine["width"]);
-    ///  else 
-    ///    Console.WriteLine("Width not defined !");
-    ///
-    ///  if(CommandLine["size"] != null) 
-    ///    Console.WriteLine("Size value: " + 
-    ///        CommandLine["size"]);
-    ///  else 
-    ///    Console.WriteLine("Size not defined !");
-    ///
-    ///  if(CommandLine["debug"] != null) 
-    ///    Console.WriteLine("Debug value: " + 
-    ///        CommandLine["debug"]);
-    ///  else 
-    ///    Console.WriteLine("Debug not defined !");
-    /// </example>
+    ///     Arguments class.
+    ///     <example>
+    ///         // Command line parsing
+    ///         ArgumentsParser CommandLine=new ArgumentsParser(Args);
+    ///         // Look for specific arguments values and display
+    ///         // them if they exist (return null if they don't)
+    ///         if(CommandLine["param1"] != null)
+    ///         Console.WriteLine("Param1 value: " +
+    ///         CommandLine["param1"]);
+    ///         else
+    ///         Console.WriteLine("Param1 not defined !");
+    ///         if(CommandLine["height"] != null)
+    ///         Console.WriteLine("Height value: " +
+    ///         CommandLine["height"]);
+    ///         else
+    ///         Console.WriteLine("Height not defined !");
+    ///         if(CommandLine["width"] != null)
+    ///         Console.WriteLine("Width value: " +
+    ///         CommandLine["width"]);
+    ///         else
+    ///         Console.WriteLine("Width not defined !");
+    ///         if(CommandLine["size"] != null)
+    ///         Console.WriteLine("Size value: " +
+    ///         CommandLine["size"]);
+    ///         else
+    ///         Console.WriteLine("Size not defined !");
+    ///         if(CommandLine["debug"] != null)
+    ///         Console.WriteLine("Debug value: " +
+    ///         CommandLine["debug"]);
+    ///         else
+    ///         Console.WriteLine("Debug not defined !");
+    ///     </example>
     /// </summary>
     public class ArgumentsParser
     {
         // Variables
-        private StringDictionary parameters;
+        private readonly StringDictionary parameters;
 
         // Constructor
         public ArgumentsParser(string[] args)
         {
-            parameters = new StringDictionary();
+            this.parameters = new StringDictionary();
             Regex splitter = new Regex(@"^-{1,2}|^/|=|:",
                 RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
@@ -80,12 +73,12 @@ namespace AxsUtils
                     case 1:
                         if (parameter != null)
                         {
-                            if (!parameters.ContainsKey(parameter))
+                            if (!this.parameters.ContainsKey(parameter))
                             {
                                 parts[0] =
                                     remover.Replace(parts[0], "$1");
 
-                                parameters.Add(parameter, parts[0]);
+                                this.parameters.Add(parameter, parts[0]);
                             }
                             parameter = null;
                         }
@@ -98,8 +91,8 @@ namespace AxsUtils
                         // With no value, set it to true.
                         if (parameter != null)
                         {
-                            if (!parameters.ContainsKey(parameter))
-                                parameters.Add(parameter, "true");
+                            if (!this.parameters.ContainsKey(parameter))
+                                this.parameters.Add(parameter, "true");
                         }
                         parameter = parts[1];
                         break;
@@ -110,17 +103,17 @@ namespace AxsUtils
                         // With no value, set it to true.
                         if (parameter != null)
                         {
-                            if (!parameters.ContainsKey(parameter))
-                                parameters.Add(parameter, "true");
+                            if (!this.parameters.ContainsKey(parameter))
+                                this.parameters.Add(parameter, "true");
                         }
 
                         parameter = parts[1];
 
                         // Remove possible enclosing characters (",')
-                        if (!parameters.ContainsKey(parameter))
+                        if (!this.parameters.ContainsKey(parameter))
                         {
                             parts[2] = remover.Replace(parts[2], "$1");
-                            parameters.Add(parameter, parts[2]);
+                            this.parameters.Add(parameter, parts[2]);
                         }
 
                         parameter = null;
@@ -130,8 +123,8 @@ namespace AxsUtils
             // In case a parameter is still waiting
             if (parameter != null)
             {
-                if (!parameters.ContainsKey(parameter))
-                    parameters.Add(parameter, "true");
+                if (!this.parameters.ContainsKey(parameter))
+                    this.parameters.Add(parameter, "true");
             }
         }
 
@@ -139,10 +132,7 @@ namespace AxsUtils
         // (overriding C# indexer property)
         public string this[string param]
         {
-            get
-            {
-                return (parameters[param]);
-            }
+            get { return this.parameters[param]; }
         }
     }
 }

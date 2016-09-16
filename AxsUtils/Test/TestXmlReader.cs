@@ -1,3 +1,4 @@
+
 #if ENABLE_TESTS
 
 using System;
@@ -54,4 +55,3 @@ namespace AxsUtils.Test
 }
 
 #endif
-

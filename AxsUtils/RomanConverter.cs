@@ -1,54 +1,44 @@
-/*
- * 
- *  xProcs - Tool Collection
- * 
- *  Copyright 1995-2006  Stefan Böther,  xprocs@hotmail.de
- * 
- *  Thanks for Andrei Kireev (Golden Software of Belarus) for his work in (21-Oct-95)  
- * 
- */
-
 using System;
-using System.Collections;
 using System.Text;
 
 namespace AxsUtils
 {
     /// <summary>
-    /// Converter for roman numbers 
+    ///     Converter for roman numbers
     /// </summary>
     public sealed class RomanConverter : ConverterBase
     {
-        private static int MAX = 3998;              
-                
+        private static readonly int MAX = 3998;
+
         public override string ToString(int value)
         {
-            if (value > MAX) 
+            if (value > MAX)
                 throw new ArgumentOutOfRangeException("value");
 
-            string[,] romanDigits = new string[,] {
-                 {"M",      "C",    "X",    "I"    },
-                 {"MM",     "CC",   "XX",   "II"   },
-                 {"MMM",    "CCC",  "XXX",  "III"  },
-                 {null,     "CD",   "XL",   "IV"   },
-                 {null,     "D",    "L",    "V"    },
-                 {null,     "DC",   "LX",   "VI"   },
-                 {null,     "DCC",  "LXX",  "VII"  },
-                 {null,     "DCCC", "LXXX", "VIII" },
-                 {null,     "CM",   "XC",   "IX"   }
+            string[,] romanDigits =
+            {
+                {"M", "C", "X", "I"},
+                {"MM", "CC", "XX", "II"},
+                {"MMM", "CCC", "XXX", "III"},
+                {null, "CD", "XL", "IV"},
+                {null, "D", "L", "V"},
+                {null, "DC", "LX", "VI"},
+                {null, "DCC", "LXX", "VII"},
+                {null, "DCCC", "LXXX", "VIII"},
+                {null, "CM", "XC", "IX"}
             };
 
             StringBuilder result = new StringBuilder(15);
-                       
+
             for (int index = 0; index < 4; index++)
             {
                 int power = (int) Math.Pow(10, 3 - index);
-                int digit = value / power;
-                value -= digit * power;
+                int digit = value/power;
+                value -= digit*power;
                 if (digit > 0)
-                    result.Append(romanDigits[digit - 1,index]);
+                    result.Append(romanDigits[digit - 1, index]);
             }
-            
+
             return result.ToString();
         }
 
@@ -66,7 +56,7 @@ namespace AxsUtils
             {
                 int newValue = RomanDigit(number[index]);
                 if (newValue > oldValue)
-                    result = result + newValue - 2 * oldValue;                
+                    result = result + newValue - 2*oldValue;
                 else
                     result += newValue;
 
@@ -93,10 +83,9 @@ namespace AxsUtils
                     return 500;
                 case 'M':
                     return 1000;
-                default :
+                default:
                     throw new ArgumentOutOfRangeException("digit");
             }
         }
-
     }
 }

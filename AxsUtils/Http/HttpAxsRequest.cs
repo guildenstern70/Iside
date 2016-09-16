@@ -1,68 +1,56 @@
-/**
- * AXS C# Utils
- * Copyright Copyright (C) 2004-2009 LittleLite Software
- * 
- * All Rights Reserved 
- * 
- * AxsUtils.Http.HttpAxsRequest.cs
- * 
- */
-
 using System;
 using System.IO;
 using System.Net;
 using System.Text;
-using System.Web;
 
 namespace AxsUtils.Http
 {
-	/// <summary>
-	/// 
-	/// </summary>
-	public class HttpAxsRequest
-	{
-		private int timeout;
-		private string userAgent;
-		private IWebProxy proxy;
+    /// <summary>
+    /// </summary>
+    public class HttpAxsRequest
+    {
+        private IWebProxy proxy;
+        private readonly int timeout;
+        private readonly string userAgent;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="T:HttpAxsRequest"/> class.
+        ///     Initializes a new instance of the <see cref="T:HttpAxsRequest" /> class.
         /// </summary>
-		public HttpAxsRequest()
-		{
-			this.timeout = 8000;
-			this.userAgent = "Axs Application";
-		}
+        public HttpAxsRequest()
+        {
+            this.timeout = 8000;
+            this.userAgent = "Axs Application";
+        }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="T:HttpAxsRequest"/> class.
+        ///     Initializes a new instance of the <see cref="T:HttpAxsRequest" /> class.
         /// </summary>
         /// <param name="time">The time.</param>
-		public HttpAxsRequest(int time)
-		{
-			this.timeout = time;
-			this.userAgent = "Axs Application";
-		}
+        public HttpAxsRequest(int time)
+        {
+            this.timeout = time;
+            this.userAgent = "Axs Application";
+        }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="T:HttpAxsRequest"/> class.
+        ///     Initializes a new instance of the <see cref="T:HttpAxsRequest" /> class.
         /// </summary>
         /// <param name="time">The time.</param>
         /// <param name="agent">The agent.</param>
-		public HttpAxsRequest(int time, string agent)
-		{
-			this.timeout = time;
-			this.userAgent = agent;
-		}
+        public HttpAxsRequest(int time, string agent)
+        {
+            this.timeout = time;
+            this.userAgent = agent;
+        }
 
         /// <summary>
-        /// Sets the proxy.
+        ///     Sets the proxy.
         /// </summary>
         /// <param name="proxy">The proxy.</param>
         /// <param name="port">The port.</param>
-		public void SetProxy(string inProxy, string port)
-		{
-			string proxyport = inProxy+":"+port;
+        public void SetProxy(string inProxy, string port)
+        {
+            string proxyport = inProxy + ":" + port;
             try
             {
                 WebProxy loProxy = new WebProxy(proxyport, true);
@@ -73,18 +61,18 @@ namespace AxsUtils.Http
                 System.Diagnostics.Debug.WriteLine(uff.ToString());
                 this.proxy = null;
             }
-		}
+        }
 
         /// <summary>
-        /// Sets the proxy.
+        ///     Sets the proxy.
         /// </summary>
         /// <param name="proxy">The proxy.</param>
         /// <param name="port">The port.</param>
         /// <param name="username">The username.</param>
         /// <param name="password">The password.</param>
-		public void SetProxy(string iProxy, string port, string username, string password)
-		{
-			string proxyport = iProxy+":"+port;
+        public void SetProxy(string iProxy, string port, string username, string password)
+        {
+            string proxyport = iProxy + ":" + port;
             try
             {
                 WebProxy loProxy = new WebProxy(proxyport, true);
@@ -96,10 +84,10 @@ namespace AxsUtils.Http
                 System.Diagnostics.Debug.WriteLine(uff.ToString());
                 this.proxy = null;
             }
-		}
+        }
 
         /// <summary>
-        /// Sets the proxy.
+        ///     Sets the proxy.
         /// </summary>
         /// <param name="subProxy">The proxy object</param>
         public void SetProxy(IWebProxy subProxy)
@@ -108,72 +96,73 @@ namespace AxsUtils.Http
         }
 
         /// <summary>
-        /// Makes the request.
+        ///     Makes the request.
         /// </summary>
         /// <param name="url">The URL.</param>
         /// <param name="page">The page.</param>
         /// <returns></returns>
-		public string MakeRequest(string url, string page)
-		{
-			string lcUrl = url+page;
-			string lcXml;
+        public string MakeRequest(string url, string page)
+        {
+            string lcUrl = url + page;
+            string lcXml;
 
-			HttpWebResponse loWebResponse = null;
-			StreamReader loResponseStream = null;
+            HttpWebResponse loWebResponse = null;
+            StreamReader loResponseStream = null;
             Uri webUri = new Uri(lcUrl);
 
-			try
-			{
-				// *** Establish the request 
-                HttpWebRequest loHttp = (HttpWebRequest)WebRequest.Create(webUri);
+            try
+            {
+                // *** Establish the request 
+                HttpWebRequest loHttp = (HttpWebRequest) WebRequest.Create(webUri);
 
-				// *** Set properties
-				loHttp.Timeout = this.timeout;     
-				loHttp.UserAgent = this.userAgent;
-				if (this.proxy!=null)
-				{
-					loHttp.Proxy = this.proxy;
-				}
+                // *** Set properties
+                loHttp.Timeout = this.timeout;
+                loHttp.UserAgent = this.userAgent;
+                if (this.proxy != null)
+                {
+                    loHttp.Proxy = this.proxy;
+                }
 
-				// *** Retrieve request info headers
-				loWebResponse = (HttpWebResponse)loHttp.GetResponse();
-				Encoding enc = Encoding.UTF8;
+                // *** Retrieve request info headers
+                loWebResponse = (HttpWebResponse) loHttp.GetResponse();
+                Encoding enc = Encoding.UTF8;
 
-				loResponseStream = 
-					new StreamReader(loWebResponse.GetResponseStream(),enc);
+                loResponseStream =
+                    new StreamReader(loWebResponse.GetResponseStream(), enc);
 
-				lcXml = loResponseStream.ReadToEnd();
-			}
-			catch (Exception exc)
-			{
-				lcXml = "Error: "+exc.Message;
+                lcXml = loResponseStream.ReadToEnd();
+            }
+            catch (Exception exc)
+            {
+                lcXml = "Error: " + exc.Message;
 #if (DEBUG)
-				Console.WriteLine(lcXml);
-				Console.WriteLine(exc.StackTrace);
+                Console.WriteLine(lcXml);
+                Console.WriteLine(exc.StackTrace);
 #endif
-			}
-			finally
-			{
-				if (loWebResponse!=null)
-					loWebResponse.Close();
-				if (loResponseStream!=null)
-					loResponseStream.Close();	
-			}
+            }
+            finally
+            {
+                if (loWebResponse != null)
+                    loWebResponse.Close();
+                if (loResponseStream != null)
+                    loResponseStream.Close();
+            }
 
-			return lcXml;
-		}
+            return lcXml;
+        }
 
-//		/// <summary>
-//		/// TO BE COMPLETED
-//		/// </summary>
-//		/// <returns></returns>
-//		public string MakePostRequest()
-//		{
+//				(HttpWebRequest) WebRequest.Create(lcUrl);
+//			HttpWebRequest loHttp = 
+//
 
 //			string lcUrl = HttpAxsRequest.LittleLiteURL+HttpAxsRequest.LittleLiteVersionsPage;
-//
-//			HttpWebRequest loHttp = 
-//				(HttpWebRequest) WebRequest.Create(lcUrl);
+//		{
+//		public string MakePostRequest()
+//		/// <returns></returns>
+//		/// </summary>
+//		/// TO BE COMPLETED
+
+//		/// <summary>
 //
 //			// *** Send any POST data
 //			string lcPostData = "";
@@ -208,8 +197,5 @@ namespace AxsUtils.Http
 //			return readStr;
 
 //		}
-
-
-	}
+    }
 }
-

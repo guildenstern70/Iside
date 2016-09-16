@@ -1,21 +1,7 @@
-/*
- * 
- *  xProcs - Tool Collection
- * 
- *  Copyright 1995-2006  Stefan Böther,  xprocs@hotmail.de
- * 
- *  Feel free to use this library into your own projects. A small eMail that you
- *  use it and with a suggestion for improving and from where you came would be nice :-)
- */
-
-using System;
-using System.Collections;
-using System.Text;
-
 namespace AxsUtils
 {
     /// <summary>
-    /// Abstract Converter class
+    ///     Abstract Converter class
     /// </summary>
     public abstract class ConverterBase
     {
@@ -24,11 +10,11 @@ namespace AxsUtils
         private static volatile ConverterBase hexadecimal;
         private static volatile ConverterBase octal;
         private static volatile ConverterBase binary;
-               
+
         /// <summary>
-        /// Singleton access a converter for roman numbers
+        ///     Singleton access a converter for roman numbers
         /// </summary>
-        static public ConverterBase Roman
+        public static ConverterBase Roman
         {
             get
             {
@@ -39,9 +25,9 @@ namespace AxsUtils
         }
 
         /// <summary>
-        /// Singleton access a converter for hexadecimal numbers
+        ///     Singleton access a converter for hexadecimal numbers
         /// </summary>
-        static public ConverterBase Hexadecimal
+        public static ConverterBase Hexadecimal
         {
             get
             {
@@ -52,9 +38,9 @@ namespace AxsUtils
         }
 
         /// <summary>
-        /// Singleton access a converter for octal numbers
+        ///     Singleton access a converter for octal numbers
         /// </summary>
-        static public ConverterBase Octal
+        public static ConverterBase Octal
         {
             get
             {
@@ -65,9 +51,9 @@ namespace AxsUtils
         }
 
         /// <summary>
-        /// Singleton access a converter for octal numbers
+        ///     Singleton access a converter for octal numbers
         /// </summary>
-        static public ConverterBase Binary
+        public static ConverterBase Binary
         {
             get
             {
@@ -78,22 +64,18 @@ namespace AxsUtils
         }
 
 
-
-
         /// <summary>
-        /// Convert a integer value into the foreign number system
+        ///     Convert a integer value into the foreign number system
         /// </summary>
         /// <param name="value">Value</param>
         /// <returns>number</returns>
         public abstract string ToString(int value);
 
         /// <summary>
-        /// Convert from a number system into a integer value
+        ///     Convert from a number system into a integer value
         /// </summary>
         /// <param name="number">number in different system</param>
         /// <returns>Integer-Value</returns>
         public abstract int ToInt(string number);
-
     }
-
 }
